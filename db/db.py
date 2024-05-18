@@ -1,5 +1,4 @@
 from uuid import uuid4
-from pydantic import BaseModel
 
 from data_models.categories import (
     Categories,
@@ -39,7 +38,7 @@ items = {
 }
 
 
-def get_items(category: Categories | None = None):
+def get_items(category: Categories | None = None) -> list:
     if isinstance(category, Categories):
         return items.get(category, [])
     return items
