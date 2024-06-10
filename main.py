@@ -1,13 +1,11 @@
 from fastapi import FastAPI
 
-from db.db import get_items
-from data_models.categories import (
-    Categories,
-    Item,
-    get_category_models
-)
+from db.db import Item, get_items_all, get_items_categories, add_item, CATEGORIES_SCHEMA
 
-
+# Use Field(... class from pydantic (pt 8)
+# Use Body (pt11), Body(..., embed=True) class from pydantic (pt 8)
+# Add images (pt9 )
+# Add examples of requests pt 10 with model_config
 app = FastAPI()
 
 
@@ -16,17 +14,25 @@ def home():
     return {"message": "Welcome to my marketplace ;)"}
 
 
-@app.get("/{category}")
-def get_category_items(category: Categories):
-    return get_items(category)
+# TODO: Add query (pt: 5, 6, 7)
+# Param's query as a standard query / filter for db searches (for GET, POST, PUT, ...)
+# U can add query attr to returned item to keep info on condition it was retrieved
+# Use Query class from fastapi to standarize it
+# Use Query(...
+
+@app.get("/items")
+def get_category_items():
+    return get_items_all()
 
 
-@app.post("/{category}/create_item")
-def post_category_create_item(category: Categories, item: Item):
-    item_model: Item = get_category_models(category).item_model
-    item: Item = item_model.model_validate(item.model_dump())
-    
-    items: list = get_items(category)
-    items.append(item)
+@app.get("/items/{category}")
+def get_category_items(category: str):
+    if category not in CATEGORIES_SCHEMA:
+        return {"message": "category unknown"}
 
-    return item
+    return get_items_categories({category}, strict=False)
+
+
+@app.post("/create_item")
+def post_category_create_item(item: Item):
+    return add_item(item)
