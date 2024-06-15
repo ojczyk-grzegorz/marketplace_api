@@ -36,14 +36,14 @@ class ItemDb(Item):
 
 
 
-def add_item(item: Item):
+def create_items_db(item: Item):
     db_item = ItemDb.model_validate(item.model_dump())
     items.append(db_item)
 
     return db_item
 
 
-def get_items_all():
+def get_items_db():
     return items
 
 
