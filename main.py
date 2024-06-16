@@ -17,7 +17,7 @@ def get_items():
     with MongoClient("mongodb://localhost:27017/") as client:
         db = client["marketplaceApi"]
         collection = db["items"]
-        results: list = list(collection.find().)
+        results: list = list(collection.find())
     return str(results)
 
 
