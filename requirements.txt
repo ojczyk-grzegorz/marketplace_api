@@ -6,3 +6,4 @@ pandas
 pandasql
 requests
 pymongo
+bson

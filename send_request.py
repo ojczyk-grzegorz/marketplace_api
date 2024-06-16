@@ -15,7 +15,7 @@ body: dict = req_data.get("body", {})
 response = requests.request(
     method,
     url=url + route,
-    data=body
+    json=body
 )
 
 print(
