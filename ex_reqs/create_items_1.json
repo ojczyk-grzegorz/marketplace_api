@@ -1,13 +1,25 @@
 {
     "method": "POST",
     "route": "create_items",
-    "body": [{
-        "name": "Mazda XS",
-        "price": 12000.50,
-        "currency": "PLN",
-        "categories": ["vehicles"],
-        "subcategories": ["cars"],
-        "description": "Super fast car",
-        "post": "Please buy"
-    }]
+    "body": [
+        {
+            "name": "Mazda XS",
+            "price": {
+                "currency": "PLN",
+                "base_100": 1200050,
+                "tax_100": 0
+            },
+            "post": {
+                "description": "Super fast car",
+                "post": "Please buy"
+            },
+            "features": {},
+            "categories": [
+                "vehicles"
+            ],
+            "subcategories": [
+                "cars"
+            ]
+        }
+    ]
 }

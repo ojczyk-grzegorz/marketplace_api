@@ -17,18 +17,40 @@ class MongoDocument(BaseModel):
 class MongoCursor(BaseModel):
     records: list[MongoDocument]
 
-class Item(BaseModel):
-    name: str
-    price: Decimal
+
+class ItemPrice(BaseModel):
+    model_config=ConfigDict(extra="allow")
+    
     currency: str
-    categories: list[str]
-    subcategories: list[str]
+    base_100: int
+    tax_100: int
+
+class ItemFeatures(BaseModel):
+    model_config=ConfigDict(extra="allow")
+
+
+class ItemPost(BaseModel):
+    model_config=ConfigDict(extra="allow")
+
     description: str | None = None
     post: str | None = None
+
+class Item(BaseModel):
+    _id: str | None = None
+    name: str
+    price: ItemPrice
+    post: ItemPost
+    features: ItemFeatures
+    categories: list[str]
+    subcategories: list[str]
+
+class RequestItemsCreate(BaseModel):
+    items: list[Item]
 
 
 app = FastAPI()
 db = MongoClient("mongodb://localhost:27017/")["marketplaceApi"]
+db_items = db["items"]
 
 @app.get("/", description="Home page")
 def home():
@@ -38,14 +60,17 @@ def home():
 @app.get("/items")
 def get_items():
     return MongoCursor(
-        records=db["items"].find()
+        records=db_items.find()
     ).records
 
 
 @app.post("/create_items")
 def create_items(items: list[Item]):
-    response = db["items"].insert_many([item.model_dump() for item in items])
-    return [str(x) for x in response.inserted_ids]
+
+    response = db_items.insert_many(
+        x.model_dump(exclude_none=True) for x in items
+    )
+    return (str(x) for x in response.inserted_ids)
 
 
 @app.get("/categories")
