@@ -1,0 +1,92 @@
+{
+    "method": "POST",
+    "route": "create_items",
+    "body": {
+        "items": [
+            {
+                "name": "BMW X1",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 5600000,
+                    "tax_100": 120000
+                },
+                "post": {
+                    "description": "Super fast car",
+                    "post": "Please buy"
+                },
+                "features": [
+                    {
+                        "name": "seats",
+                        "value": "leather"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "cars"
+                    }
+                ]
+            },
+            {
+                "name": "Audi Q7",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 7000000,
+                    "tax_100": 150000
+                },
+                "post": {
+                    "description": "Luxury SUV",
+                    "post": "Best in class"
+                },
+                "features": [
+                    {
+                        "name": "seats",
+                        "value": "leather"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "cars"
+                    }
+                ]
+            },
+            {
+                "name": "Mercedes C-Class",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 6200000,
+                    "tax_100": 130000
+                },
+                "post": {
+                    "description": "Elegant sedan",
+                    "post": "Drive with style"
+                },
+                "features": [
+                    {
+                        "name": "seats",
+                        "value": "leather"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "cars"
+                    }
+                ]
+            }
+        ]
+    }
+}

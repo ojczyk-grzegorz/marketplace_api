@@ -1,0 +1,176 @@
+{
+    "method": "POST",
+    "route": "create_items",
+    "body": {
+        "items": [
+            {
+                "name": "Tesla Model 3",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 8000000,
+                    "tax_100": 0
+                },
+                "post": {
+                    "description": "Electric car",
+                    "post": "Future of driving"
+                },
+                "features": [
+                    {
+                        "name": "battery",
+                        "value": "long range"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "electric"
+                    }
+                ]
+            },
+            {
+                "name": "Toyota Corolla",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 3000000,
+                    "tax_100": 50000
+                },
+                "post": {
+                    "description": "Reliable and efficient",
+                    "post": "Value for money"
+                },
+                "features": [
+                    {
+                        "name": "fuel economy",
+                        "value": "high"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "sedans"
+                    }
+                ]
+            },
+            {
+                "name": "Ford Mustang",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 9500000,
+                    "tax_100": 200000
+                },
+                "post": {
+                    "description": "Classic muscle car",
+                    "post": "Feel the power"
+                },
+                "features": [
+                    {
+                        "name": "engine",
+                        "value": "V8"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "sports cars"
+                    }
+                ]
+            },
+            {
+                "name": "Honda CR-V",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 4000000,
+                    "tax_100": 80000
+                },
+                "post": {
+                    "description": "Versatile SUV",
+                    "post": "Perfect for families"
+                },
+                "features": [
+                    {
+                        "name": "seats",
+                        "value": "fabric"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "SUVs"
+                    }
+                ]
+            },
+            {
+                "name": "Chevrolet Camaro",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 8500000,
+                    "tax_100": 180000
+                },
+                "post": {
+                    "description": "Performance and style",
+                    "post": "Own the road"
+                },
+                "features": [
+                    {
+                        "name": "engine",
+                        "value": "V6"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "sports cars"
+                    }
+                ]
+            },
+            {
+                "name": "Nissan Leaf",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 4500000,
+                    "tax_100": 0
+                },
+                "post": {
+                    "description": "Affordable electric",
+                    "post": "Eco-friendly"
+                },
+                "features": [
+                    {
+                        "name": "battery",
+                        "value": "medium range"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "electric"
+                    }
+                ]
+            }
+        ]
+    }
+}

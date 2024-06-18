@@ -1,25 +1,36 @@
 {
     "method": "POST",
     "route": "create_items",
-    "body": [
-        {
-            "name": "Mazda XS",
-            "price": {
-                "currency": "PLN",
-                "base_100": 1200050,
-                "tax_100": 0
-            },
-            "post": {
-                "description": "Super fast car",
-                "post": "Please buy"
-            },
-            "features": {},
-            "categories": [
-                "vehicles"
-            ],
-            "subcategories": [
-                "cars"
-            ]
-        }
-    ]
+    "body": {
+        "items": [
+            {
+                "name": "BMW X1",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 5600000,
+                    "tax_100": 120000
+                },
+                "post": {
+                    "description": "Super fast car",
+                    "post": "Please buy"
+                },
+                "features": [
+                    {
+                        "name": "seats",
+                        "value": "leather"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "cars"
+                    }
+                ]
+            }
+        ]
+    }
 }
