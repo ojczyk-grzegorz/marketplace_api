@@ -1,0 +1,660 @@
+{
+    "method": "POST",
+    "route": "create_items",
+    "body": {
+        "items": [
+            {
+                "user_id": "user_id_5",
+                "name": "Audi A4",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 4000000,
+                    "tax_100": 80000
+                },
+                "post": {
+                    "description": "Comfortable and reliable",
+                    "post": "Great deal!"
+                },
+                "features": [
+                    {
+                        "name": "engine",
+                        "value": "2.0 TDI"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "cars"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_5",
+                "name": "Toyota Corolla",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 2500000,
+                    "tax_100": 50000
+                },
+                "post": {
+                    "description": "Fuel-efficient and reliable",
+                    "post": "Perfect for everyday use"
+                },
+                "features": [
+                    {
+                        "name": "transmission",
+                        "value": "automatic"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "cars"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_5",
+                "name": "iPhone 14 Pro",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 100000,
+                    "tax_100": 1000
+                },
+                "post": {
+                    "description": "The latest and greatest iPhone",
+                    "post": "Pre-order now!"
+                },
+                "features": [
+                    {
+                        "name": "camera",
+                        "value": "48MP"
+                    },
+                    {
+                        "name": "storage",
+                        "value": "1TB"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "electronics"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "smartphones"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_5",
+                "name": "Sony PlayStation 5",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 50000,
+                    "tax_100": 500
+                },
+                "post": {
+                    "description": "Next-generation gaming console",
+                    "post": "Experience the future of gaming"
+                },
+                "features": [
+                    {
+                        "name": "processor",
+                        "value": "AMD Ryzen"
+                    },
+                    {
+                        "name": "storage",
+                        "value": "825GB SSD"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "electronics"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "gaming consoles"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_5",
+                "name": "Nike Air Max 1",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 15000,
+                    "tax_100": 150
+                },
+                "post": {
+                    "description": "Classic and stylish sneakers",
+                    "post": "Limited edition colorway"
+                },
+                "features": [
+                    {
+                        "name": "size",
+                        "value": "10"
+                    },
+                    {
+                        "name": "color",
+                        "value": "white/red"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "fashion"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "sneakers"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_5",
+                "name": "Samsung Galaxy S23 Ultra",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 120000,
+                    "tax_100": 1200
+                },
+                "post": {
+                    "description": "Powerful and versatile smartphone",
+                    "post": "Experience the future of mobile"
+                },
+                "features": [
+                    {
+                        "name": "camera",
+                        "value": "200MP"
+                    },
+                    {
+                        "name": "storage",
+                        "value": "1TB"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "electronics"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "smartphones"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_5",
+                "name": "Microsoft Xbox Series X",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 50000,
+                    "tax_100": 500
+                },
+                "post": {
+                    "description": "Powerful gaming console with exclusive titles",
+                    "post": "Join the Xbox community"
+                },
+                "features": [
+                    {
+                        "name": "processor",
+                        "value": "Custom AMD Zen 2"
+                    },
+                    {
+                        "name": "storage",
+                        "value": "1TB NVMe SSD"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "electronics"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "gaming consoles"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_5",
+                "name": "Adidas Ultraboost 22",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 18000,
+                    "tax_100": 180
+                },
+                "post": {
+                    "description": "Comfortable and responsive running shoes",
+                    "post": "Perfect for your next run"
+                },
+                "features": [
+                    {
+                        "name": "size",
+                        "value": "11"
+                    },
+                    {
+                        "name": "color",
+                        "value": "black/white"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "fashion"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "sneakers"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_5",
+                "name": "MacBook Pro 14",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 200000,
+                    "tax_100": 2000
+                },
+                "post": {
+                    "description": "Powerful and portable laptop",
+                    "post": "Get your work done in style"
+                },
+                "features": [
+                    {
+                        "name": "processor",
+                        "value": "Apple M2 Pro"
+                    },
+                    {
+                        "name": "storage",
+                        "value": "1TB SSD"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "electronics"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "laptops"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_5",
+                "name": "Dell XPS 13",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 150000,
+                    "tax_100": 1500
+                },
+                "post": {
+                    "description": "Premium ultrabook with stunning display",
+                    "post": "Work and play in style"
+                },
+                "features": [
+                    {
+                        "name": "processor",
+                        "value": "Intel Core i7"
+                    },
+                    {
+                        "name": "storage",
+                        "value": "512GB SSD"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "electronics"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "laptops"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_5",
+                "name": "New Balance 574",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 8000,
+                    "tax_100": 80
+                },
+                "post": {
+                    "description": "Classic and comfortable sneakers",
+                    "post": "A timeless style"
+                },
+                "features": [
+                    {
+                        "name": "size",
+                        "value": "9"
+                    },
+                    {
+                        "name": "color",
+                        "value": "grey/blue"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "fashion"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "sneakers"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_5",
+                "name": "Nintendo Switch OLED",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 35000,
+                    "tax_100": 350
+                },
+                "post": {
+                    "description": "Portable gaming console with vibrant display",
+                    "post": "Play your favorite games on the go"
+                },
+                "features": [
+                    {
+                        "name": "processor",
+                        "value": "Custom NVIDIA Tegra"
+                    },
+                    {
+                        "name": "storage",
+                        "value": "64GB"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "electronics"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "gaming consoles"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_6",
+                "name": "Canon EOS R5",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 200000,
+                    "tax_100": 2000
+                },
+                "post": {
+                    "description": "Professional mirrorless camera with 45MP sensor",
+                    "post": "Capture stunning photos and videos"
+                },
+                "features": [
+                    {
+                        "name": "sensor",
+                        "value": "45MP full-frame CMOS"
+                    },
+                    {
+                        "name": "video",
+                        "value": "8K 30fps"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "electronics"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "cameras"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_6",
+                "name": "GoPro Hero 11 Black",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 50000,
+                    "tax_100": 500
+                },
+                "post": {
+                    "description": "Action camera with 5.3K video and 27MP photos",
+                    "post": "Capture your adventures in stunning detail"
+                },
+                "features": [
+                    {
+                        "name": "video",
+                        "value": "5.3K 60fps"
+                    },
+                    {
+                        "name": "photo",
+                        "value": "27MP"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "electronics"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "action cameras"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_6",
+                "name": "Beats Fit Pro",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 20000,
+                    "tax_100": 200
+                },
+                "post": {
+                    "description": "Wireless earbuds with active noise cancellation",
+                    "post": "Enjoy your music in peace"
+                },
+                "features": [
+                    {
+                        "name": "noise cancellation",
+                        "value": "active"
+                    },
+                    {
+                        "name": "audio",
+                        "value": "aptX Adaptive"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "electronics"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "headphones"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_6",
+                "name": "Bose QuietComfort 45",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 35000,
+                    "tax_100": 350
+                },
+                "post": {
+                    "description": "Over-ear headphones with industry-leading noise cancellation",
+                    "post": "Escape the noise and immerse yourself in your music"
+                },
+                "features": [
+                    {
+                        "name": "noise cancellation",
+                        "value": "active"
+                    },
+                    {
+                        "name": "audio",
+                        "value": "TriPort technology"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "electronics"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "headphones"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_6",
+                "name": "Ray-Ban Wayfarer",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 15000,
+                    "tax_100": 150
+                },
+                "post": {
+                    "description": "Classic and stylish sunglasses",
+                    "post": "A timeless design"
+                },
+                "features": [
+                    {
+                        "name": "frame",
+                        "value": "black"
+                    },
+                    {
+                        "name": "lens",
+                        "value": "green"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "fashion"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "sunglasses"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_6",
+                "name": "Oakley Frogskins",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 18000,
+                    "tax_100": 180
+                },
+                "post": {
+                    "description": "Sporty and stylish sunglasses",
+                    "post": "Perfect for outdoor adventures"
+                },
+                "features": [
+                    {
+                        "name": "frame",
+                        "value": "matte black"
+                    },
+                    {
+                        "name": "lens",
+                        "value": "prizm black"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "fashion"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "sunglasses"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_6",
+                "name": "LEGO Star Wars Millennium Falcon",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 15000,
+                    "tax_100": 150
+                },
+                "post": {
+                    "description": "Detailed LEGO model of the iconic spaceship",
+                    "post": "Build your own Millennium Falcon"
+                },
+                "features": [
+                    {
+                        "name": "pieces",
+                        "value": "7541"
+                    },
+                    {
+                        "name": "age",
+                        "value": "18+"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "toys"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "building sets"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_6",
+                "name": "LEGO Technic Bugatti Chiron",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 35000,
+                    "tax_100": 350
+                },
+                "post": {
+                    "description": "Detailed LEGO model of the supercar",
+                    "post": "Build your own Bugatti Chiron"
+                },
+                "features": [
+                    {
+                        "name": "pieces",
+                        "value": "3599"
+                    },
+                    {
+                        "name": "age",
+                        "value": "16+"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "toys"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "building sets"
+                    }
+                ]
+            }
+        ]
+    }
+}

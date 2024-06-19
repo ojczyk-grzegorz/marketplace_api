@@ -40,7 +40,9 @@ class ItemSubCategory(BaseModel):
 
 class Item(BaseModel):
     _id: str | None = None
-    datetime: dt.datetime = dt.datetime.now()
+    user_id: str
+    created_at: dt.datetime = dt.datetime.now(dt.UTC)
+    updated_at: dt.datetime = dt.datetime.now(dt.UTC)
     name: str
     price: ItemPrice
     post: ItemPost

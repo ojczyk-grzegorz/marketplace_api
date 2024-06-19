@@ -4,20 +4,195 @@
     "body": {
         "items": [
             {
-                "name": "BMW X1",
+                "user_id": "user_id_2",
+                "name": "Tesla Model 3",
                 "price": {
                     "currency": "PLN",
-                    "base_100": 5600000,
-                    "tax_100": 120000
+                    "base_100": 8000000,
+                    "tax_100": 0
                 },
                 "post": {
-                    "description": "Super fast car",
-                    "post": "Please buy"
+                    "description": "Electric car",
+                    "post": "Future of driving"
+                },
+                "features": [
+                    {
+                        "name": "battery",
+                        "value": "long range"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "electric"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_2",
+                "name": "Toyota Corolla",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 3000000,
+                    "tax_100": 50000
+                },
+                "post": {
+                    "description": "Reliable and efficient",
+                    "post": "Value for money"
+                },
+                "features": [
+                    {
+                        "name": "fuel economy",
+                        "value": "high"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "sedans"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_2",
+                "name": "Ford Mustang",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 9500000,
+                    "tax_100": 200000
+                },
+                "post": {
+                    "description": "Classic muscle car",
+                    "post": "Feel the power"
+                },
+                "features": [
+                    {
+                        "name": "engine",
+                        "value": "V8"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "sports cars"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_2",
+                "name": "Honda CR-V",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 4000000,
+                    "tax_100": 80000
+                },
+                "post": {
+                    "description": "Versatile SUV",
+                    "post": "Perfect for families"
                 },
                 "features": [
                     {
                         "name": "seats",
-                        "value": "leather"
+                        "value": "fabric"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "SUVs"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_2",
+                "name": "Chevrolet Camaro",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 8500000,
+                    "tax_100": 180000
+                },
+                "post": {
+                    "description": "Performance and style",
+                    "post": "Own the road"
+                },
+                "features": [
+                    {
+                        "name": "engine",
+                        "value": "V6"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "sports cars"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_2",
+                "name": "Nissan Leaf",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 4500000,
+                    "tax_100": 0
+                },
+                "post": {
+                    "description": "Affordable electric",
+                    "post": "Eco-friendly"
+                },
+                "features": [
+                    {
+                        "name": "battery",
+                        "value": "medium range"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "vehicles"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "electric"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_3",
+                "name": "Audi A4",
+                "price": {
+                    "currency": "PLN",
+                    "base_100": 4000000,
+                    "tax_100": 80000
+                },
+                "post": {
+                    "description": "Comfortable and reliable",
+                    "post": "Great deal!"
+                },
+                "features": [
+                    {
+                        "name": "engine",
+                        "value": "2.0 TDI"
                     }
                 ],
                 "categories": [
@@ -32,48 +207,21 @@
                 ]
             },
             {
-                "name": "Audi Q7",
+                "user_id": "user_id_3",
+                "name": "Toyota Corolla",
                 "price": {
                     "currency": "PLN",
-                    "base_100": 7000000,
-                    "tax_100": 150000
+                    "base_100": 2500000,
+                    "tax_100": 50000
                 },
                 "post": {
-                    "description": "Luxury SUV",
-                    "post": "Best in class"
+                    "description": "Fuel-efficient and reliable",
+                    "post": "Perfect for everyday use"
                 },
                 "features": [
                     {
-                        "name": "seats",
-                        "value": "leather"
-                    }
-                ],
-                "categories": [
-                    {
-                        "name": "vehicles"
-                    }
-                ],
-                "subcategories": [
-                    {
-                        "name": "cars"
-                    }
-                ]
-            },
-            {
-                "name": "Mercedes C-Class",
-                "price": {
-                    "currency": "PLN",
-                    "base_100": 6200000,
-                    "tax_100": 130000
-                },
-                "post": {
-                    "description": "Elegant sedan",
-                    "post": "Drive with style"
-                },
-                "features": [
-                    {
-                        "name": "seats",
-                        "value": "leather"
+                        "name": "transmission",
+                        "value": "automatic"
                     }
                 ],
                 "categories": [

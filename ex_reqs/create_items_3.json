@@ -4,132 +4,21 @@
     "body": {
         "items": [
             {
-                "name": "Tesla Model 3",
-                "price": {
-                    "currency": "PLN",
-                    "base_100": 8000000,
-                    "tax_100": 0
-                },
-                "post": {
-                    "description": "Electric car",
-                    "post": "Future of driving"
-                },
-                "features": [
-                    {
-                        "name": "battery",
-                        "value": "long range"
-                    }
-                ],
-                "categories": [
-                    {
-                        "name": "vehicles"
-                    }
-                ],
-                "subcategories": [
-                    {
-                        "name": "electric"
-                    }
-                ]
-            },
-            {
-                "name": "Toyota Corolla",
-                "price": {
-                    "currency": "PLN",
-                    "base_100": 3000000,
-                    "tax_100": 50000
-                },
-                "post": {
-                    "description": "Reliable and efficient",
-                    "post": "Value for money"
-                },
-                "features": [
-                    {
-                        "name": "fuel economy",
-                        "value": "high"
-                    }
-                ],
-                "categories": [
-                    {
-                        "name": "vehicles"
-                    }
-                ],
-                "subcategories": [
-                    {
-                        "name": "sedans"
-                    }
-                ]
-            },
-            {
-                "name": "Ford Mustang",
-                "price": {
-                    "currency": "PLN",
-                    "base_100": 9500000,
-                    "tax_100": 200000
-                },
-                "post": {
-                    "description": "Classic muscle car",
-                    "post": "Feel the power"
-                },
-                "features": [
-                    {
-                        "name": "engine",
-                        "value": "V8"
-                    }
-                ],
-                "categories": [
-                    {
-                        "name": "vehicles"
-                    }
-                ],
-                "subcategories": [
-                    {
-                        "name": "sports cars"
-                    }
-                ]
-            },
-            {
-                "name": "Honda CR-V",
+                "user_id": "user_id_4",
+                "name": "Audi A4",
                 "price": {
                     "currency": "PLN",
                     "base_100": 4000000,
                     "tax_100": 80000
                 },
                 "post": {
-                    "description": "Versatile SUV",
-                    "post": "Perfect for families"
-                },
-                "features": [
-                    {
-                        "name": "seats",
-                        "value": "fabric"
-                    }
-                ],
-                "categories": [
-                    {
-                        "name": "vehicles"
-                    }
-                ],
-                "subcategories": [
-                    {
-                        "name": "SUVs"
-                    }
-                ]
-            },
-            {
-                "name": "Chevrolet Camaro",
-                "price": {
-                    "currency": "PLN",
-                    "base_100": 8500000,
-                    "tax_100": 180000
-                },
-                "post": {
-                    "description": "Performance and style",
-                    "post": "Own the road"
+                    "description": "Comfortable and reliable",
+                    "post": "Great deal!"
                 },
                 "features": [
                     {
                         "name": "engine",
-                        "value": "V6"
+                        "value": "2.0 TDI"
                     }
                 ],
                 "categories": [
@@ -139,25 +28,26 @@
                 ],
                 "subcategories": [
                     {
-                        "name": "sports cars"
+                        "name": "cars"
                     }
                 ]
             },
             {
-                "name": "Nissan Leaf",
+                "user_id": "user_id_4",
+                "name": "Toyota Corolla",
                 "price": {
                     "currency": "PLN",
-                    "base_100": 4500000,
-                    "tax_100": 0
+                    "base_100": 2500000,
+                    "tax_100": 50000
                 },
                 "post": {
-                    "description": "Affordable electric",
-                    "post": "Eco-friendly"
+                    "description": "Fuel-efficient and reliable",
+                    "post": "Perfect for everyday use"
                 },
                 "features": [
                     {
-                        "name": "battery",
-                        "value": "medium range"
+                        "name": "transmission",
+                        "value": "automatic"
                     }
                 ],
                 "categories": [
@@ -167,7 +57,106 @@
                 ],
                 "subcategories": [
                     {
-                        "name": "electric"
+                        "name": "cars"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_4",
+                "name": "iPhone 14 Pro",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 100000,
+                    "tax_100": 1000
+                },
+                "post": {
+                    "description": "The latest and greatest iPhone",
+                    "post": "Pre-order now!"
+                },
+                "features": [
+                    {
+                        "name": "camera",
+                        "value": "48MP"
+                    },
+                    {
+                        "name": "storage",
+                        "value": "1TB"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "electronics"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "smartphones"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_4",
+                "name": "Sony PlayStation 5",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 50000,
+                    "tax_100": 500
+                },
+                "post": {
+                    "description": "Next-generation gaming console",
+                    "post": "Experience the future of gaming"
+                },
+                "features": [
+                    {
+                        "name": "processor",
+                        "value": "AMD Ryzen"
+                    },
+                    {
+                        "name": "storage",
+                        "value": "825GB SSD"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "electronics"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "gaming consoles"
+                    }
+                ]
+            },
+            {
+                "user_id": "user_id_4",
+                "name": "Nike Air Max 1",
+                "price": {
+                    "currency": "USD",
+                    "base_100": 15000,
+                    "tax_100": 150
+                },
+                "post": {
+                    "description": "Classic and stylish sneakers",
+                    "post": "Limited edition colorway"
+                },
+                "features": [
+                    {
+                        "name": "size",
+                        "value": "10"
+                    },
+                    {
+                        "name": "color",
+                        "value": "white/red"
+                    }
+                ],
+                "categories": [
+                    {
+                        "name": "fashion"
+                    }
+                ],
+                "subcategories": [
+                    {
+                        "name": "sneakers"
                     }
                 ]
             }

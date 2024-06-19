@@ -7,3 +7,5 @@ pandasql
 requests
 pymongo
 bson
+openai
+llamaapi
