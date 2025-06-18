@@ -1,7 +1,7 @@
 local_utils
-python/py_art/random images/images_**/*.JPG
-python/py_art/random images/images_**/*.PNG
-python/py_fastapi/practice/db/mock_data/*
+examples/*
+python/py_fastapi/practice/db/mock_data/*.json
+
 
 **/.svelte-kit/
 **/package
