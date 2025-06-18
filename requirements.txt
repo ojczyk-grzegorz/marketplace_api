@@ -1,0 +1,5 @@
+uvicorn
+fastapi
+ruff
+pydantic
+pydantic[email]
