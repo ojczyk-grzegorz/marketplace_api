@@ -1,0 +1,16 @@
+steps
+- users, items, transactions
+    - mock data
+    - data models
+    - all endpoints
+    - all logic / features
+- chat, tickets
+    - mock data
+    - data models
+    - all endpoints
+    - all logic / features
+- db implementation
+- configs
+- tests
+- deployment
+- CICD

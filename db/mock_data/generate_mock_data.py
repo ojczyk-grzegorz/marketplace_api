@@ -8,7 +8,7 @@ dir_files_db = "db/mock_data"
 os.makedirs(dir_files_db, exist_ok=True)
 
 filepath_items = os.path.join(dir_files_db, "items.json")
-filepath_customers = os.path.join(dir_files_db, "customers.json")
+filepath_customers = os.path.join(dir_files_db, "users.json")
 filepath_transactions = os.path.join(dir_files_db, "transactions.json")
 
 today = datetime(2025, 6, 11)
