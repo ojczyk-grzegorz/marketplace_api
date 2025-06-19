@@ -2,7 +2,10 @@ import datetime as dt
 from typing import Annotated, Literal
 
 from fastapi import FastAPI, Body, Query, Path
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+
+from routers import users, items, chats, transactions, tickets
 
 from db.db import database
 from datamodels.datamodels import (
@@ -16,7 +19,23 @@ from datamodels.datamodels import (
 )
 from testing import openapi_examples
 
+
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
+
+
+app.include_router(users.router)
+app.include_router(items.router)
+app.include_router(chats.router)
+app.include_router(transactions.router)
+app.include_router(tickets.router)
 
 
 @app.get(
@@ -25,69 +44,6 @@ app = FastAPI()
 )
 async def root():
     return {"message": "Applictation is up and running"}
-
-
-class QueryItems(BaseModel):
-    subcategory: list[str] | None = None
-    brand: list[str] | None = None
-    type: list[str] | None = None
-    material: list[str] | None = None
-    color: list[str] | None = None
-    pattern: list[str] | None = None
-    size: list[str] | None = None
-    style: list[str] | None = None
-    price: tuple[float, float] = (0.01, 1_000_000.0)
-    iid: int | None = None
-    limit: int = Field(
-        default=10,
-        ge=1,
-        le=30,
-    )
-
-
-@app.get("/items/{category}", description="Query items based on various filters")
-async def read_item(
-    category: str = Path(
-        ...,
-        title="Category of items",
-    ),
-    query_items: Annotated[QueryItems, Query()] = QueryItems(),
-    # limit: int = Query(default=10, ge=1, le=30)
-):
-    query_items: dict = query_items.model_dump(exclude_none=True)
-    limit: int = query_items.pop("limit")
-
-    db_items: list[dict] = database["items"]
-    items = []
-
-    for item in db_items:
-        qualified = True
-        for key, value in query_items.items():
-            if not qualified:
-                break
-
-            item_value = item["features"].get(key)
-            if item_value is None:
-                qualified = False
-            elif isinstance(value, list):
-                if item_value not in value:
-                    qualified = False
-            elif isinstance(value, tuple):
-                if value[0] > item_value or item_value > value[1]:
-                    qualified = False
-            elif value != item_value:
-                qualified = False
-
-        if qualified:
-            items.append(item)
-
-        if len(items) >= limit:
-            break
-
-    return dict(
-        q=query_items,
-        items=items,
-    )
 
 
 # @app.post("/items", description="Route for creating item")

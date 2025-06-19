@@ -18,6 +18,6 @@ with open(filepath_transactions, "r") as f:
 
 database = dict(
     items=items,
-    customers=customers,
+    users=customers,
     transactions=transactions,
 )

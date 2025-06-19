@@ -13,7 +13,7 @@ DB TABLES
 
 
 Item
-    Category [Clothes, Shoes, Other]
+    Category [clothes, shoes, Other]
     Subcategory: str
     Type: str
     Size: str
@@ -35,7 +35,7 @@ Trousers
     Shape [Straight, Fitted, Flared, Tapered, Cocoon]
     Rise [Low, Normal, High]
 
-Shoes
+shoes
     Fastener [Buckle, Laces, Hook-and-loop, Slip-on, Straps, Zip]
     Toe [Open, Rointed, Round, Square Toe]
     Width [Narrow, Regular, Large]

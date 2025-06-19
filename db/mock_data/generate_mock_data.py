@@ -18,44 +18,206 @@ one_year_ago = today - timedelta(days=365)
 
 # polish cities
 cities = [
-    "Warsaw", "Kraków", "Łódź", "Wrocław", "Poznań", "Gdańsk", "Szczecin", "Bydgoszcz",
-    "Lublin", "Białystok", "Katowice", "Gdynia", "Częstochowa", "Radom", "Sosnowiec",
-    "Toruń", "Kielce", "Gliwice", "Zabrze", "Olsztyn", "Bielsko-Biała", "Rzeszów",
-    "Ruda Śląska", "Rybnik", "Dąbrowa Górnicza", "Elbląg", "Płock", "Opole", "Zielona Góra",
+    "Warsaw",
+    "Kraków",
+    "Łódź",
+    "Wrocław",
+    "Poznań",
+    "Gdańsk",
+    "Szczecin",
+    "Bydgoszcz",
+    "Lublin",
+    "Białystok",
+    "Katowice",
+    "Gdynia",
+    "Częstochowa",
+    "Radom",
+    "Sosnowiec",
+    "Toruń",
+    "Kielce",
+    "Gliwice",
+    "Zabrze",
+    "Olsztyn",
+    "Bielsko-Biała",
+    "Rzeszów",
+    "Ruda Śląska",
+    "Rybnik",
+    "Dąbrowa Górnicza",
+    "Elbląg",
+    "Płock",
+    "Opole",
+    "Zielona Góra",
 ]
 
 streets = [
-    "Kwiatowa", "Słoneczna", "Leśna", "Polna", "Wiosenna", "Złota", "Srebrna", "Brązowa",
-    "Różana", "Jasna", "Ciemna", "Węgierska", "Polska", "Francuska", "Hiszpańska",
-    "Włoska", "Niemiecka", "Angielska", "Szwedzka", "Norweska", "Fińska", "Duńska", 
-    "Rosyjska", "Ukraińska", "Białoruska", "Czeska", "Słowacka", "Węgierska", "Rumuńska",
-    "Bułgarska", "Serbska", "Chorwacka", "Słoweńska", "Grecka", "Turecka", "Cypryjska",
-    "Portugalska", "Hiszpańska", "Włoska", "Francuska", "Belgijska", "Holenderska",
-    "Szwajcarska", "Australijska", "Kanadyjska", "Amerykańska", "Argentyńska", "Brazylijska",
+    "Kwiatowa",
+    "Słoneczna",
+    "Leśna",
+    "Polna",
+    "Wiosenna",
+    "Złota",
+    "Srebrna",
+    "Brązowa",
+    "Różana",
+    "Jasna",
+    "Ciemna",
+    "Węgierska",
+    "Polska",
+    "Francuska",
+    "Hiszpańska",
+    "Włoska",
+    "Niemiecka",
+    "Angielska",
+    "Szwedzka",
+    "Norweska",
+    "Fińska",
+    "Duńska",
+    "Rosyjska",
+    "Ukraińska",
+    "Białoruska",
+    "Czeska",
+    "Słowacka",
+    "Węgierska",
+    "Rumuńska",
+    "Bułgarska",
+    "Serbska",
+    "Chorwacka",
+    "Słoweńska",
+    "Grecka",
+    "Turecka",
+    "Cypryjska",
+    "Portugalska",
+    "Hiszpańska",
+    "Włoska",
+    "Francuska",
+    "Belgijska",
+    "Holenderska",
+    "Szwajcarska",
+    "Australijska",
+    "Kanadyjska",
+    "Amerykańska",
+    "Argentyńska",
+    "Brazylijska",
 ]
 
 
 # polish first names
 first_names = [
-    "Jakub", "Zuzanna", "Kacper", "Julia", "Michał", "Zofia", "Szymon", "Maja",
-    "Filip", "Hanna", "Aleksander", "Wiktoria", "Antoni", "Natalia", "Jan", "Emilia",
-    "Wojciech", "Lena", "Mateusz", "Oliwia", "Piotr", "Amelia", "Kamil", "Martyna",
-    "Tomasz", "Karolina", "Adam", "Klaudia", "Paweł", "Alicja", "Rafał", "Weronika",
-    "Marek", "Magdalena", "Grzegorz", "Ewa", "Marcin", "Agata", "Łukasz", "Anna",
-    "Dawid", "Katarzyna", "Bartosz", "Joanna", "Sebastian", "Gabriela", "Dominik", "Patrycja",
-    "Artur", "Monika", "Michał", "Justyna", "Krzysztof", "Barbara", "Sławomir", "Elżbieta",
+    "Jakub",
+    "Zuzanna",
+    "Kacper",
+    "Julia",
+    "Michał",
+    "Zofia",
+    "Szymon",
+    "Maja",
+    "Filip",
+    "Hanna",
+    "Aleksander",
+    "Wiktoria",
+    "Antoni",
+    "Natalia",
+    "Jan",
+    "Emilia",
+    "Wojciech",
+    "Lena",
+    "Mateusz",
+    "Oliwia",
+    "Piotr",
+    "Amelia",
+    "Kamil",
+    "Martyna",
+    "Tomasz",
+    "Karolina",
+    "Adam",
+    "Klaudia",
+    "Paweł",
+    "Alicja",
+    "Rafał",
+    "Weronika",
+    "Marek",
+    "Magdalena",
+    "Grzegorz",
+    "Ewa",
+    "Marcin",
+    "Agata",
+    "Łukasz",
+    "Anna",
+    "Dawid",
+    "Katarzyna",
+    "Bartosz",
+    "Joanna",
+    "Sebastian",
+    "Gabriela",
+    "Dominik",
+    "Patrycja",
+    "Artur",
+    "Monika",
+    "Michał",
+    "Justyna",
+    "Krzysztof",
+    "Barbara",
+    "Sławomir",
+    "Elżbieta",
 ]
 
 # polish last names
 last_names = [
-    "Nowak", "Kowalski", "Wiśniewski", "Wójcik", "Kowalczyk", "Kamiński", "Lewandowski",
-    "Zieliński", "Szymański", "Woźniak", "Dąbrowski", "Kozłowski", "Jankowski", "Witkowski",
-    "Mazur", "Krawczyk", "Piotrowski", "Grabowski", "Zając", "Pawlak", "Michalski",
-    "Król", "Wieczorek", "Jasiński", "Olszewski", "Baran", "Sikora", "Walczak",
-    "Kubiak", "Wysocki", "Czarnecki", "Kucharski", "Sadowski", "Wojciechowski", "Bąk",
-    "Kaczmarek", "Pietrzak", "Nowicki", "Szulc", "Wasilewski", "Kalinowski", "Ciesielski",
-    "Klimczak", "Wojtasik", "Zalewski", "Kowalewski", "Szczepaniak", "Błaszczyk",
-    "Kowal", "Górski", "Jabłoński", "Kozak", "Sienkiewicz", "Wysocka", "Krawczyk",
+    "Nowak",
+    "Kowalski",
+    "Wiśniewski",
+    "Wójcik",
+    "Kowalczyk",
+    "Kamiński",
+    "Lewandowski",
+    "Zieliński",
+    "Szymański",
+    "Woźniak",
+    "Dąbrowski",
+    "Kozłowski",
+    "Jankowski",
+    "Witkowski",
+    "Mazur",
+    "Krawczyk",
+    "Piotrowski",
+    "Grabowski",
+    "Zając",
+    "Pawlak",
+    "Michalski",
+    "Król",
+    "Wieczorek",
+    "Jasiński",
+    "Olszewski",
+    "Baran",
+    "Sikora",
+    "Walczak",
+    "Kubiak",
+    "Wysocki",
+    "Czarnecki",
+    "Kucharski",
+    "Sadowski",
+    "Wojciechowski",
+    "Bąk",
+    "Kaczmarek",
+    "Pietrzak",
+    "Nowicki",
+    "Szulc",
+    "Wasilewski",
+    "Kalinowski",
+    "Ciesielski",
+    "Klimczak",
+    "Wojtasik",
+    "Zalewski",
+    "Kowalewski",
+    "Szczepaniak",
+    "Błaszczyk",
+    "Kowal",
+    "Górski",
+    "Jabłoński",
+    "Kozak",
+    "Sienkiewicz",
+    "Wysocka",
+    "Krawczyk",
 ]
 
 users_reviews = [
@@ -97,18 +259,29 @@ users_reviews = [
     (3.0, "Average quality, nothing special."),
     (5.0, "Perfect fit and great value for money!"),
     (4.0, "Nice design and comfortable to wear."),
-    
 ]
 
 categories = {
-    "Clothes": {
+    "clothes": {
         "T-Shirt": {
             "size": ["S", "M", "L", "XL"],
             "pattern": ["Solid", "Striped", "Graphic"],
             "fit": ["Regular", "Slim", "Loose"],
             "sleeve": ["Short", "Long", "Sleeveless"],
             "collar": ["Crew", "V-Neck", "Polo"],
-            "price": [10.99, 15.99, 20.99, 25.99, 30.99, 35.99, 40.99, 45.99, 50.99, 55.99, 60.99],
+            "price": [
+                10.99,
+                15.99,
+                20.99,
+                25.99,
+                30.99,
+                35.99,
+                40.99,
+                45.99,
+                50.99,
+                55.99,
+                60.99,
+            ],
         },
         "Trousers": {
             "size": ["S", "M", "L", "XL"],
@@ -117,34 +290,80 @@ categories = {
             "fit": ["Regular", "Slim", "Loose"],
             "shape": ["Straight", "Bootcut", "Skinny"],
             "raise": ["High", "Mid", "Low"],
-            "price": [20.99, 25.99, 30.99, 35.99, 40.99, 45.99, 50.99, 55.99, 60.99, 65.99],
-        }
+            "price": [
+                20.99,
+                25.99,
+                30.99,
+                35.99,
+                40.99,
+                45.99,
+                50.99,
+                55.99,
+                60.99,
+                65.99,
+            ],
+        },
     },
-    "Shoes": {
+    "shoes": {
         "Sneakers": {
             "size": ["36", "37", "38", "39", "40", "41", "42", "43", "44", "45"],
             "color": ["Black", "White", "Red", "Blue", "Green"],
             "material": ["Leather", "Canvas", "Synthetic"],
-            "price": [29.99, 34.99, 39.99, 44.99, 49.99, 54.99, 59.99, 64.99, 69.99, 74.99],
-            
+            "price": [
+                29.99,
+                34.99,
+                39.99,
+                44.99,
+                49.99,
+                54.99,
+                59.99,
+                64.99,
+                69.99,
+                74.99,
+            ],
         },
         "Boots": {
             "size": ["36", "37", "38", "39", "40", "41", "42", "43", "44", "45"],
             "color": ["Black", "Brown", "Tan"],
             "material": ["Leather", "Suede"],
             "style": ["Ankle Boots", "Knee-High Boots"],
-            "price": [49.99, 59.99, 69.99, 79.99, 89.99, 99.99, 109.99, 119.99, 129.99, 139.99],
-        }
-    }
+            "price": [
+                49.99,
+                59.99,
+                69.99,
+                79.99,
+                89.99,
+                99.99,
+                109.99,
+                119.99,
+                129.99,
+                139.99,
+            ],
+        },
+    },
 }
-    
+
 condtions = ["New", "Not Used", "Very Good", "Good", "Fair", "Poor"]
 types = ["Casual", "Sporty", "Fashion"]
 materials = ["Cotton", "Polyester", "Wool", "Leather", "Denim", "Linen"]
 colors = ["Red", "Blue", "Green", "Black", "White", "Yellow", "Pink", "Purple"]
 brands = [
-    "Aetheria Apparel", "Terra Nova Threads", "Vesper Collective", "Kinetic Stitch", "Obsidian Weave", "Luminary Loft", "Solstice Supply Co.", "Echo Garb",
-    "Summit & Spoke", "Meridian Mode", "Wilde Folk Goods", "Cascade Clothiers", "Phantom Fit", "Nova Bloom", "Evergreen & Elm"]
+    "Aetheria Apparel",
+    "Terra Nova Threads",
+    "Vesper Collective",
+    "Kinetic Stitch",
+    "Obsidian Weave",
+    "Luminary Loft",
+    "Solstice Supply Co.",
+    "Echo Garb",
+    "Summit & Spoke",
+    "Meridian Mode",
+    "Wilde Folk Goods",
+    "Cascade Clothiers",
+    "Phantom Fit",
+    "Nova Bloom",
+    "Evergreen & Elm",
+]
 patterns = ["Solid", "Striped", "Checked", "Floral", "Geometric", "Graphic"]
 descriptions = [
     "A stylish and comfortable piece for everyday wear",
@@ -184,7 +403,7 @@ descriptions = [
     "A stylish option for both casual and formal occasions",
     "A piece that embodies the essence of modern fashion",
     "A unique blend of textures and materials for a standout look",
-    "A piece that tells a story with its intricate design",        
+    "A piece that tells a story with its intricate design",
 ]
 joins_sent = ["\n", ".\n", ". "]
 joins_kv = [" ", " ", ": ", ":", " - ", "-"]
@@ -215,7 +434,9 @@ def main():
                 "phone": f"+48{random.randint(500000000, 799999999)}",
                 "first_name": first_name,
                 "last_name": last_name,
-                "birth_date": random_date(datetime(1975, 1, 1), datetime(2009, 12, 31)).strftime("%Y-%m-%d"),
+                "birth_date": random_date(
+                    datetime(1975, 1, 1), datetime(2009, 12, 31)
+                ).strftime("%Y-%m-%d"),
                 "country": "Poland",
                 "city": random.choice(cities),
                 "street": random.choice(streets),
@@ -226,11 +447,15 @@ def main():
                     {
                         "rating": review[0],
                         "comment": review[1],
-                        "created_at": random_date(created_at, today).strftime("%Y-%m-%dT%H:%M:%S"),
+                        "created_at": random_date(created_at, today).strftime(
+                            "%Y-%m-%dT%H:%M:%S"
+                        ),
                     }
                     for review in reviews
                 ],
-                "rating": round(sum(review[0] for review in reviews) / len(reviews), 1) if reviews else 0.0,
+                "rating": round(sum(review[0] for review in reviews) / len(reviews), 1)
+                if reviews
+                else 0.0,
                 "avatar": None,
             }
             n += 1
@@ -243,8 +468,6 @@ def main():
 
     ########### ITEMS ###########
 
-
-
     items = []
     for n in range(5_000):
         created_at = random_date(one_year_ago, today)
@@ -256,11 +479,11 @@ def main():
         material = random.choice(materials)
         color = random.choice(colors)
         brand = random.choice(brands)
-        pattern = random.choice(patterns)    
+        pattern = random.choice(patterns)
 
-        features = {            
+        features = {
             "condition": condition,
-            "brand": brand,            
+            "brand": brand,
             "material": material,
             "color": color,
             "pattern": pattern,
@@ -269,26 +492,28 @@ def main():
                 for k, v in categories[category][subcategory].items()
             },
         }
-        
+
         seller = customers[random.randint(0, len(customers) // 3)]
         name = f"{brand} {color} {subcategory}"
 
         join_kv: str = random.choice(joins_kv)
         join_sent: str = random.choice(joins_sent)
-        
+
         desc = random.choices(descriptions, k=random.randint(2, 6))
-        feat = random.choices(list(features.items()), k=len(desc)-1)
+        feat = random.choices(list(features.items()), k=len(desc) - 1)
         description = []
         for d, f in zip(desc, feat):
-            description.append(d),
+            (description.append(d),)
             description.append(join_kv.join([str(x) for x in f]))
         description.append(desc[-1])
         description = join_sent.join(description)
-        
+
         item = {
             "iid": n,
             "created_at": created_at.strftime("%Y-%m-%dT%H:%M:%S"),
-            "expires_at": (created_at + timedelta(days=random.randint(15, 60))).strftime("%Y-%m-%dT%H:%M:%S"),
+            "expires_at": (
+                created_at + timedelta(days=random.randint(15, 60))
+            ).strftime("%Y-%m-%dT%H:%M:%S"),
             "seller": seller["cid"],
             "city": seller["city"],
             "name": name,
@@ -298,18 +523,19 @@ def main():
             "interested": random.randint(0, 30),
             "images": [],
             "description": description,
-            "delivery": random.choices(deliveries, k=random.randint(1, len(deliveries))),
+            "delivery": random.choices(
+                deliveries, k=random.randint(1, len(deliveries))
+            ),
             "seller_rating": seller["rating"],
             "features": features,
         }
-        
+
         items.append(item)
 
     with open(filepath_items, "w") as file:
         json.dump(items, file, indent=4)
 
     print("Items generated:", len(items))
-
 
     ########### TRANSACTIONS ###########
     transactions = []
@@ -320,19 +546,19 @@ def main():
             customer_id = random.choice(customers)["cid"]
             if customer_id != item["seller"]:
                 break
-        
+
         transaction_date = random_date(
             datetime.fromisoformat(item["created_at"]),
             datetime.fromisoformat(item["expires_at"]),
         )
-        
+
         transaction = {
             "tid": n,
             "iid": item["iid"],
             "name": item["name"],
             "seller": item["seller"],
             "date": transaction_date.strftime("%Y-%m-%dT%H:%M:%S"),
-            "buyer": customer_id,        
+            "buyer": customer_id,
             "item": item,
         }
         transactions.append(transaction)
