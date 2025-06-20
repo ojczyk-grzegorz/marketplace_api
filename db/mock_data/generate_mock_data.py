@@ -2,13 +2,13 @@ import random
 from datetime import datetime, timedelta
 import json
 import os
-
+from collections import defaultdict
 
 dir_files_db = "db/mock_data"
 os.makedirs(dir_files_db, exist_ok=True)
 
 filepath_items = os.path.join(dir_files_db, "items.json")
-filepath_customers = os.path.join(dir_files_db, "users.json")
+filepath_users = os.path.join(dir_files_db, "users.json")
 filepath_transactions = os.path.join(dir_files_db, "transactions.json")
 
 today = datetime(2025, 6, 11)
@@ -422,14 +422,14 @@ def main():
     random.seed(0)
 
     ########### CUSTOMERS ###########
-    customers = []
+    users = []
     n = 0
     for first_name in first_names:
         for last_name in last_names:
             reviews = random.choices(users_reviews, k=random.randint(0, 20))
             created_at = random_date(six_months_ago, today)
             customer = {
-                "cid": n,
+                "uid": n,
                 "email": f"{first_name.lower()}.{last_name.lower()}@example.com",
                 "phone": f"+48{random.randint(500000000, 799999999)}",
                 "first_name": first_name,
@@ -459,20 +459,40 @@ def main():
                 "avatar": None,
             }
             n += 1
-            customers.append(customer)
+            users.append(customer)
 
-    with open(filepath_customers, "w") as file:
-        json.dump(customers, file, indent=4)
+    with open(filepath_users, "w") as file:
+        json.dump(users, file, indent=4)
 
-    print("Customers generated:", len(customers))
+    print("Customers generated:", len(users))
 
     ########### ITEMS ###########
 
     items = []
+    items_categories = defaultdict(list)
+
     for n in range(5_000):
+        iid = n
+
         created_at = random_date(one_year_ago, today)
+        updated_at = created_at
+        expires_at = (created_at + timedelta(days=random.randint(15, 60)))
 
         category = random.choice(list(categories.keys()))
+        table = f"items_{category}"
+
+        items.append(
+            {
+                "iid": iid,
+                "created_at": created_at.strftime("%Y-%m-%dT%H:%M:%S"),
+                "updated_at": updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
+                "expires_at": expires_at.strftime("%Y-%m-%dT%H:%M:%S"),
+                "category": category,
+                "table": table,
+            }
+        )
+        
+
         subcategory = random.choice(list(categories[category].keys()))
         type = random.choice(types)
         condition = random.choice(condtions)
@@ -492,8 +512,7 @@ def main():
                 for k, v in categories[category][subcategory].items()
             },
         }
-
-        seller = customers[random.randint(0, len(customers) // 3)]
+        seller = users[random.randint(0, len(users) // 3)]
         name = f"{brand} {color} {subcategory}"
 
         join_kv: str = random.choice(joins_kv)
@@ -509,15 +528,11 @@ def main():
         description = join_sent.join(description)
 
         item = {
-            "iid": n,
-            "created_at": created_at.strftime("%Y-%m-%dT%H:%M:%S"),
-            "expires_at": (
-                created_at + timedelta(days=random.randint(15, 60))
-            ).strftime("%Y-%m-%dT%H:%M:%S"),
-            "seller": seller["cid"],
+            "iid": iid,
+            "seller": seller["uid"],
             "city": seller["city"],
+            "street": seller["street"],
             "name": name,
-            "category": category,
             "subcategory": subcategory,
             "type": type,
             "interested": random.randint(0, 30),
@@ -527,13 +542,18 @@ def main():
                 deliveries, k=random.randint(1, len(deliveries))
             ),
             "seller_rating": seller["rating"],
-            "features": features,
+            **features
         }
 
-        items.append(item)
+        items_categories[table].append(item)
 
     with open(filepath_items, "w") as file:
         json.dump(items, file, indent=4)
+
+    for table, items_list in items_categories.items():
+        filepath = os.path.join(dir_files_db, f"{table}.json")
+        with open(filepath, "w") as file:
+            json.dump(items_list, file, indent=4)
 
     print("Items generated:", len(items))
 
@@ -541,10 +561,11 @@ def main():
     transactions = []
     for n in range(4_000):
         item: dict = items.pop()
+        item_details = items_categories[item["table"]].pop()
 
         while True:
-            customer_id = random.choice(customers)["cid"]
-            if customer_id != item["seller"]:
+            customer_id = random.choice(users)["uid"]
+            if customer_id != item_details["seller"]:
                 break
 
         transaction_date = random_date(
@@ -554,12 +575,12 @@ def main():
 
         transaction = {
             "tid": n,
-            "iid": item["iid"],
-            "name": item["name"],
-            "seller": item["seller"],
+            "iid": item_details["iid"],
+            "name": item_details["name"],
+            "seller": item_details["seller"],
             "date": transaction_date.strftime("%Y-%m-%dT%H:%M:%S"),
             "buyer": customer_id,
-            "item": item,
+            "item": item_details,
         }
         transactions.append(transaction)
 
