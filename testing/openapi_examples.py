@@ -225,7 +225,7 @@ EXAMPLE_UPDATE_CUSTOMER = {
             {
                 "first_name": "Elbertinaaaaaa",
                 "last_name": "Jandacccccc",
-                "cid": 1,
+                "uid": 1,
             }
         ],
     },
@@ -234,12 +234,12 @@ EXAMPLE_UPDATE_CUSTOMER = {
             {
                 "first_name": "Ernestaaaaa",
                 "last_name": "Fischerrrrrr",
-                "cid": 2,
+                "uid": 2,
             },
             {
                 "first_name": "Tyyyyyyyy",
                 "last_name": "Dutchburnnnnnnnnn",
-                "cid": 3,
+                "uid": 3,
             },
         ],
     },
@@ -258,12 +258,12 @@ EXAMPLE_CREATE_TRANSACTION = {
     "multiple_details": {
         "value": [
             {
-                "cid": 2,
+                "uid": 2,
                 "iid": 2,
                 "quantity": 2,
             },
             {
-                "cid": 3,
+                "uid": 3,
                 "iid": 3,
                 "quantity": 3,
             },
@@ -272,7 +272,7 @@ EXAMPLE_CREATE_TRANSACTION = {
     "error": {
         "value": [
             {
-                "cid": 4,
+                "uid": 4,
                 "iid": 4,
                 "quantity": 1_000_000,  # Exceeds available stock
             },

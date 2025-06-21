@@ -1,12 +1,78 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Query, Path, Body
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, status, Query, Path, Body
+from pydantic import BaseModel, Field, ConfigDict
 
 from db.db import database
+from datamodels.response import ErrorResponse
 
 
 router = APIRouter(prefix="/items", tags=["Items"])
+
+
+class Item(BaseModel):
+    iid: int
+    city: str
+    street: str
+    name: str
+    icon: str | None = None
+    subcategory: str
+    type: str
+    interested: int = 0
+    description: str
+    delivery: list[str]
+    seller_rating: float
+    condition: str
+    brand: str
+    material: str
+    color: str
+    pattern: str
+    size: str
+    style: str
+    price: float
+
+
+class ItemDetails(BaseModel):
+    iid: int
+    seller: int
+    created_at: str
+    updated_at: str
+    expires_at: str
+    category: str
+    table: str
+    images: list[str] = []
+
+
+class ItemResponse(BaseModel):
+    item: Item
+    details: ItemDetails
+
+
+@router.get(
+    "/{iid}",
+    status_code=status.HTTP_200_OK,
+    response_model=ItemResponse | ErrorResponse,
+    description="Get item by its ID",
+)
+async def get_item(
+    iid: int = Path(
+        ...,
+    ),
+):
+    db_items: dict = database["items"]
+    for detail in db_items["items"]:
+        if detail.get("iid") == iid:
+            for item in db_items[detail["table"]]:
+                if item.get("iid") == iid:
+                    return ItemResponse(
+                        item=Item.model_validate(item),
+                        details=ItemDetails.model_validate(detail),
+                    )
+
+    return ErrorResponse(
+        error="ITEM_NOT_FOUND",
+        details={"item_id": iid},
+    )
 
 
 class QueryItems(BaseModel):
@@ -27,34 +93,63 @@ class QueryItems(BaseModel):
     )
 
 
-@router.get("/{category}", description="Query items based on various filters")
+class ItemQuery(BaseModel):
+    model_config = ConfigDict(
+        extra="allow",
+        populate_by_name=True,
+    )
+    
+    iid: int
+    name: str
+    price: float
+    condition: str
+    city: str
+    street: str
+    icon: str | None = None
+    subcategory: str | None = None
+    type: str | None = None
+    interested: int = 0
+    brand: str | None = None
+    material: str | None = None
+    color: str | None = None
+    pattern: str | None = None
+    length: str | None = None
+    size: str | None = None
+    style: str | None = None
+    seller_rating: float = 0.0
+
+
+class ItemsQueryResponse(BaseModel):
+    q: QueryItems
+    items: list[ItemQuery]
+
+
+@router.get(
+    "/query/{category}",
+    status_code=status.HTTP_200_OK,
+    response_model=ItemsQueryResponse | ErrorResponse,
+    description="Query items based on various filters",
+    response_model_exclude_none=True,
+)
 async def get_items(
     category: str = Path(
         ...,
-        title="Category of items",
     ),
     query_items: Annotated[QueryItems, Query()] = QueryItems(),
-    # limit: int = Query(default=10, ge=1, le=30)
 ):
     query_items: dict = query_items.model_dump(exclude_none=True)
     limit: int = query_items.pop("limit")
 
-    db_items: list[dict] = database["items"]
+    db_items: list[dict] = database["items"][f"items_{category}"]
+
     items = []
-
     for item in db_items:
-        if item.get("category", "").lower() != category.lower():
-            continue
-
         qualified = True
         for key, value in query_items.items():
             if not qualified:
                 break
 
-            if key == "iid" and item.get("iid") == value:
-                continue
-
-            item_value = item["features"].get(key)
+            item_value = item.get(key)
             if item_value is None:
                 qualified = False
             elif isinstance(value, list):
@@ -72,10 +167,42 @@ async def get_items(
         if len(items) >= limit:
             break
 
-    return dict(
-        q=query_items,
-        items=items,
-    )
+    if not items:
+        return ErrorResponse(
+            error="ITEMS_NOT_FOUND",
+            details={"query": query_items, "category": category},
+        )
+    return ItemsQueryResponse(q=query_items, items=items)
+
+
+class ItemCreate(BaseModel):
+    city: str
+    street: str
+    name: str
+    icon: str | None = None
+    subcategory: str
+    type: str
+    interested: int = 0
+    description: str
+    delivery: list[str]
+    condition: str
+    brand: str
+    material: str
+    color: str
+    pattern: str
+    size: str
+    style: str
+    price: float
+
+
+class ItemDetailsCreate(BaseModel):
+    seller: int
+    expires_at: str
+    category: str
+    table: str
+    images: list[str] = []
+
+class 
 
 
 @router.post("", description="Route for creating item")
@@ -88,28 +215,36 @@ async def create_items(
                 "summary": "single item example",
                 "value": [
                     {
-                        "name": "Black jeans",
-                        "category": "clothes",
-                        "seller": 300,
-                        "city": "P\u0142ock",
-                        "subcategory": "T-Shirt",
-                        "type": "Fashion",
-                        "interested": 28,
-                        "images": [],
-                        "description": "Made with sustainable practices in mind.\nprice - 15.99.\nA classic design with a contemporary twist.\nbrand - Kinetic Stitch.\nA must-have addition to any wardrobe.\npattern - Striped.\nIdeal for layering or wearing on its own",
-                        "delivery": ["Pick-up", "Courier", "Courier", "Parcel box"],
-                        "seller_rating": 3.7,
-                        "features": {
-                            "price": 79.99,
-                            "condition": "Fair",
-                            "brand": "Kinetic Stitch",
+                        "item": {
+                            "iid": 0,
+                            "city": "Kielce",
+                            "street": "Francuska",
+                            "name": "Wilde Folk Goods Blue Boots",
+                            "icon": None,
+                            "subcategory": "Boots",
+                            "type": "Fashion",
+                            "interested": 30,
+                            "description": "A versatile item that can be dressed up or down. material Leather. Lightweight and breathable for all-day comfort",
+                            "delivery": ["Courier", "Postal service", "Pick-up"],
+                            "seller_rating": 3.8,
+                            "condition": "New",
+                            "brand": "Wilde Folk Goods",
                             "material": "Leather",
-                            "color": "Purple",
-                            "pattern": "Striped",
-                            "size": "S",
-                            "fit": "Loose",
-                            "sleeve": "Long",
-                            "collar": "Crew",
+                            "color": "Brown",
+                            "pattern": "Floral",
+                            "size": "45",
+                            "style": "Knee-High Boots",
+                            "price": 129.99,
+                        },
+                        "details": {
+                            "iid": 0,
+                            "seller": 162,
+                            "created_at": "2025-05-07T00:00:00",
+                            "updated_at": "2025-05-07T00:00:00",
+                            "expires_at": "2025-05-25T00:00:00",
+                            "category": "shoes",
+                            "table": "items_shoes",
+                            "images": [],
                         },
                     }
                 ],
@@ -117,9 +252,6 @@ async def create_items(
         },
     ),
 ):
-    # added_items_details = {}
-    # added_items_stocks = {}
-    # errors_items = []
     db_items: list[dict] = database["items"]
 
     item_id = max([x["iid"] for x in db_items], default=0)

@@ -431,6 +431,7 @@ def main():
             customer = {
                 "uid": n,
                 "email": f"{first_name.lower()}.{last_name.lower()}@example.com",
+                "password_hash": f"password_hash{n}",
                 "phone": f"+48{random.randint(500000000, 799999999)}",
                 "first_name": first_name,
                 "last_name": last_name,
@@ -440,7 +441,7 @@ def main():
                 "country": "Poland",
                 "city": random.choice(cities),
                 "street": random.choice(streets),
-                "street_number": random.randint(1, 200),
+                "street_number": str(random.randint(1, 200)),
                 "postal_code": f"{random.randint(10, 99)}-{random.randint(100, 999)}",
                 "created_at": created_at.strftime("%Y-%m-%dT%H:%M:%S"),
                 "reviews": [
@@ -476,22 +477,24 @@ def main():
 
         created_at = random_date(one_year_ago, today)
         updated_at = created_at
-        expires_at = (created_at + timedelta(days=random.randint(15, 60)))
+        expires_at = created_at + timedelta(days=random.randint(15, 60))
 
         category = random.choice(list(categories.keys()))
         table = f"items_{category}"
 
+        seller = users[random.randint(0, len(users) // 3)]
         items.append(
             {
                 "iid": iid,
+                "seller": seller["uid"],
                 "created_at": created_at.strftime("%Y-%m-%dT%H:%M:%S"),
                 "updated_at": updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
                 "expires_at": expires_at.strftime("%Y-%m-%dT%H:%M:%S"),
                 "category": category,
                 "table": table,
+                "images": [],
             }
         )
-        
 
         subcategory = random.choice(list(categories[category].keys()))
         type = random.choice(types)
@@ -512,7 +515,7 @@ def main():
                 for k, v in categories[category][subcategory].items()
             },
         }
-        seller = users[random.randint(0, len(users) // 3)]
+
         name = f"{brand} {color} {subcategory}"
 
         join_kv: str = random.choice(joins_kv)
@@ -529,20 +532,19 @@ def main():
 
         item = {
             "iid": iid,
-            "seller": seller["uid"],
             "city": seller["city"],
             "street": seller["street"],
             "name": name,
+            "icon": None,
             "subcategory": subcategory,
             "type": type,
             "interested": random.randint(0, 30),
-            "images": [],
             "description": description,
-            "delivery": list(set(random.choices(
-                deliveries, k=random.randint(1, len(deliveries))
-            ))),
+            "delivery": list(
+                set(random.choices(deliveries, k=random.randint(1, len(deliveries))))
+            ),
             "seller_rating": seller["rating"],
-            **features
+            **features,
         }
 
         items_categories[table].append(item)
@@ -565,7 +567,7 @@ def main():
 
         while True:
             customer_id = random.choice(users)["uid"]
-            if customer_id != item_details["seller"]:
+            if customer_id != item["seller"]:
                 break
 
         transaction_date = random_date(
@@ -577,7 +579,7 @@ def main():
             "tid": n,
             "iid": item_details["iid"],
             "name": item_details["name"],
-            "seller": item_details["seller"],
+            "seller": item["seller"],
             "date": transaction_date.strftime("%Y-%m-%dT%H:%M:%S"),
             "buyer": customer_id,
             "item": item_details,
