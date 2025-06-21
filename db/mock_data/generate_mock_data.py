@@ -426,7 +426,7 @@ def main():
     n = 0
     for first_name in first_names:
         for last_name in last_names:
-            reviews = random.choices(users_reviews, k=random.randint(0, 20))
+            reviews = list(set(random.choices(users_reviews, k=random.randint(0, 20))))
             created_at = random_date(six_months_ago, today)
             customer = {
                 "uid": n,
@@ -518,8 +518,8 @@ def main():
         join_kv: str = random.choice(joins_kv)
         join_sent: str = random.choice(joins_sent)
 
-        desc = random.choices(descriptions, k=random.randint(2, 6))
-        feat = random.choices(list(features.items()), k=len(desc) - 1)
+        desc = list(set(random.choices(descriptions, k=random.randint(2, 6))))
+        feat = list(set(random.choices(list(features.items()), k=len(desc) - 1)))
         description = []
         for d, f in zip(desc, feat):
             (description.append(d),)
@@ -538,9 +538,9 @@ def main():
             "interested": random.randint(0, 30),
             "images": [],
             "description": description,
-            "delivery": random.choices(
+            "delivery": list(set(random.choices(
                 deliveries, k=random.randint(1, len(deliveries))
-            ),
+            ))),
             "seller_rating": seller["rating"],
             **features
         }

@@ -1,6 +1,6 @@
 local_utils
 examples/*
-python/py_fastapi/practice/db/mock_data/*.json
+db/mock_data/*.json
 
 
 **/.svelte-kit/
