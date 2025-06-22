@@ -52,7 +52,7 @@ async def create_customers(
             )
     else:
         user_id = max([x["uid"] for x in db_users], default=0) + 1
-        created_at = dt.datetime.now().isoformat()
+        created_at = dt.datetime.now(dt.timezone.utc).isoformat()
 
         user = UserDb(
             **user.model_dump(exclude_none=True, exclude_unset=True),
@@ -68,7 +68,7 @@ async def create_customers(
             reviews=[],
             rating=0.0,
             avatar=None,
-            lastactivity=created_at,
+            last_activity=created_at,
         )
 
         db_users.append(user.model_dump())

@@ -39,7 +39,7 @@ class UserDb(UserCreate):
     reviews: list[Review] = []
     rating: float = 0.0
     avatar: str | None = None
-    lastactivity: dt.datetime
+    last_activity: dt.datetime
 
 
 class UserPatch(BaseModel):
@@ -70,4 +70,4 @@ class UserOut(BaseModel):
     reviews: list[Review] | None = None
     rating: float = 0.0
     avatar: str | None = None
-    lastactivity: dt.datetime
+    last_activity: dt.datetime
