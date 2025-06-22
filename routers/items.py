@@ -89,7 +89,10 @@ async def get_items(
     db_items: list[dict] = database["items"]
 
     items = []
-    features = query_items.model_dump(exclude_none=True, exclude=["limit"])
+    features = {
+        **query_items.model_dump(exclude_none=True, exclude=["limit", "features"]),
+        **(query_items.features or {}),
+    }
 
     for item in db_items:
         qualified = True

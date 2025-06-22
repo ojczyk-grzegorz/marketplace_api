@@ -50,6 +50,7 @@ class QueryItems(BaseModel):
     size: list[str] | None = None
     style: list[str] | None = None
     price: tuple[float, float] = (0.01, 1_000_000.0)
+    features: dict | None = None
 
 
 class ItemDBToList(BaseModel):
