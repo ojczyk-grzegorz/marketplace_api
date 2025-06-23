@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import users, items, chats, transactions, tickets
+from routers import users, items, transactions
 
 
 app = FastAPI()
@@ -17,9 +17,7 @@ app.add_middleware(
 
 app.include_router(users.router)
 app.include_router(items.router)
-app.include_router(chats.router)
 app.include_router(transactions.router)
-app.include_router(tickets.router)
 
 
 @app.get(

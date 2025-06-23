@@ -13,6 +13,8 @@ from datamodels.item import (
     ItemsCreate,
     ItemsCreated,
     ItemUpdate,
+    ItemDelete,
+    ItemDeleted,
 )
 from datamodels.user import UserDb
 from testing.openapi.items import ITEM_CREATE, ITEM_PATCH
@@ -130,7 +132,7 @@ async def get_items(
     "",
     status_code=status.HTTP_200_OK,
     response_model=ItemsCreated | ErrorResponse,
-    description="Route for creating item",
+    description="Route for creating an item",
 )
 async def create_items(
     req_body: ItemsCreate = Body(
@@ -181,7 +183,7 @@ async def create_items(
     "",
     status_code=status.HTTP_200_OK,
     response_model=ItemDB | ErrorResponse,
-    description="Route for creating item",
+    description="Route for patching an item",
 )
 async def update_items(
     item: ItemUpdate = Body(
@@ -211,3 +213,34 @@ async def update_items(
     )
 
     return item_db
+
+
+@router.delete(
+    "",
+    status_code=status.HTTP_200_OK,
+    response_model=ItemDeleted | ErrorResponse,
+    description="Route for deleting an item",
+)
+async def update_items(req_body: ItemDelete = Body(...)):
+    db_items: list[dict] = database["items"]
+
+    for n, item_db in enumerate(db_items):
+        if item_db["iid"] == req_body.item_id:
+            if item_db["seller_id"] != req_body.user_id:
+                return ErrorResponse(
+                    error="ITEM_NOT_OWNED",
+                    details={
+                        "item_id": req_body.item_id,
+                        "user_id": req_body.user_id,
+                    },
+                )
+            db_items.pop(n)
+            return ItemDeleted(
+                item_id=item_db["iid"],
+                user_id=req_body.user_id,
+            )
+
+    return ErrorResponse(
+        error="ITEM_NOT_FOUND",
+        details={"item_id": req_body.item_id},
+    )

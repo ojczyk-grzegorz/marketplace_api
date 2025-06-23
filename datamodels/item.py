@@ -150,3 +150,14 @@ class ItemUpdate(BaseModel):
     icon: str | None = None
     images: list[str] | None = None
     description: str | None = None
+
+
+class ItemDelete(BaseModel):
+    item_id: int
+    User_id: int
+
+
+class ItemDeleted(BaseModel):
+    item_id: int
+    User_id: int
+    message: str = "Item deleted successfully"

@@ -2,6 +2,7 @@ import random
 from datetime import datetime, timedelta
 import json
 import os
+from uuid import uuid4
 
 from mock_values.common import CITIES, STREETS
 from mock_values.users import FIRST_NAMES, LAST_NAMES, USER_REVIEWS
@@ -25,7 +26,10 @@ os.makedirs(dir_files_db, exist_ok=True)
 filepath_users = os.path.join(dir_files_db, "users.json")
 filepath_categories = os.path.join(dir_files_db, "categories.json")
 filepath_items = os.path.join(dir_files_db, "items.json")
-filepath_transactions = os.path.join(dir_files_db, "transactions.json")
+filepath_transactions_current = os.path.join(dir_files_db, "transactions_current.json")
+filepath_transactions_archived = os.path.join(
+    dir_files_db, "transactions_archived.json"
+)
 
 today = datetime(2025, 6, 11)
 six_months_ago = today - timedelta(days=180)
@@ -51,6 +55,7 @@ def main():
             created_at = random_date(six_months_ago, today)
             customer = {
                 "uid": n,
+                "uid_uuid4": uuid4().hex,
                 "email": f"{first_name.lower()}.{last_name.lower()}@example.com",
                 "password_hash": f"password_hash{n}",
                 "phone": f"+48{random.randint(500000000, 799999999)}",
@@ -85,13 +90,7 @@ def main():
             n += 1
             users.append(customer)
 
-    with open(filepath_users, "w") as file:
-        json.dump(users, file, indent=4)
-
-    print("Users generated:", len(users))
-
     ########### CATEGORIES ###########
-
     categories = []
     for n, category in enumerate(CATEGORIES):
         categories.append(
@@ -100,13 +99,8 @@ def main():
                 "name": category,
             }
         )
-    with open(filepath_categories, "w") as file:
-        json.dump(categories, file, indent=4)
-
-    print("Categories generated:", len(categories))
 
     ########### ITEMS ###########
-
     items = []
     for n in range(5_000):
         iid = n
@@ -160,10 +154,12 @@ def main():
 
         item = {
             "iid": iid,
+            "iid_uuid4": uuid4().hex,
             "name": name,
             "cid": category["cid"],
             "seller_id": seller["uid"],
             "seller_rating": seller["rating"],
+            "transaction_id": None,
             "subcategory": subcategory["name"],
             "price": price,
             "condition": condition,
@@ -191,40 +187,98 @@ def main():
 
         items.append(item)
 
-    with open(filepath_items, "w") as file:
-        json.dump(items, file, indent=4)
-
-    print("Items generated:", len(items))
-
-    ########### TRANSACTIONS ###########
-    transactions = []
+    ########### TRANSACTIONS STARTED ###########
+    transactions_current = []
     for n in range(4_000):
-        item: dict = items.pop()
+        item: dict = items[n]
 
         while True:
-            customer_id = random.choice(users)["uid"]
-            if customer_id != item["seller_id"]:
+            customer = random.choice(users)
+            if customer["uid"] != item["seller_id"]:
                 break
 
-        transaction_date = random_date(
+        transaction_start = random_date(
             datetime.fromisoformat(item["created_at"]),
             datetime.fromisoformat(item["expires_at"]),
         )
+        status = random.choice(["started", "finished", "cancelled", "expired"])
+        if status != "started":
+            transaction_end = random_date(
+                transaction_start,
+                datetime.fromisoformat(item["expires_at"]),
+            )
+        else:
+            transaction_end = None
 
         transaction = {
             "tid": n,
-            "name": item["name"],
-            "seller_id": item["seller_id"],
-            "date": transaction_date.strftime("%Y-%m-%dT%H:%M:%S"),
-            "buyer": customer_id,
-            "item": item,
+            "tid_uuid4": uuid4().hex,
+            "buyer_id": customer["uid"],
+            "status": status,
+            "transaction_start": transaction_start.strftime("%Y-%m-%dT%H:%M:%S"),
+            "transaction_end": transaction_end.strftime("%Y-%m-%dT%H:%M:%S")
+            if transaction_end
+            else None,
         }
-        transactions.append(transaction)
+        transactions_current.append(transaction)
+        item["transaction_id"] = transaction["tid"]
 
-    with open(filepath_transactions, "w") as file:
-        json.dump(transactions, file, indent=4)
+    ########### TRANSACTIONS FINISHED ###########
+    transactions_archived = []
+    for n in range(len(items) - 1, -1, -1):
+        item: dict = items[n]
+        transaction_id = item["transaction_id"]
+        if transaction_id is None:
+            continue
 
-    print("Transactions generated:", len(transactions))
+        for tn, transaction in enumerate(transactions_current):
+            if transaction["tid"] == transaction_id:
+                break
+
+        if transaction["transaction_end"] is None:
+            continue
+
+        transaction.pop("tid", None)
+
+        transaction["item_id_uuid4"] = item["iid_uuid4"]
+        transaction["item_snapshot"] = item
+
+        for user in users:
+            if user["uid"] == transaction["buyer_id"]:
+                transaction["buyer_id_uuid4"] = user["uid_uuid4"]
+                transaction["buyer_snapshot"] = user
+                transaction.pop("buyer_id", None)
+                break
+
+        for user in users:
+            if user["uid"] == item["seller_id"]:
+                transaction["seller_id_uuid4"] = user["uid_uuid4"]
+                transaction["seller_snapshot"] = user
+                break
+
+        transactions_archived.append(transaction)
+        items.pop(n)
+        transactions_current.pop(tn)
+
+    with open(filepath_users, "w") as file:
+        json.dump(users, file, indent=4)
+    print("Users generated:", len(users))
+
+    with open(filepath_categories, "w") as file:
+        json.dump(categories, file, indent=4)
+    print("Categories generated:", len(categories))
+
+    with open(filepath_items, "w") as file:
+        json.dump(items, file, indent=4)
+    print("Items generated:", len(items))
+
+    with open(filepath_transactions_archived, "w") as file:
+        json.dump(transactions_archived, file, indent=4)
+    print("Archived transactions generated:", len(transactions_archived))
+
+    with open(filepath_transactions_current, "w") as file:
+        json.dump(transactions_current, file, indent=4)
+    print("Current transactions generated:", len(transactions_current))
 
 
 if __name__ == "__main__":
