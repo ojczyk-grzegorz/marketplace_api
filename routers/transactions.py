@@ -6,12 +6,9 @@ from fastapi import APIRouter, Query, status, Header
 from db.db import database
 from datamodels.response import ErrorResponse
 from datamodels.transaction import (
-    TransactionCurrentDB,
     TransactionCurrentOut,
     TransationArchivedDB,
 )
-from datamodels.user import UserDB
-from datamodels.item import ItemDB
 
 router = APIRouter(prefix="/transactions", tags=["Transactions"])
 

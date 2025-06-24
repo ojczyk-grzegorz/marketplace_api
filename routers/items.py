@@ -51,7 +51,7 @@ async def get_item(
     response_model=ItemsUser | ErrorResponse,
     description="Get item by its ID",
 )
-async def get_item(
+async def get_user_items(
     uid: int = Path(
         ...,
     ),
