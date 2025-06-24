@@ -4,6 +4,8 @@ from pydantic import BaseModel, Field
 
 class ItemDB(BaseModel):
     iid: int
+    iid_uuid4: str
+
     name: str
     cid: int
 
@@ -152,12 +154,12 @@ class ItemUpdate(BaseModel):
     description: str | None = None
 
 
-class ItemDelete(BaseModel):
+class ItemRemove(BaseModel):
     item_id: int
     User_id: int
 
 
-class ItemDeleted(BaseModel):
+class ItemRemoved(BaseModel):
     item_id: int
     User_id: int
-    message: str = "Item deleted successfully"
+    message: str = "Item removed successfully"

@@ -3,7 +3,7 @@ import datetime as dt
 from fastapi import APIRouter, Path, Body, status
 
 from db.db import database
-from datamodels.user import UserCreate, UserDb, UserPatch, UserOut, Address
+from datamodels.user import UserCreate, UserDB, UserPatch, UserOut, Address
 from datamodels.response import ErrorResponse
 from testing.openapi.users import USER_CREATE, USER_PATCH
 
@@ -54,7 +54,7 @@ async def create_customers(
         user_id = max([x["uid"] for x in db_users], default=0) + 1
         created_at = dt.datetime.now(dt.timezone.utc).isoformat()
 
-        user = UserDb(
+        user = UserDB(
             **user.model_dump(exclude_none=True, exclude_unset=True),
             uid=user_id,
             created_at=created_at,

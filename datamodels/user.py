@@ -31,8 +31,10 @@ class UserCreate(BaseModel):
     postal_code: str
 
 
-class UserDb(UserCreate):
+class UserDB(UserCreate):
     uid: int
+    uid_uuid4: str
+
     created_at: dt.datetime
     updated_at: dt.datetime
     addresses: list[Address] = []

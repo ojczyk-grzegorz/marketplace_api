@@ -1,15 +1,27 @@
 from uuid import uuid4
 import datetime as dt
 
-from fastapi import APIRouter, Query, Body
+from fastapi import APIRouter, Query, status
 
 from db.db import database
 from datamodels.response import ErrorResponse
+from datamodels.transaction import (
+    TransactionCurrentDB,
+    TransactionCurrentOut,
+    TransationArchivedDB,
+)
+from datamodels.user import UserDB
+from datamodels.item import ItemDB
 
 router = APIRouter(prefix="/transactions", tags=["Transactions"])
 
 
-@router.post("/user_current", description="Get user transactions by user ID")
+@router.post(
+    "/user_current",
+    status_code=status.HTTP_200_OK,
+    response_model=list[TransactionCurrentOut] | ErrorResponse,
+    description="Get user transactions by user ID",
+)
 async def get_user_transactions_current(user_id: int = Query(...)):
     transactions_current_db = database["transactions_current"]
     items_db = database["items"]
@@ -30,17 +42,20 @@ async def get_user_transactions_current(user_id: int = Query(...)):
             transaction_id = transaction.get("tid")
             for item in items_db:
                 if item.get("transaction_id") == transaction_id:
-                    transactions.append(
-                        {
-                            "item": item,
-                            "transaction": transaction,
-                        }
+                    transaction_out = TransactionCurrentOut(
+                        transaction=transaction, item=item
                     )
+                    transactions.append(transaction_out)
 
     return transactions
 
 
-@router.post("/transaction", description="Get current transaction by item ID")
+@router.post(
+    "/transaction",
+    status_code=status.HTTP_200_OK,
+    response_model=TransactionCurrentOut | ErrorResponse,
+    description="Get current transaction by item ID",
+)
 async def get_item_transaction_current(item_id: int = Query(...)):
     items_db = database["items"]
     transactions_current_db = database["transactions_current"]
@@ -57,7 +72,7 @@ async def get_item_transaction_current(item_id: int = Query(...)):
 
     for transaction in transactions_current_db:
         if transaction.get("tid") == transaction_id:
-            return dict(
+            return TransactionCurrentOut(
                 item=item,
                 transaction=transaction,
             )
@@ -68,7 +83,12 @@ async def get_item_transaction_current(item_id: int = Query(...)):
     )
 
 
-@router.post("/user_archived", description="Get user transactions by user ID")
+@router.post(
+    "/user_archived",
+    status_code=status.HTTP_200_OK,
+    response_model=list[TransationArchivedDB] | ErrorResponse,
+    description="Get user transactions by user ID",
+)
 async def get_user_transactions_archived(user_id: int = Query(...)):
     transactions_archived_db = database["transactions_archived"]
     users_db = database["users"]
@@ -92,7 +112,12 @@ async def get_user_transactions_archived(user_id: int = Query(...)):
     return transactions
 
 
-@router.post("/create", description="Route for creating transactions")
+@router.post(
+    "/create",
+    status_code=status.HTTP_200_OK,
+    response_model=TransactionCurrentOut | ErrorResponse,
+    description="Route for creating transactions",
+)
 async def create_transaction(item_id: int = Query(...), user_id: int = Query(...)):
     transactions_current_db = database["transactions_current"]
     users_db = database["users"]
@@ -127,7 +152,7 @@ async def create_transaction(item_id: int = Query(...), user_id: int = Query(...
         "tid": tid,
         "tid_uuid4": uuid4().hex,
         "buyer_id": user_id,
-        "status": "started",
+        "status": "pending",
         "transaction_start": dt.datetime.now().isoformat(),
         "transaction_end": None,
     }
@@ -135,13 +160,18 @@ async def create_transaction(item_id: int = Query(...), user_id: int = Query(...
     transactions_current_db.append(transaction)
     item["transaction_id"] = tid
 
-    return dict(
+    return TransactionCurrentOut(
         transaction=transaction,
         item=item,
     )
 
 
-@router.post("/finalize", description="Route for creating transactions")
+@router.post(
+    "/finalize",
+    status_code=status.HTTP_200_OK,
+    response_model=TransactionCurrentOut | ErrorResponse,
+    description="Route for creating transactions",
+)
 async def finish_transaction(
     transaction_id: int = Query(...),
     status: str = Query(..., examples=["finished", "cancelled", "expired"]),
@@ -185,13 +215,19 @@ async def finish_transaction(
                 transactions_current_db.pop(nt)
                 items_db.pop(ni)
 
-                return transaction
+                return TransactionCurrentOut(
+                    item=item,
+                    transaction=transaction,
+                )
 
             else:
                 item["transaction_id"] = None
                 transactions_current_db.pop(nt)
 
-            return item
+            return TransactionCurrentOut(
+                item=item,
+                transaction=transaction,
+            )
 
     return ErrorResponse(
         error="TRANSACTION_NOT_FOUND",

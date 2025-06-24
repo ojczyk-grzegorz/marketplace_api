@@ -13,10 +13,10 @@ from datamodels.item import (
     ItemsCreate,
     ItemsCreated,
     ItemUpdate,
-    ItemDelete,
-    ItemDeleted,
+    ItemRemove,
+    ItemRemoved,
 )
-from datamodels.user import UserDb
+from datamodels.user import UserDB
 from testing.openapi.items import ITEM_CREATE, ITEM_PATCH
 
 
@@ -145,7 +145,7 @@ async def create_items(
 
     for seller in db_users:
         if seller.get("uid") == req_body.seller_id:
-            seller = UserDb.model_validate(seller)
+            seller = UserDB.model_validate(seller)
             break
     else:
         return ErrorResponse(
@@ -218,10 +218,10 @@ async def update_items(
 @router.delete(
     "",
     status_code=status.HTTP_200_OK,
-    response_model=ItemDeleted | ErrorResponse,
+    response_model=ItemRemoved | ErrorResponse,
     description="Route for deleting an item",
 )
-async def update_items(req_body: ItemDelete = Body(...)):
+async def update_items(req_body: ItemRemove = Body(...)):
     db_items: list[dict] = database["items"]
 
     for n, item_db in enumerate(db_items):
@@ -235,7 +235,7 @@ async def update_items(req_body: ItemDelete = Body(...)):
                     },
                 )
             db_items.pop(n)
-            return ItemDeleted(
+            return ItemRemoved(
                 item_id=item_db["iid"],
                 user_id=req_body.user_id,
             )

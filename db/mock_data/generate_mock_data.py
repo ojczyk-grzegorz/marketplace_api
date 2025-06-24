@@ -187,7 +187,7 @@ def main():
 
         items.append(item)
 
-    ########### TRANSACTIONS STARTED ###########
+    ########### TRANSACTIONS pending ###########
     transactions_current = []
     for n in range(4_000):
         item: dict = items[n]
@@ -201,8 +201,8 @@ def main():
             datetime.fromisoformat(item["created_at"]),
             datetime.fromisoformat(item["expires_at"]),
         )
-        status = random.choice(["started", "finished", "cancelled", "expired"])
-        if status != "started":
+        status = random.choice(["pending", "finished", "cancelled", "expired"])
+        if status != "pending":
             transaction_end = random_date(
                 transaction_start,
                 datetime.fromisoformat(item["expires_at"]),
