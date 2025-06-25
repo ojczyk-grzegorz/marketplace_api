@@ -1,6 +1,9 @@
 import datetime as dt
+from typing import Annotated
 
-from fastapi import APIRouter, Path, Body, status, Header
+from fastapi import APIRouter, Path, Body, status, Header, Depends
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from passlib.context import CryptContext
 
 from db.db import database
 from datamodels.user import UserCreate, UserDB, UserPatch, UserOut, Address
@@ -8,12 +11,36 @@ from datamodels.response import ErrorResponse
 from auth.auth import get_access_token, validate_access_token, KEY, ALGORITHM
 from testing.openapi.users import USER_CREATE, USER_PATCH
 
+from pydantic import BaseModel
+
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/token")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def get_password_hash(password):
+    # return pwd_context.hash(password)
+    return password + "_hash"
+
+def verify_password(plain_password, hashed_password):
+    # return pwd_context.verify(plain_password, hashed_password)
+    return get_password_hash(plain_password) == hashed_password
+
+
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenPayload(BaseModel):
+    user_id: int
+
 
 @router.get(
-    "/{user_id}",
+    "/user/{user_id}",
     status_code=status.HTTP_200_OK,
     response_model=UserOut | ErrorResponse,
     description="Route for getting user by ID",
@@ -34,31 +61,21 @@ async def get_user(
 
 
 @router.post(
-    "/login",
+    "/token",
     status_code=status.HTTP_200_OK,
-    response_model=dict | ErrorResponse,
+    # response_model=dict | ErrorResponse,
     description="Route for getting user by ID",
 )
-async def login(
-    req_body: dict = Body(
-        ...,
-        openapi_examples={
-            "example1": {
-                "summary": "Login with email and password",
-                "value": {"email": "jakub.nowak@example.com", "password": "password"},
-            }
-        },
-    ),
+async def get_token(
+    form: Annotated[OAuth2PasswordRequestForm, Depends()]
 ):
-    users_db = database["users"]
+    users_db: list[dict] = database["users"]
 
-    email = req_body["email"]
-    password = req_body["password"]
-
-    password_hash = password + "_hash"
+    email: str = form.username
+    password: str = form.password
 
     for user in users_db:
-        if user.get("email") == email and user.get("password_hash") == password_hash:
+        if user.get("email") == email and verify_password(password, user["password_hash"]):
             token = get_access_token(
                 data={"user_id": user["uid"]},
                 secret_key=KEY,
@@ -66,10 +83,9 @@ async def login(
                 expire_minutes=60,
             )
 
-            return dict(
+            return Token(
                 access_token=token,
                 token_type="bearer",
-                user_id=user["uid"],
             )
 
     return ErrorResponse(
@@ -78,22 +94,16 @@ async def login(
 
 
 @router.get(
-    "/me/{user_id}",
+    "/me",
     status_code=status.HTTP_200_OK,
-    response_model=UserDB | ErrorResponse,
+    # response_model=UserDB | ErrorResponse,
     description="Route for getting user by ID",
 )
-async def get_user_me(
-    user_id: int = Path(
-        ...,
-    ),
-    authorization: str = Header(..., alias="Authorization"),
-):
-    validate_access_token(
-        token=authorization,
+async def get_user_me(token: Annotated[str, Depends(oauth2_scheme)]):
+    user_id = validate_access_token(
+        token=token,
         secret_key=KEY,
         algorithms=[ALGORITHM],
-        user_id=user_id,
     )
     for user in database["users"]:
         if user.get("uid") == user_id:

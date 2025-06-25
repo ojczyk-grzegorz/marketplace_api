@@ -22,13 +22,10 @@ def get_access_token(
 
 
 def validate_access_token(
-    token: str, secret_key: str, algorithms: list[str], user_id: int
-) -> dict | None:
+    token: str, secret_key: str, algorithms: list[str]
+) -> int:
     payload: dict = jwt.decode(
         jwt=token, key=secret_key, algorithms=algorithms, options={"verify_exp": True}
     )
 
-    if payload.get("user_id") != user_id:
-        raise ValueError("Invalid user ID in token")
-
-    return True
+    return payload.get("user_id")

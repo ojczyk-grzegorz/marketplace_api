@@ -1,6 +1,8 @@
 uvicorn
 fastapi
+python-multipart
 ruff
 pydantic
 pydantic[email]
 pyjwt
+passlib
