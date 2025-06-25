@@ -194,15 +194,30 @@ async def create_items(
     description="Route for patching an item",
 )
 async def update_items(
+    token: Annotated[str, Depends(oauth2_scheme)],
     item: ItemUpdate = Body(
         ...,
         openapi_examples=ITEM_PATCH,
     ),
 ):
+    user_id: int = validate_access_token(
+        token=token,
+        secret_key=KEY,
+        algorithms=[ALGORITHM],
+    )
+
     db_items: list[dict] = database["items"]
 
     for item_db in db_items:
         if item_db["iid"] == item.iid:
+            if item_db["seller_id"] != user_id:
+                return ErrorResponse(
+                    error="ITEM_NOT_OWNED",
+                    details={
+                        "item_id": item.iid,
+                        "user_id": user_id,
+                    },
+                )
             break
     else:
         return ErrorResponse(
@@ -229,12 +244,21 @@ async def update_items(
     response_model=ItemRemoved | ErrorResponse,
     description="Route for deleting an item",
 )
-async def update_items(req_body: ItemRemove = Body(...)):
+async def update_items(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    req_body: ItemRemove = Body(...)
+):
+    user_id: int = validate_access_token(
+        token=token,
+        secret_key=KEY,
+        algorithms=[ALGORITHM],
+    )
+
     db_items: list[dict] = database["items"]
 
     for n, item_db in enumerate(db_items):
         if item_db["iid"] == req_body.item_id:
-            if item_db["seller_id"] != req_body.user_id:
+            if item_db["seller_id"] is None:
                 return ErrorResponse(
                     error="ITEM_NOT_OWNED",
                     details={

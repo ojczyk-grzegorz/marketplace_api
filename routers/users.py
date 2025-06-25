@@ -3,13 +3,12 @@ from typing import Annotated
 import copy
 
 from fastapi import APIRouter, Path, Body, status, Depends
-from fastapi.security import OAuth2PasswordRequestForm
 
 from db.db import database
 from datamodels.user import UserCreate, UserDB, UserPatch, UserOut, Address
 from datamodels.response import ErrorResponse
 from datamodels.auth import Token
-from auth.auth import get_access_token, validate_access_token, KEY, ALGORITHM, verify_password, oauth2_scheme
+from auth.auth import validate_access_token, KEY, ALGORITHM, oauth2_scheme
 from testing.openapi.users import USER_CREATE, USER_PATCH
 
 
@@ -132,3 +131,26 @@ async def update_customers(
             return du
 
     return ErrorResponse(error="USER_NOT_FOUND", details={"uid": user.uid})
+
+
+@router.delete(
+    "/me/update",
+    status_code=status.HTTP_200_OK,
+    response_model=dict | ErrorResponse,
+    description="Route for creating user",
+)
+async def update_customers(
+    token: Annotated[str, Depends(oauth2_scheme)],
+):
+    user_id = validate_access_token(
+        token=token,
+        secret_key=KEY,
+        algorithms=[ALGORITHM],
+    )
+    db_users: list[dict] = database["users"]
+    for n, du in enumerate(db_users):
+        if du.get("uid") == user_id:
+            del db_users[n]
+            return {"message": "User deleted successfully", "uid": user_id}
+
+    return ErrorResponse(error="USER_NOT_FOUND", details={"uid": user_id})

@@ -1,7 +1,9 @@
 from uuid import uuid4
 import datetime as dt
+from typing import Annotated
 
-from fastapi import APIRouter, Query, status, Header
+from fastapi import APIRouter, Query, status, Depends
+from auth.auth import oauth2_scheme, validate_access_token, KEY, ALGORITHM
 
 from db.db import database
 from datamodels.response import ErrorResponse
@@ -14,12 +16,20 @@ router = APIRouter(prefix="/transactions", tags=["Transactions"])
 
 
 @router.post(
-    "/user_current",
+    "/mine",
     status_code=status.HTTP_200_OK,
     response_model=list[TransactionCurrentOut] | ErrorResponse,
     description="Get user transactions by user ID",
 )
-async def get_user_transactions_current(user_id: int = Query(...)):
+async def get_user_transactions_current(
+    token: Annotated[str, Depends(oauth2_scheme)],
+):
+    user_id: int = validate_access_token(
+        token=token,
+        secret_key=KEY,
+        algorithms=[ALGORITHM],
+    )
+
     transactions_current_db = database["transactions_current"]
     items_db = database["items"]
     users_db = database["users"]
@@ -53,7 +63,16 @@ async def get_user_transactions_current(user_id: int = Query(...)):
     response_model=TransactionCurrentOut | ErrorResponse,
     description="Get current transaction by item ID",
 )
-async def get_item_transaction_current(item_id: int = Query(...)):
+async def get_item_transaction_current(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    item_id: int = Query(...)
+):
+    user_id: int = validate_access_token(
+        token=token,
+        secret_key=KEY,
+        algorithms=[ALGORITHM],
+    )
+    
     items_db = database["items"]
     transactions_current_db = database["transactions_current"]
 
@@ -69,6 +88,11 @@ async def get_item_transaction_current(item_id: int = Query(...)):
 
     for transaction in transactions_current_db:
         if transaction.get("tid") == transaction_id:
+            if transaction.get("buyer_id") != user_id:
+                return ErrorResponse(
+                    error="TRANSACTION_NOT_FOUND",
+                    details={"transaction_id": transaction_id},
+                )
             return TransactionCurrentOut(
                 item=item,
                 transaction=transaction,
