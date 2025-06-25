@@ -35,7 +35,6 @@ USER_CREATE = {
 USER_PATCH = {
     "good": {
         "value": {
-            "uid": 0,
             "email": "jakub22.nowak@example.com",
             "phone": "+48634489566",
             "first_name": "Jakub",
@@ -47,20 +46,5 @@ USER_PATCH = {
             "street_number": "38",
             "postal_code": "49-201",
         }
-    },
-    "bad": {
-        "value": {
-            "uid": 10_000_000,
-            "email": "jakub23.nowak@example.com",
-            "phone": "+48634489566",
-            "first_name": "Jakub",
-            "last_name": "Nowak",
-            "birth_date": "1998-11-21",
-            "country": "Poland",
-            "city": "Ruda \u015al\u0105ska",
-            "street": "W\u0142oska",
-            "street_number": "38",
-            "postal_code": "49-201",
-        }
-    },
+    }
 }

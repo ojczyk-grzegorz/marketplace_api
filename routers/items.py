@@ -1,7 +1,8 @@
 from typing import Annotated
 import datetime as dt
 
-from fastapi import APIRouter, status, Query, Path, Body
+from fastapi import APIRouter, status, Query, Path, Body, Depends
+from auth.auth import oauth2_scheme, validate_access_token, KEY, ALGORITHM
 
 from db.db import database
 from datamodels.response import ErrorResponse
@@ -135,16 +136,23 @@ async def get_items(
     description="Route for creating an item",
 )
 async def create_items(
+    token: Annotated[str, Depends(oauth2_scheme)],
     req_body: ItemsCreate = Body(
         ...,
         openapi_examples=ITEM_CREATE,
     ),
 ):
+    user_id: int = validate_access_token(
+        token=token,
+        secret_key=KEY,
+        algorithms=[ALGORITHM],
+    )
+
     db_users: list[dict] = database["users"]
     db_items: list[dict] = database["items"]
 
     for seller in db_users:
-        if seller.get("uid") == req_body.seller_id:
+        if seller.get("uid") == user_id:
             seller = UserDB.model_validate(seller)
             break
     else:

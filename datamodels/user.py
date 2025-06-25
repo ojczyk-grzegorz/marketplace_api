@@ -45,7 +45,6 @@ class UserDB(UserCreate):
 
 
 class UserPatch(BaseModel):
-    uid: int
     email: EmailStr | None = None
     password_hash: str | None = None
     phone: str | None = None
@@ -62,6 +61,7 @@ class UserPatch(BaseModel):
 
 
 class UserOut(BaseModel):
+    uid: int
     email: EmailStr
     phone: str
     first_name: str
