@@ -1,13 +1,13 @@
 steps
-- users, items, transactions
-    - mock data
-    - data models
-    - all endpoints
-    - all logic / features
-- db implementation
-- errors / responses
+- endpoints params
+- data models
+- mock data
+- postgres basics
+- features(auth, querying, ...)
+- errors
 - logging
 - configs
+- postgres advanced
 - tests
 - deployment
 - CICD

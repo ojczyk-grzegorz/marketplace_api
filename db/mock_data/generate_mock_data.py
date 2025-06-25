@@ -31,9 +31,8 @@ filepath_transactions_archived = os.path.join(
     dir_files_db, "transactions_archived.json"
 )
 
-today = datetime(2025, 6, 11)
+today = datetime(2025, 6, 11, tzinfo=datetime.timezone.utc)
 six_months_ago = today - timedelta(days=180)
-one_year_ago = today - timedelta(days=365)
 
 
 # Helper function to generate random dates for history
@@ -131,7 +130,7 @@ def main():
             **features_specific,
         }
 
-        created_at = random_date(one_year_ago, today)
+        created_at = random_date(six_months_ago, today)
         updated_at = created_at
         expires_at = created_at + timedelta(days=random.randint(15, 60))
 
