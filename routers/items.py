@@ -25,58 +25,6 @@ router = APIRouter(prefix="/items", tags=["Items"])
 
 
 @router.get(
-    "/{iid}",
-    status_code=status.HTTP_200_OK,
-    response_model=ItemDB | ErrorResponse,
-    description="Get item by its ID",
-)
-async def get_item(
-    iid: int = Path(
-        ...,
-    ),
-):
-    db_items: list[dict] = database["items"]
-    for item_db in db_items:
-        if item_db.get("iid") == iid:
-            return item_db
-
-    return ErrorResponse(
-        error="ITEM_NOT_FOUND",
-        details={"item_id": iid},
-    )
-
-
-@router.get(
-    "/user/{uid}",
-    status_code=status.HTTP_200_OK,
-    response_model=ItemsUser | ErrorResponse,
-    description="Get item by its ID",
-)
-async def get_user_items(
-    uid: int = Path(
-        ...,
-    ),
-):
-    db_users: list[dict] = database["users"]
-    db_items: list[dict] = database["items"]
-    for user in db_users:
-        if user.get("uid") == uid:
-            items = []
-            for item_db in db_items:
-                if item_db.get("seller_id") == uid:
-                    items.append(item_db)
-            return ItemsUser(
-                user_id=uid,
-                items=items,
-            )
-
-    return ErrorResponse(
-        error="USER_NOT_FOUND",
-        details={"user_id": uid},
-    )
-
-
-@router.get(
     "/query/{category}",
     status_code=status.HTTP_200_OK,
     response_model=ItemsQuery | ErrorResponse,
@@ -129,8 +77,95 @@ async def get_items(
     return ItemsQuery(q=query_items, items=items)
 
 
+@router.get(
+    "/{iid}",
+    status_code=status.HTTP_200_OK,
+    response_model=ItemDB | ErrorResponse,
+    description="Get item by its ID",
+)
+async def get_item(
+    iid: int = Path(
+        ...,
+    ),
+):
+    db_items: list[dict] = database["items"]
+    for item_db in db_items:
+        if item_db.get("iid") == iid:
+            return item_db
+
+    return ErrorResponse(
+        error="ITEM_NOT_FOUND",
+        details={"item_id": iid},
+    )
+
+
+@router.get(
+    "/user/{uid}",
+    status_code=status.HTTP_200_OK,
+    response_model=ItemsUser | ErrorResponse,
+    description="Get item by its ID",
+)
+async def get_user_items(
+    uid: int = Path(
+        ...,
+    ),
+):
+    db_users: list[dict] = database["users"]
+    db_items: list[dict] = database["items"]
+    for user in db_users:
+        if user.get("uid") == uid:
+            items = []
+            for item_db in db_items:
+                if item_db.get("seller_id") == uid:
+                    items.append(item_db)
+            return ItemsUser(
+                user_id=uid,
+                items=items,
+            )
+
+    return ErrorResponse(
+        error="USER_NOT_FOUND",
+        details={"user_id": uid},
+    )
+
+
 @router.post(
-    "",
+    "/mine",
+    status_code=status.HTTP_200_OK,
+    response_model=ItemsUser | ErrorResponse,
+    description="Get item by its ID",
+)
+async def get_user_items(
+    token: Annotated[str, Depends(oauth2_scheme)],
+):
+    user_id: int = validate_access_token(
+        token=token,
+        secret_key=KEY,
+        algorithms=[ALGORITHM],
+    )
+
+    db_users: list[dict] = database["users"]
+    db_items: list[dict] = database["items"]
+    
+    for user in db_users:
+        if user.get("uid") == user_id:
+            items = []
+            for item_db in db_items:
+                if item_db.get("seller_id") == user_id:
+                    items.append(item_db)
+            return ItemsUser(
+                user_id=user_id,
+                items=items,
+            )
+
+    return ErrorResponse(
+        error="USER_NOT_FOUND",
+        details={"user_id": user_id},
+    )
+
+
+@router.post(
+    "/create",
     status_code=status.HTTP_200_OK,
     response_model=ItemsCreated | ErrorResponse,
     description="Route for creating an item",
@@ -188,7 +223,7 @@ async def create_items(
 
 
 @router.patch(
-    "",
+    "/update",
     status_code=status.HTTP_200_OK,
     response_model=ItemDB | ErrorResponse,
     description="Route for patching an item",
@@ -239,7 +274,7 @@ async def update_items(
 
 
 @router.delete(
-    "",
+    "/remove",
     status_code=status.HTTP_200_OK,
     response_model=ItemRemoved | ErrorResponse,
     description="Route for deleting an item",

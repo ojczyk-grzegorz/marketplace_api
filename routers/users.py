@@ -7,7 +7,6 @@ from fastapi import APIRouter, Path, Body, status, Depends
 from db.db import database
 from datamodels.user import UserCreate, UserDB, UserPatch, UserOut, Address
 from datamodels.response import ErrorResponse
-from datamodels.auth import Token
 from auth.auth import validate_access_token, KEY, ALGORITHM, oauth2_scheme
 from testing.openapi.users import USER_CREATE, USER_PATCH
 
@@ -37,7 +36,7 @@ async def get_user(
     return ErrorResponse(error="USER_NOT_FOUND", details={"user_id": user_id})
 
 
-@router.get(
+@router.post(
     "/me",
     status_code=status.HTTP_200_OK,
     response_model=UserDB | ErrorResponse,
@@ -63,7 +62,7 @@ async def get_user_me(token: Annotated[str, Depends(oauth2_scheme)]):
 
 
 @router.post(
-    "",
+    "/create",
     status_code=status.HTTP_200_OK,
     response_model=UserOut | ErrorResponse,
     description="Route for creating user",
@@ -104,7 +103,7 @@ async def create_customers(
 
 
 @router.patch(
-    "/me/update",
+    "/update",
     status_code=status.HTTP_200_OK,
     response_model=UserOut | ErrorResponse,
     description="Route for creating user",
@@ -134,7 +133,7 @@ async def update_customers(
 
 
 @router.delete(
-    "/me/update",
+    "/remove",
     status_code=status.HTTP_200_OK,
     response_model=dict | ErrorResponse,
     description="Route for creating user",

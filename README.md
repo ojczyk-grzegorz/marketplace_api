@@ -5,6 +5,8 @@ steps
     - all endpoints
     - all logic / features
 - db implementation
+- errors / responses
+- logging
 - configs
 - tests
 - deployment

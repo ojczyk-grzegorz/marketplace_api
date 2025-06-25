@@ -2,7 +2,7 @@ from uuid import uuid4
 import datetime as dt
 from typing import Annotated
 
-from fastapi import APIRouter, Query, status, Depends
+from fastapi import APIRouter, Query, status, Depends, Body
 from auth.auth import oauth2_scheme, validate_access_token, KEY, ALGORITHM
 
 from db.db import database
@@ -12,11 +12,12 @@ from datamodels.transaction import (
     TransationArchivedDB,
 )
 
+
 router = APIRouter(prefix="/transactions", tags=["Transactions"])
 
 
 @router.post(
-    "/mine",
+    "/mine/active/all",
     status_code=status.HTTP_200_OK,
     response_model=list[TransactionCurrentOut] | ErrorResponse,
     description="Get user transactions by user ID",
@@ -58,14 +59,14 @@ async def get_user_transactions_current(
 
 
 @router.post(
-    "/transaction",
+    "/mine/active",
     status_code=status.HTTP_200_OK,
     response_model=TransactionCurrentOut | ErrorResponse,
     description="Get current transaction by item ID",
 )
-async def get_item_transaction_current(
+async def get_user_transaction_current(
     token: Annotated[str, Depends(oauth2_scheme)],
-    item_id: int = Query(...)
+    transaction_id: int = Body(...),
 ):
     user_id: int = validate_access_token(
         token=token,
@@ -73,31 +74,18 @@ async def get_item_transaction_current(
         algorithms=[ALGORITHM],
     )
     
-    items_db = database["items"]
-    transactions_current_db = database["transactions_current"]
-
-    for item in items_db:
-        if item.get("iid") == item_id:
-            transaction_id = item.get("transaction_id")
-            break
-    else:
-        return ErrorResponse(
-            error="ITEM_NOT_FOUND",
-            details={"item_id": item_id},
-        )
+    items_db: list[dict] = database["items"]
+    transactions_current_db: list[dict] = database["transactions_current"]
 
     for transaction in transactions_current_db:
         if transaction.get("tid") == transaction_id:
-            if transaction.get("buyer_id") != user_id:
-                return ErrorResponse(
-                    error="TRANSACTION_NOT_FOUND",
-                    details={"transaction_id": transaction_id},
-                )
-            return TransactionCurrentOut(
-                item=item,
-                transaction=transaction,
-            )
-
+            if transaction.get("buyer_id") == user_id:
+                for item in items_db:
+                    if item.get("transaction_id") == transaction_id:
+                        return TransactionCurrentOut(
+                            item=item,
+                            transaction=transaction,
+                        )
     return ErrorResponse(
         error="TRANSACTION_NOT_FOUND",
         details={"transaction_id": transaction_id},
@@ -105,12 +93,20 @@ async def get_item_transaction_current(
 
 
 @router.post(
-    "/user_archived",
+    "/mine/archived/all",
     status_code=status.HTTP_200_OK,
     response_model=list[TransationArchivedDB] | ErrorResponse,
     description="Get user transactions by user ID",
 )
-async def get_user_transactions_archived(user_id: int = Query(...)):
+async def get_user_transactions_archived(
+    token: Annotated[str, Depends(oauth2_scheme)],
+):
+    user_id: int = validate_access_token(
+        token=token,
+        secret_key=KEY,
+        algorithms=[ALGORITHM],
+    )
+
     transactions_archived_db = database["transactions_archived"]
     users_db = database["users"]
 
@@ -134,12 +130,62 @@ async def get_user_transactions_archived(user_id: int = Query(...)):
 
 
 @router.post(
+    "/mine/archived",
+    status_code=status.HTTP_200_OK,
+    response_model=list[TransationArchivedDB] | ErrorResponse,
+    description="Get user transactions by user ID",
+)
+async def get_user_transactions_archived(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    transaction_id_uuid4: str = Body(...),
+):
+    user_id: int = validate_access_token(
+        token=token,
+        secret_key=KEY,
+        algorithms=[ALGORITHM],
+    )
+
+    transactions_archived_db = database["transactions_archived"]
+    users_db = database["users"]
+
+    for user in users_db:
+        if user.get("uid") == user_id:
+            break
+    else:
+        return ErrorResponse(
+            error="USER_NOT_FOUND",
+            details={"user_id": user_id},
+        )
+
+    user_uid_uuid4 = user.get("uid_uuid4")
+
+    for transaction in transactions_archived_db:
+        if transaction.get("buyer_id_uuid4") == user_uid_uuid4:
+            if transaction.get("tid_uuid4") == transaction_id_uuid4:
+                return transaction
+
+    return ErrorResponse(
+        error="TRANSACTION_NOT_FOUND",
+        details={"transaction_id_uuid4": transaction_id_uuid4},
+    )
+
+
+@router.post(
     "/create",
     status_code=status.HTTP_200_OK,
     response_model=TransactionCurrentOut | ErrorResponse,
     description="Route for creating transactions",
 )
-async def create_transaction(item_id: int = Query(...), user_id: int = Query(...)):
+async def create_transaction(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    item_id: int = Body(...),
+):
+    user_id: int = validate_access_token(
+        token=token,
+        secret_key=KEY,
+        algorithms=[ALGORITHM],
+    )
+
     transactions_current_db = database["transactions_current"]
     users_db = database["users"]
     items_db = database["items"]
@@ -193,10 +239,17 @@ async def create_transaction(item_id: int = Query(...), user_id: int = Query(...
     response_model=TransactionCurrentOut | ErrorResponse,
     description="Route for creating transactions",
 )
-async def finish_transaction(
-    transaction_id: int = Query(...),
-    status: str = Query(..., examples=["finished", "cancelled", "expired"]),
+async def finalize_transaction(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    transaction_id: int = Body(...),
+    status: str = Body(..., examples=["finished", "cancelled", "expired"]),
 ):
+    user_id: int = validate_access_token(
+        token=token,
+        secret_key=KEY,
+        algorithms=[ALGORITHM],
+    )
+
     transactions_current_db = database["transactions_current"]
     transactions_archived_db = database["transactions_archived"]
     users_db = database["users"]
@@ -204,6 +257,11 @@ async def finish_transaction(
 
     for nt, transaction in enumerate(transactions_current_db):
         if transaction.get("tid") == transaction_id:
+            if transaction.get("buyer_id") != user_id:
+                return ErrorResponse(
+                    error="TRANSACTION_NOT_FOR_USER",
+                    details={"transaction_id": transaction_id, "user_id": user_id},
+                )
             for ni, item in enumerate(items_db):
                 if item.get("transaction_id") == transaction_id:
                     item["transaction_id"] = None
