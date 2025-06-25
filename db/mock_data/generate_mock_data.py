@@ -57,7 +57,7 @@ def main():
                 "uid": n,
                 "uid_uuid4": uuid4().hex,
                 "email": f"{first_name.lower()}.{last_name.lower()}@example.com",
-                "password_hash": f"password_hash{n}",
+                "password_hash": "password_hash",
                 "phone": f"+48{random.randint(500000000, 799999999)}",
                 "first_name": first_name,
                 "last_name": last_name,

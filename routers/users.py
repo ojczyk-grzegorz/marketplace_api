@@ -1,10 +1,11 @@
 import datetime as dt
 
-from fastapi import APIRouter, Path, Body, status
+from fastapi import APIRouter, Path, Body, status, Header
 
 from db.db import database
 from datamodels.user import UserCreate, UserDB, UserPatch, UserOut, Address
 from datamodels.response import ErrorResponse
+from auth.auth import get_access_token, validate_access_token, KEY, ALGORITHM
 from testing.openapi.users import USER_CREATE, USER_PATCH
 
 
@@ -22,6 +23,78 @@ async def get_user(
         ...,
     ),
 ):
+    for user in database["users"]:
+        if user.get("uid") == user_id:
+            reviews = user.get("reviews", [])
+            if len(reviews) > 3:
+                user["reviews"] = reviews[len(reviews) - 3 :]
+                return user
+
+    return ErrorResponse(error="USER_NOT_FOUND", details={"user_id": user_id})
+
+
+@router.post(
+    "/login",
+    status_code=status.HTTP_200_OK,
+    response_model=dict | ErrorResponse,
+    description="Route for getting user by ID",
+)
+async def login(
+    req_body: dict = Body(
+        ...,
+        openapi_examples={
+            "example1": {
+                "summary": "Login with email and password",
+                "value": {"email": "jakub.nowak@example.com", "password": "password"},
+            }
+        },
+    ),
+):
+    users_db = database["users"]
+
+    email = req_body["email"]
+    password = req_body["password"]
+
+    password_hash = password + "_hash"
+
+    for user in users_db:
+        if user.get("email") == email and user.get("password_hash") == password_hash:
+            token = get_access_token(
+                data={"user_id": user["uid"]},
+                secret_key=KEY,
+                algorithm=ALGORITHM,
+                expire_minutes=60,
+            )
+
+            return dict(
+                access_token=token,
+                token_type="bearer",
+                user_id=user["uid"],
+            )
+
+    return ErrorResponse(
+        error="INVALID_CREDENTIALS",
+    )
+
+
+@router.get(
+    "/me/{user_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=UserDB | ErrorResponse,
+    description="Route for getting user by ID",
+)
+async def get_user_me(
+    user_id: int = Path(
+        ...,
+    ),
+    authorization: str = Header(..., alias="Authorization"),
+):
+    validate_access_token(
+        token=authorization,
+        secret_key=KEY,
+        algorithms=[ALGORITHM],
+        user_id=user_id,
+    )
     for user in database["users"]:
         if user.get("uid") == user_id:
             reviews = user.get("reviews", [])

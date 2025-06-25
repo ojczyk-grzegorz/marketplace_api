@@ -3,3 +3,4 @@ fastapi
 ruff
 pydantic
 pydantic[email]
+pyjwt
