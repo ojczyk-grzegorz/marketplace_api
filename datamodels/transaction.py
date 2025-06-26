@@ -6,7 +6,7 @@ from datamodels.item import ItemDB
 from datamodels.user import UserDB
 
 
-class TransactionCurrentDB(BaseModel):
+class TransactionActiveDB(BaseModel):
     tid: int
     tid_uuid4: str
 
@@ -17,8 +17,8 @@ class TransactionCurrentDB(BaseModel):
     transaction_end: dt.datetime | None = None
 
 
-class TransactionCurrentOut(BaseModel):
-    transaction: TransactionCurrentDB
+class TransactionActiveOut(BaseModel):
+    transaction: TransactionActiveDB
     item: ItemDB
 
 

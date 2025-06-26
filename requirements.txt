@@ -6,3 +6,4 @@ pydantic
 pydantic[email]
 pyjwt
 passlib
+psycopg2-binary

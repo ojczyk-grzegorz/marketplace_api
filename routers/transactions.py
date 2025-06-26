@@ -8,7 +8,7 @@ from auth.auth import oauth2_scheme, validate_access_token, KEY, ALGORITHM
 from db.db import database
 from datamodels.response import ErrorResponse
 from datamodels.transaction import (
-    TransactionCurrentOut,
+    TransactionActiveOut,
     TransationArchivedDB,
 )
 
@@ -19,10 +19,10 @@ router = APIRouter(prefix="/transactions", tags=["Transactions"])
 @router.post(
     "/mine/active/all",
     status_code=status.HTTP_200_OK,
-    response_model=list[TransactionCurrentOut] | ErrorResponse,
+    response_model=list[TransactionActiveOut] | ErrorResponse,
     description="Get user transactions by user ID",
 )
-async def get_user_transactions_current(
+async def get_user_transactions_active(
     token: str = Depends(oauth2_scheme),
 ):
     user_id: int = validate_access_token(
@@ -31,7 +31,7 @@ async def get_user_transactions_current(
         algorithms=[ALGORITHM],
     )
 
-    transactions_current_db = database["transactions_current"]
+    transactions_active_db = database["transactions_active"]
     items_db = database["items"]
     users_db = database["users"]
 
@@ -45,12 +45,12 @@ async def get_user_transactions_current(
         )
 
     transactions = []
-    for transaction in transactions_current_db:
+    for transaction in transactions_active_db:
         if transaction.get("buyer_id") == user_id:
             transaction_id = transaction.get("tid")
             for item in items_db:
                 if item.get("transaction_id") == transaction_id:
-                    transaction_out = TransactionCurrentOut(
+                    transaction_out = TransactionActiveOut(
                         transaction=transaction, item=item
                     )
                     transactions.append(transaction_out)
@@ -61,10 +61,10 @@ async def get_user_transactions_current(
 @router.post(
     "/mine/active",
     status_code=status.HTTP_200_OK,
-    response_model=TransactionCurrentOut | ErrorResponse,
-    description="Get current transaction by item ID",
+    response_model=TransactionActiveOut | ErrorResponse,
+    description="Get active transaction by item ID",
 )
-async def get_user_transaction_current(
+async def get_user_transaction_active(
     token: str = Depends(oauth2_scheme),
     transaction_id: int = Body(...),
 ):
@@ -75,14 +75,14 @@ async def get_user_transaction_current(
     )
 
     items_db: list[dict] = database["items"]
-    transactions_current_db: list[dict] = database["transactions_current"]
+    transactions_active_db: list[dict] = database["transactions_active"]
 
-    for transaction in transactions_current_db:
+    for transaction in transactions_active_db:
         if transaction.get("tid") == transaction_id:
             if transaction.get("buyer_id") == user_id:
                 for item in items_db:
                     if item.get("transaction_id") == transaction_id:
-                        return TransactionCurrentOut(
+                        return TransactionActiveOut(
                             item=item,
                             transaction=transaction,
                         )
@@ -173,7 +173,7 @@ async def get_user_transactions_archived(
 @router.post(
     "/create",
     status_code=status.HTTP_200_OK,
-    response_model=TransactionCurrentOut | ErrorResponse,
+    response_model=TransactionActiveOut | ErrorResponse,
     description="Route for creating transactions",
 )
 async def create_transaction(
@@ -186,7 +186,7 @@ async def create_transaction(
         algorithms=[ALGORITHM],
     )
 
-    transactions_current_db = database["transactions_current"]
+    transactions_active_db = database["transactions_active"]
     users_db = database["users"]
     items_db = database["items"]
 
@@ -214,7 +214,7 @@ async def create_transaction(
             details={"item_id": item_id},
         )
 
-    tid = max([x["tid"] for x in transactions_current_db], default=0) + 1
+    tid = max([x["tid"] for x in transactions_active_db], default=0) + 1
     transaction = {
         "tid": tid,
         "tid_uuid4": uuid4().hex,
@@ -224,10 +224,10 @@ async def create_transaction(
         "transaction_end": None,
     }
 
-    transactions_current_db.append(transaction)
+    transactions_active_db.append(transaction)
     item["transaction_id"] = tid
 
-    return TransactionCurrentOut(
+    return TransactionActiveOut(
         transaction=transaction,
         item=item,
     )
@@ -236,7 +236,7 @@ async def create_transaction(
 @router.post(
     "/finalize",
     status_code=status.HTTP_200_OK,
-    response_model=TransactionCurrentOut | ErrorResponse,
+    response_model=TransactionActiveOut | ErrorResponse,
     description="Route for creating transactions",
 )
 async def finalize_transaction(
@@ -250,12 +250,12 @@ async def finalize_transaction(
         algorithms=[ALGORITHM],
     )
 
-    transactions_current_db = database["transactions_current"]
+    transactions_active_db = database["transactions_active"]
     transactions_archived_db = database["transactions_archived"]
     users_db = database["users"]
     items_db = database["items"]
 
-    for nt, transaction in enumerate(transactions_current_db):
+    for nt, transaction in enumerate(transactions_active_db):
         if transaction.get("tid") == transaction_id:
             if transaction.get("buyer_id") != user_id:
                 return ErrorResponse(
@@ -267,7 +267,7 @@ async def finalize_transaction(
                     item["transaction_id"] = None
                     break
             else:
-                transactions_current_db.pop(nt)
+                transactions_active_db.pop(nt)
                 return ErrorResponse(
                     error="ITEM_NOT_FOUND",
                     details={"transaction_id": transaction_id},
@@ -291,19 +291,19 @@ async def finalize_transaction(
                         transaction["seller_snapshot"] = user
                         break
                 transactions_archived_db.append(transaction)
-                transactions_current_db.pop(nt)
+                transactions_active_db.pop(nt)
                 items_db.pop(ni)
 
-                return TransactionCurrentOut(
+                return TransactionActiveOut(
                     item=item,
                     transaction=transaction,
                 )
 
             else:
                 item["transaction_id"] = None
-                transactions_current_db.pop(nt)
+                transactions_active_db.pop(nt)
 
-            return TransactionCurrentOut(
+            return TransactionActiveOut(
                 item=item,
                 transaction=transaction,
             )

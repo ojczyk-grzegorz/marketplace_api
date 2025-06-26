@@ -26,7 +26,7 @@ os.makedirs(dir_files_db, exist_ok=True)
 filepath_users = os.path.join(dir_files_db, "users.json")
 filepath_categories = os.path.join(dir_files_db, "categories.json")
 filepath_items = os.path.join(dir_files_db, "items.json")
-filepath_transactions_current = os.path.join(dir_files_db, "transactions_current.json")
+filepath_transactions_active = os.path.join(dir_files_db, "transactions_active.json")
 filepath_transactions_archived = os.path.join(
     dir_files_db, "transactions_archived.json"
 )
@@ -187,7 +187,7 @@ def main():
         items.append(item)
 
     ########### TRANSACTIONS pending ###########
-    transactions_current = []
+    transactions_active = []
     for n in range(4_000):
         item: dict = items[n]
 
@@ -219,7 +219,7 @@ def main():
             if transaction_end
             else None,
         }
-        transactions_current.append(transaction)
+        transactions_active.append(transaction)
         item["transaction_id"] = transaction["tid"]
 
     ########### TRANSACTIONS FINISHED ###########
@@ -230,7 +230,7 @@ def main():
         if transaction_id is None:
             continue
 
-        for tn, transaction in enumerate(transactions_current):
+        for tn, transaction in enumerate(transactions_active):
             if transaction["tid"] == transaction_id:
                 break
 
@@ -257,7 +257,7 @@ def main():
 
         transactions_archived.append(transaction)
         items.pop(n)
-        transactions_current.pop(tn)
+        transactions_active.pop(tn)
 
     with open(filepath_users, "w") as file:
         json.dump(users, file, indent=4)
@@ -275,9 +275,9 @@ def main():
         json.dump(transactions_archived, file, indent=4)
     print("Archived transactions generated:", len(transactions_archived))
 
-    with open(filepath_transactions_current, "w") as file:
-        json.dump(transactions_current, file, indent=4)
-    print("Current transactions generated:", len(transactions_current))
+    with open(filepath_transactions_active, "w") as file:
+        json.dump(transactions_active, file, indent=4)
+    print("Active transactions generated:", len(transactions_active))
 
 
 if __name__ == "__main__":
