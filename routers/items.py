@@ -1,4 +1,3 @@
-from typing import Annotated
 import datetime as dt
 
 from fastapi import APIRouter, status, Query, Path, Body, Depends
@@ -15,7 +14,6 @@ from datamodels.item import (
     ItemsCreated,
     ItemUpdate,
     ItemRemove,
-    ItemRemoved,
 )
 from datamodels.user import UserDB
 from testing.openapi.items import ITEM_CREATE, ITEM_PATCH
@@ -32,10 +30,8 @@ router = APIRouter(prefix="/items", tags=["Items"])
     response_model_exclude_none=True,
 )
 async def get_items(
-    category: str = Path(
-        ...,
-    ),
-    query_items: Annotated[QueryItems, Query()] = QueryItems(),
+    category: str = Path(...),
+    query_items: QueryItems = Query(QueryItems()),
 ):
     db_items: list[dict] = database["items"]
 
@@ -74,6 +70,7 @@ async def get_items(
             error="ITEMS_NOT_FOUND",
             details={"query": query_items, "category": category},
         )
+
     return ItemsQuery(q=query_items, items=items)
 
 
@@ -83,11 +80,7 @@ async def get_items(
     response_model=ItemDB | ErrorResponse,
     description="Get item by its ID",
 )
-async def get_item(
-    iid: int = Path(
-        ...,
-    ),
-):
+async def get_item(iid: int = Path(...)):
     db_items: list[dict] = database["items"]
     for item_db in db_items:
         if item_db.get("iid") == iid:
@@ -105,13 +98,10 @@ async def get_item(
     response_model=ItemsUser | ErrorResponse,
     description="Get item by its ID",
 )
-async def get_user_items(
-    uid: int = Path(
-        ...,
-    ),
-):
+async def get_user_items(uid: int = Path(...)):
     db_users: list[dict] = database["users"]
     db_items: list[dict] = database["items"]
+
     for user in db_users:
         if user.get("uid") == uid:
             items = []
@@ -119,7 +109,7 @@ async def get_user_items(
                 if item_db.get("seller_id") == uid:
                     items.append(item_db)
             return ItemsUser(
-                user_id=uid,
+                user=user,
                 items=items,
             )
 
@@ -135,9 +125,7 @@ async def get_user_items(
     response_model=ItemsUser | ErrorResponse,
     description="Get item by its ID",
 )
-async def get_user_items(
-    token: Annotated[str, Depends(oauth2_scheme)],
-):
+async def get_user_items(token: str = Depends(oauth2_scheme)):
     user_id: int = validate_access_token(
         token=token,
         secret_key=KEY,
@@ -146,7 +134,7 @@ async def get_user_items(
 
     db_users: list[dict] = database["users"]
     db_items: list[dict] = database["items"]
-    
+
     for user in db_users:
         if user.get("uid") == user_id:
             items = []
@@ -154,7 +142,7 @@ async def get_user_items(
                 if item_db.get("seller_id") == user_id:
                     items.append(item_db)
             return ItemsUser(
-                user_id=user_id,
+                user=user,
                 items=items,
             )
 
@@ -171,7 +159,7 @@ async def get_user_items(
     description="Route for creating an item",
 )
 async def create_items(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    token: str = Depends(oauth2_scheme),
     req_body: ItemsCreate = Body(
         ...,
         openapi_examples=ITEM_CREATE,
@@ -225,11 +213,11 @@ async def create_items(
 @router.patch(
     "/update",
     status_code=status.HTTP_200_OK,
-    response_model=ItemDB | ErrorResponse,
+    response_model=ItemsCreated | ErrorResponse,
     description="Route for patching an item",
 )
-async def update_items(
-    token: Annotated[str, Depends(oauth2_scheme)],
+async def update_item(
+    token: str = Depends(oauth2_scheme),
     item: ItemUpdate = Body(
         ...,
         openapi_examples=ITEM_PATCH,
@@ -270,17 +258,20 @@ async def update_items(
         }
     )
 
-    return item_db
+    return ItemsCreated(
+        seller_id=user_id,
+        items=[item_db]
+    )
 
 
 @router.delete(
     "/remove",
     status_code=status.HTTP_200_OK,
-    response_model=ItemRemoved | ErrorResponse,
+    response_model=ItemsCreated | ErrorResponse,
     description="Route for deleting an item",
 )
-async def update_items(
-    token: Annotated[str, Depends(oauth2_scheme)],
+async def remove_item(
+    token: str = Depends(oauth2_scheme),
     req_body: ItemRemove = Body(...)
 ):
     user_id: int = validate_access_token(
@@ -302,9 +293,9 @@ async def update_items(
                     },
                 )
             db_items.pop(n)
-            return ItemRemoved(
-                item_id=item_db["iid"],
-                user_id=req_body.user_id,
+            return ItemsCreated(
+                seller_id=user_id,
+                items=[item_db],
             )
 
     return ErrorResponse(

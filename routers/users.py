@@ -1,5 +1,4 @@
 import datetime as dt
-from typing import Annotated
 import copy
 
 from fastapi import APIRouter, Path, Body, status, Depends
@@ -21,10 +20,7 @@ router = APIRouter(prefix="/users", tags=["Users"])
     description="Route for getting user by ID",
 )
 async def get_user(
-    user_id: int = Path(
-        ...,
-    ),
-):
+    user_id: int = Path(...)):
     for user in database["users"]:
         if user.get("uid") == user_id:
             reviews = user.get("reviews", [])
@@ -42,29 +38,28 @@ async def get_user(
     response_model=UserDB | ErrorResponse,
     description="Route for getting user by ID",
 )
-async def get_user_me(token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_user_me(token: str = Depends(oauth2_scheme)):
     user_id = validate_access_token(
         token=token,
         secret_key=KEY,
         algorithms=[ALGORITHM],
     )
-    for user in database["users"]:
+    db_users: list[dict] = database["users"]
+
+    for user in db_users:
         if user.get("uid") == user_id:
             reviews = user.get("reviews", [])
             if len(reviews) > 3:
                 user["reviews"] = reviews[len(reviews) - 3 :]
-            break
+            return user
 
-    else:
-        return ErrorResponse(error="USER_NOT_FOUND", details={"user_id": user_id})
-
-    return user
+    return ErrorResponse(error="USER_NOT_FOUND", details={"user_id": user_id})
 
 
 @router.post(
     "/create",
     status_code=status.HTTP_200_OK,
-    response_model=UserOut | ErrorResponse,
+    response_model=UserDB | ErrorResponse,
     description="Route for creating user",
 )
 async def create_customers(
@@ -109,7 +104,7 @@ async def create_customers(
     description="Route for creating user",
 )
 async def update_customers(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    token: str = Depends(oauth2_scheme),
     user: UserPatch = Body(
         ...,
         openapi_examples=USER_PATCH,
@@ -139,7 +134,7 @@ async def update_customers(
     description="Route for creating user",
 )
 async def update_customers(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    token: str = Depends(oauth2_scheme),
 ):
     user_id = validate_access_token(
         token=token,

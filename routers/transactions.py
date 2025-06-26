@@ -23,7 +23,7 @@ router = APIRouter(prefix="/transactions", tags=["Transactions"])
     description="Get user transactions by user ID",
 )
 async def get_user_transactions_current(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    token: str = Depends(oauth2_scheme),
 ):
     user_id: int = validate_access_token(
         token=token,
@@ -65,7 +65,7 @@ async def get_user_transactions_current(
     description="Get current transaction by item ID",
 )
 async def get_user_transaction_current(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    token: str = Depends(oauth2_scheme),
     transaction_id: int = Body(...),
 ):
     user_id: int = validate_access_token(
@@ -73,7 +73,7 @@ async def get_user_transaction_current(
         secret_key=KEY,
         algorithms=[ALGORITHM],
     )
-    
+
     items_db: list[dict] = database["items"]
     transactions_current_db: list[dict] = database["transactions_current"]
 
@@ -99,7 +99,7 @@ async def get_user_transaction_current(
     description="Get user transactions by user ID",
 )
 async def get_user_transactions_archived(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    token: str = Depends(oauth2_scheme),
 ):
     user_id: int = validate_access_token(
         token=token,
@@ -136,7 +136,7 @@ async def get_user_transactions_archived(
     description="Get user transactions by user ID",
 )
 async def get_user_transactions_archived(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    token: str = Depends(oauth2_scheme),
     transaction_id_uuid4: str = Body(...),
 ):
     user_id: int = validate_access_token(
@@ -177,7 +177,7 @@ async def get_user_transactions_archived(
     description="Route for creating transactions",
 )
 async def create_transaction(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    token: str = Depends(oauth2_scheme),
     item_id: int = Body(...),
 ):
     user_id: int = validate_access_token(
@@ -240,7 +240,7 @@ async def create_transaction(
     description="Route for creating transactions",
 )
 async def finalize_transaction(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    token: str = Depends(oauth2_scheme),
     transaction_id: int = Body(...),
     status: str = Body(..., examples=["finished", "cancelled", "expired"]),
 ):

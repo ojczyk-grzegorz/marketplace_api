@@ -18,16 +18,16 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
     response_model=Token | ErrorResponse,
     description="Route for getting user by ID",
 )
-async def get_token(
-    form: Annotated[OAuth2PasswordRequestForm, Depends()]
-):
+async def get_token(form: Annotated[OAuth2PasswordRequestForm, Depends()]):
     users_db: list[dict] = database["users"]
 
     email: str = form.username
     password: str = form.password
 
     for user in users_db:
-        if user.get("email") == email and verify_password(password, user["password_hash"]):
+        if user.get("email") == email and verify_password(
+            password, user["password_hash"]
+        ):
             token = get_access_token(
                 data={"user_id": user["uid"]},
                 secret_key=KEY,

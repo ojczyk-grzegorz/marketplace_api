@@ -1,6 +1,8 @@
 import datetime as dt
 from pydantic import BaseModel, Field
 
+from datamodels.user import UserOut
+
 
 class ItemDB(BaseModel):
     iid: int
@@ -40,9 +42,9 @@ class ItemDB(BaseModel):
 
 class QueryItems(BaseModel):
     limit: int = Field(
-        default=10,
+        default=20,
         ge=1,
-        le=30,
+        le=50,
     )
     subcategory: list[str] | None = None
     brand: list[str] | None = None
@@ -80,7 +82,7 @@ class ItemDBToList(BaseModel):
 
 
 class ItemsUser(BaseModel):
-    user_id: int
+    user: UserOut
     items: list[ItemDBToList]
 
 
@@ -156,10 +158,3 @@ class ItemUpdate(BaseModel):
 
 class ItemRemove(BaseModel):
     item_id: int
-    User_id: int
-
-
-class ItemRemoved(BaseModel):
-    item_id: int
-    User_id: int
-    message: str = "Item removed successfully"
