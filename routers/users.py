@@ -3,7 +3,7 @@ import datetime as dt
 from fastapi import APIRouter, Path, Body, status, Depends
 
 
-from db.db import database, db_query, db_insert
+from db.db import database, db_search, db_insert, db_update, db_remove
 from datamodels.user import UserCreate, UserDB, UserPatch, UserOut, Address
 from datamodels.response import ErrorResponse
 from auth.auth import validate_access_token, KEY, ALGORITHM, oauth2_scheme
@@ -22,7 +22,7 @@ router = APIRouter(prefix="/users", tags=["Users"])
 async def get_user(
     user_id: int = Path(...)
 ):
-    results = db_query(f"SELECT row_to_json(users) FROM users WHERE uid = {user_id}")
+    results = db_search(f"SELECT row_to_json(users) FROM users WHERE uid = {user_id}")
     if results:
         return results[0][0]
 
@@ -41,7 +41,7 @@ async def get_user_me(token: str = Depends(oauth2_scheme)):
         secret_key=KEY,
         algorithms=[ALGORITHM],
     )
-    results = db_query(f"SELECT row_to_json(users) FROM users WHERE uid = {user_id}")
+    results = db_search(f"SELECT row_to_json(users) FROM users WHERE uid = {user_id}")
     if results:
         return results[0][0]
 
@@ -57,7 +57,7 @@ async def get_user_me(token: str = Depends(oauth2_scheme)):
 async def create_customers(
     user: UserCreate = Body(..., openapi_examples=USER_CREATE),
 ):
-    results = db_query(f"SELECT row_to_json(users) FROM users WHERE email = '{user.email}'")
+    results = db_search(f"SELECT row_to_json(users) FROM users WHERE email = '{user.email}'")
     if results:
         return ErrorResponse(
             error="USER_ALREADY_EXISTS", details={"email": user.email}
@@ -82,8 +82,7 @@ async def create_customers(
     )
 
     results = db_insert("users", user.model_dump(exclude_none=True, exclude_unset=True, mode="json"))
-    
-    return results
+    return results[0][0]
 
 
 @router.patch(
@@ -104,22 +103,20 @@ async def update_customers(
         secret_key=KEY,
         algorithms=[ALGORITHM],
     )
-    db_users: list[dict] = database["users"]
-    for du in db_users:
-        if du.get("uid") == user_id:
-            du.update(user.model_dump(exclude_none=True, exclude_unset=True))
-            reviews = du.get("reviews", [])
-            if len(reviews) > 3:
-                du["reviews"] = reviews[len(reviews) - 3 :]
-            return du
-
+    results = db_update(
+        table="users",
+        data=user.model_dump(exclude_none=True, exclude_unset=True),
+        where=f"uid = {user_id}",
+    )
+    if results:
+        return results[0][0] 
     return ErrorResponse(error="USER_NOT_FOUND", details={"uid": user.uid})
 
 
 @router.delete(
     "/remove",
     status_code=status.HTTP_200_OK,
-    response_model=dict | ErrorResponse,
+    # response_model=dict | ErrorResponse,
     description="Route for creating user",
 )
 async def update_customers(
@@ -130,10 +127,28 @@ async def update_customers(
         secret_key=KEY,
         algorithms=[ALGORITHM],
     )
-    db_users: list[dict] = database["users"]
-    for n, du in enumerate(db_users):
-        if du.get("uid") == user_id:
-            del db_users[n]
-            return {"message": "User deleted successfully", "uid": user_id}
+    # results = db_search(f"SELECT json_agg(transactions_active) FROM transactions_active WHERE buyer_id = {user_id}")
+    sid_cancelled = db_search(f"SELECT sid FROM status WHERE name = 'cancelled'")
+    sid_cancelled = sid_cancelled[0][0]
 
+    trans_update = db_update(
+        table="transactions_active",
+        data={"status_id": sid_cancelled},
+        where=f"buyer_id = {user_id} AND transaction_end IS NULL",
+    )
+
+    tranasctions = db_search(
+        f"SELECT json_agg(transactions_active) FROM transactions_active WHERE buyer_id = {user_id}"
+    )[0][0]
+
+    
+
+    return tranasctions
+
+
+    return trans_update
+    results = db_remove(table="users", where=f"uid = {user_id}")
+    results = db_remove(table="users", where=f"uid = {user_id}")
+    if results:
+        return {"message": "User removed successfully", "uid": user_id}
     return ErrorResponse(error="USER_NOT_FOUND", details={"uid": user_id})

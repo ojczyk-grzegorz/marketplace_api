@@ -4,6 +4,8 @@ import json
 import os
 from uuid import uuid4
 
+import psycopg2
+
 from mock_values.common import CITIES, STREETS
 from mock_values.users import FIRST_NAMES, LAST_NAMES, USER_REVIEWS
 from mock_values.transactions import STATUS
@@ -55,7 +57,7 @@ def main():
             reviews = list(set(random.choices(USER_REVIEWS, k=random.randint(0, 20))))
             created_at = random_date(six_months_ago, today)
             customer = {
-                "uid": n,
+                "uid": n + 1,
                 "uid_uuid4": uuid4().hex,
                 "email": f"{first_name.lower()}.{last_name.lower()}@example.com",
                 "password_hash": "password_hash",
@@ -97,7 +99,7 @@ def main():
     for n, category in enumerate(CATEGORIES):
         categories.append(
             {
-                "cid": n,
+                "cid": n + 1,
                 "name": category,
             }
         )
@@ -107,7 +109,7 @@ def main():
     for n, s in enumerate(STATUS):
         status.append(
             {
-                "sid": n,
+                "sid": n + 1,
                 "name": s,
             }
         )
@@ -115,7 +117,7 @@ def main():
     ########### ITEMS ###########
     items = []
     for n in range(5_000):
-        iid = n
+        iid = n + 1
 
         category = random.choice(categories)
         seller = users[random.randint(0, len(users) // 3)]
@@ -223,7 +225,7 @@ def main():
             transaction_end = None
 
         transaction = {
-            "tid": n,
+            "tid": n + 1,
             "tid_uuid4": uuid4().hex,
             "buyer_id": customer["uid"],
             "status_id": stat["sid"],
@@ -237,40 +239,40 @@ def main():
 
     ########### TRANSACTIONS FINISHED ###########
     transactions_archived = []
-    for n in range(len(items) - 1, -1, -1):
-        item: dict = items[n]
-        transaction_id = item["transaction_id"]
-        if transaction_id is None:
-            continue
+    # for n in range(len(items) - 1, -1, -1):
+    #     item: dict = items[n]
+    #     transaction_id = item["transaction_id"]
+    #     if transaction_id is None:
+    #         continue
 
-        for tn, transaction in enumerate(transactions_active):
-            if transaction["tid"] == transaction_id:
-                break
+    #     for tn, transaction in enumerate(transactions_active):
+    #         if transaction["tid"] == transaction_id:
+    #             break
 
-        if transaction["transaction_end"] is None:
-            continue
+    #     if transaction["transaction_end"] is None:
+    #         continue
 
-        transaction.pop("tid", None)
+    #     transaction.pop("tid", None)
 
-        transaction["item_id_uuid4"] = item["iid_uuid4"]
-        transaction["item_snapshot"] = item
+    #     transaction["item_id_uuid4"] = item["iid_uuid4"]
+    #     transaction["item_snapshot"] = item
 
-        for user in users:
-            if user["uid"] == transaction["buyer_id"]:
-                transaction["buyer_id_uuid4"] = user["uid_uuid4"]
-                transaction["buyer_snapshot"] = user
-                transaction.pop("buyer_id", None)
-                break
+    #     for user in users:
+    #         if user["uid"] == transaction["buyer_id"]:
+    #             transaction["buyer_id_uuid4"] = user["uid_uuid4"]
+    #             transaction["buyer_snapshot"] = user
+    #             transaction.pop("buyer_id", None)
+    #             break
 
-        for user in users:
-            if user["uid"] == item["seller_id"]:
-                transaction["seller_id_uuid4"] = user["uid_uuid4"]
-                transaction["seller_snapshot"] = user
-                break
+    #     for user in users:
+    #         if user["uid"] == item["seller_id"]:
+    #             transaction["seller_id_uuid4"] = user["uid_uuid4"]
+    #             transaction["seller_snapshot"] = user
+    #             break
 
-        transactions_archived.append(transaction)
-        items.pop(n)
-        transactions_active.pop(tn)
+    #     transactions_archived.append(transaction)
+        # items.pop(n)
+        # transactions_active.pop(tn)
 
     with open(filepath_users, "w") as file:
         json.dump(users, file, indent=4)
@@ -297,5 +299,55 @@ def main():
     print("Active transactions generated:", len(transactions_active))
 
 
+    with open("db/postgres/database.json", "r") as file:
+        database_config = json.load(file)
+
+    recreate_tables(database_config, "db/postgres/CREATE_TABLES.sql")
+
+    insert_table_json(database_config, "db/mock_data/users.json", remove=["uid", "uid_uuid4"])
+    insert_table_json(database_config, "db/mock_data/categories.json", remove=["cid"])
+    insert_table_json(database_config, "db/mock_data/status.json", remove=["sid"])
+    insert_table_json(database_config, "db/mock_data/transactions_active.json", remove=["tid", "tid_uuid4"])
+    insert_table_json(database_config, "db/mock_data/items.json", remove=["iid", "iid_uuid4"])
+
+
+def recreate_tables(db_config: dict, create_tables_sql: str = "CREATE_TABLES.sql"):
+    with open(create_tables_sql, "r") as file:
+        create_tables_query = file.read()
+
+    with psycopg2.connect(**db_config) as connection:
+        cursor = connection.cursor()
+        cursor.execute(create_tables_query)
+        connection.commit()
+
+
+def insert_table_json(db_config: dict, filepath: str, remove: list[str] = []):
+    with open(filepath, "r") as file:
+        data: list[dict] = json.load(file)
+    for key in remove:
+        for item in data:
+            if key in item:
+                del item[key]
+    
+    columns = ", ".join(data[0].keys())
+    data_json = json.dumps(data).replace("'", "''")
+    table_name = filepath.split("/")[-1].split(".")[0]
+
+    with psycopg2.connect(**db_config) as connection:
+        cursor = connection.cursor()
+        cursor.execute(f"""
+            INSERT INTO {table_name} ({columns})
+            SELECT {columns}
+            FROM json_populate_recordset(
+                NULL::{table_name},
+                '{data_json}'
+            )
+            RETURNING *;
+        """)
+        connection.commit()
+
+
 if __name__ == "__main__":
     main()
+
+

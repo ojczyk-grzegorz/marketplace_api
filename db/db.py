@@ -2,6 +2,8 @@ import psycopg2
 import json
 import os
 
+from numbers import Number
+
 dir_files_db = os.path.dirname(os.path.abspath(__file__))
 
 filepath_items = os.path.join(dir_files_db, "mock_data", "items.json")
@@ -33,7 +35,7 @@ database = dict(
 )
 
 
-def db_query(query: str):
+def db_search(query: str):
     with open("db/postgres/database.json", "r") as f:
         db_config = json.load(f)
 
@@ -44,7 +46,7 @@ def db_query(query: str):
     return results
 
 
-def db_insert(table: str, data: dict):
+def db_insert(table: str, data: dict | list[dict]):
     with open("db/postgres/database.json", "r") as f:
         db_config = json.load(f)
 
@@ -55,17 +57,68 @@ def db_insert(table: str, data: dict):
     data_json = data_json.replace("'", "''")
     with psycopg2.connect(**db_config) as connection:
         cursor = connection.cursor()
-        command = f"""
-            INSERT INTO {table}
-            SELECT {columns}
-            FROM json_populate_recordset(
-                NULL::{table},
-                '{data_json}'
-            )
-            RETURNING *;
+        query = f"""
+            INSERT INTO {table} ({columns})
+                SELECT {columns}
+                FROM json_populate_recordset(
+                    NULL::{table},
+                    '{data_json}'
+                )
+            RETURNING row_to_json({table});
         """
-        raise Exception(command)
-        cursor.execute()
+        # raise Exception(query)
+        cursor.execute(query)
+        connection.commit()
+        results = cursor.fetchone()
+    return results
+
+
+def parse_to_update(data: dict) -> str:
+    parsed_data = ""
+    for key, value in data.items():
+        if isinstance(value, str):
+            value = "'" + value.replace("'", "''") + "'"
+        elif value is None:
+            value = "NULL"
+        elif isinstance(value, Number):
+            value = str(value)
+        else:
+            value = "'" + json.dumps(value, ensure_ascii=False).replace("'", "''") + "'"
+        parsed_data += f"{key} = {value}, "
+    return parsed_data[:-2]  # Remove the last comma and space
+        
+
+def db_update(table: str, data: dict, where: str):
+    with open("db/postgres/database.json", "r") as f:
+        db_config = json.load(f)
+
+    data: str = parse_to_update(data)
+    with psycopg2.connect(**db_config) as connection:
+        cursor = connection.cursor()
+        query = f"""
+            UPDATE {table}
+            SET {data}
+            WHERE {where}
+            RETURNING row_to_json({table});
+        """
+        cursor.execute(query)
+        connection.commit()
+        results = cursor.fetchall()
+    return results
+
+
+def db_remove(table: str, where: str):
+    with open("db/postgres/database.json", "r") as f:
+        db_config = json.load(f)
+
+    with psycopg2.connect(**db_config) as connection:
+        cursor = connection.cursor()
+        query = f"""
+            DELETE FROM {table}
+            WHERE {where}
+            RETURNING row_to_json({table});
+        """
+        cursor.execute(query)
         connection.commit()
         results = cursor.fetchall()
     return results
