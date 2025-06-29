@@ -11,7 +11,7 @@ class TransactionActiveDB(BaseModel):
     tid_uuid4: str
 
     buyer_id: int
-    status: Literal["pending", "finished", "cancelled", "expired"]
+    status: Literal["active", "finished", "cancelled", "expired"]
 
     transaction_start: dt.datetime
     transaction_end: dt.datetime | None = None

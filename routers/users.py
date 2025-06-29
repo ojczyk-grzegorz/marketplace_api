@@ -1,9 +1,9 @@
 import datetime as dt
-import copy
 
 from fastapi import APIRouter, Path, Body, status, Depends
 
-from db.db import database
+
+from db.db import database, db_query, db_insert
 from datamodels.user import UserCreate, UserDB, UserPatch, UserOut, Address
 from datamodels.response import ErrorResponse
 from auth.auth import validate_access_token, KEY, ALGORITHM, oauth2_scheme
@@ -20,14 +20,11 @@ router = APIRouter(prefix="/users", tags=["Users"])
     description="Route for getting user by ID",
 )
 async def get_user(
-    user_id: int = Path(...)):
-    for user in database["users"]:
-        if user.get("uid") == user_id:
-            reviews = user.get("reviews", [])
-            if len(reviews) > 3:
-                user = copy.deepcopy(user)
-                user["reviews"] = reviews[len(reviews) - 3 :]
-            return user
+    user_id: int = Path(...)
+):
+    results = db_query(f"SELECT row_to_json(users) FROM users WHERE uid = {user_id}")
+    if results:
+        return results[0][0]
 
     return ErrorResponse(error="USER_NOT_FOUND", details={"user_id": user_id})
 
@@ -44,14 +41,9 @@ async def get_user_me(token: str = Depends(oauth2_scheme)):
         secret_key=KEY,
         algorithms=[ALGORITHM],
     )
-    db_users: list[dict] = database["users"]
-
-    for user in db_users:
-        if user.get("uid") == user_id:
-            reviews = user.get("reviews", [])
-            if len(reviews) > 3:
-                user["reviews"] = reviews[len(reviews) - 3 :]
-            return user
+    results = db_query(f"SELECT row_to_json(users) FROM users WHERE uid = {user_id}")
+    if results:
+        return results[0][0]
 
     return ErrorResponse(error="USER_NOT_FOUND", details={"user_id": user_id})
 
@@ -65,19 +57,16 @@ async def get_user_me(token: str = Depends(oauth2_scheme)):
 async def create_customers(
     user: UserCreate = Body(..., openapi_examples=USER_CREATE),
 ):
-    db_users: list[dict] = database["users"]
-    for du in db_users:
-        if du.get("email") == user.email:
-            return ErrorResponse(
-                error="USER_ALREADY_EXISTS", details={"email": user.email}
-            )
+    results = db_query(f"SELECT row_to_json(users) FROM users WHERE email = '{user.email}'")
+    if results:
+        return ErrorResponse(
+            error="USER_ALREADY_EXISTS", details={"email": user.email}
+        )
 
-    user_id = max([x["uid"] for x in db_users], default=0) + 1
     created_at = dt.datetime.now(dt.timezone.utc).isoformat()
 
     user = UserDB(
-        **user.model_dump(exclude_none=True, exclude_unset=True),
-        uid=user_id,
+        **user.model_dump(exclude_none=True),
         created_at=created_at,
         updated_at=created_at,
         addresses=[
@@ -92,9 +81,9 @@ async def create_customers(
         last_activity=created_at,
     )
 
-    db_users.append(user.model_dump())
-
-    return user
+    results = db_insert("users", user.model_dump(exclude_none=True, exclude_unset=True, mode="json"))
+    
+    return results
 
 
 @router.patch(

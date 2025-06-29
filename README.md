@@ -11,3 +11,5 @@ steps
 - tests
 - deployment
 - CICD
+
+https://www.youtube.com/watch?v=tiBeLLv5GJo

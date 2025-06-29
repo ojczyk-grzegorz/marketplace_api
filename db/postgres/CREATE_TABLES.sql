@@ -3,7 +3,9 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS categories CASCADE;
 DROP TABLE IF EXISTS status CASCADE;
-DROP TABLE IF EXISTS transactions CASCADE;
+DROP TABLE IF EXISTS transactions_active CASCADE;
+DROP TABLE IF EXISTS transcations_archived CASCADE;
+
 DROP TABLE IF EXISTS items CASCADE;
 
 CREATE TABLE users (
@@ -20,12 +22,12 @@ CREATE TABLE users (
     street VARCHAR(128) NOT NULL,
     street_number VARCHAR(16) NOT NULL,
     postal_code VARCHAR(16) NOT NULL,
-    addresses JSONB,
+    addresses JSONB DEFAULT '[]'::JSONB,
     created_at TIMESTAMPTZ NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL,
     last_activity TIMESTAMPTZ NOT NULL,
     reviews JSONB,
-    rating DECIMAL(1,2) NOT NULL DEFAULT 0.0,
+    rating NUMERIC NOT NULL DEFAULT 0.0,
     avatar TEXT
 );
 
@@ -52,7 +54,7 @@ CREATE TABLE status (
 );
 
 
-CREATE TABLE transactions (
+CREATE TABLE transactions_active (
     tid SERIAL PRIMARY KEY,
     tid_uuid4 UUID DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
     buyer_id  INT NOT NULL,
@@ -69,12 +71,12 @@ CREATE TABLE items (
 	iid SERIAL PRIMARY KEY,
 	iid_uuid4 UUID DEFAULT uuid_generate_v4() UNIQUE,
     name VARCHAR(256) NOT NULL,
-    cid INT NOT NULL,
+    category_id INT NOT NULL,
     seller_id INT NOT NULL,
-    seller_rating DECIMAL(1,2) NOT NULL DEFAULT 0.0,
-    transaction_id INT NOT NULL,
+    seller_rating NUMERIC NOT NULL DEFAULT 0.0,
+    transaction_id INT,
     subcategory VARCHAR(32) NOT NULL,
-    price DECIMAL(10, 2) NOT NULL,
+    price NUMERIC NOT NULL,
     condition VARCHAR(32) NOT NULL,
     brand VARCHAR(64),
     material VARCHAR(32),
@@ -94,7 +96,21 @@ CREATE TABLE items (
     interested INTEGER DEFAULT 0,
     description TEXT,
 
-    FOREIGN KEY (cid) REFERENCES categories(cid),
+    FOREIGN KEY (category_id) REFERENCES categories(cid),
     FOREIGN KEY (seller_id) REFERENCES users(uid),
-    FOREIGN KEY (transaction_id) REFERENCES transactions(tid)
+    FOREIGN KEY (transaction_id) REFERENCES transactions_active(tid)
+);
+
+
+CREATE TABLE transcations_archived (
+    tid_uuid4 UUID DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
+    status VARCHAR(32) NOT NULL,
+    transaction_start TIMESTAMPTZ NOT NULL,
+    transaction_end TIMESTAMPTZ NOT NULL,
+    item_id_uuid4 UUID NOT NULL,
+    item_snapshot JSONB NOT NULL,
+    buyer_id_uuid4 UUID NOT NULL,
+    buyer_snapshot JSONB NOT NULL,
+    seller_id_uuid4 UUID NOT NULL,
+    seller_snapshot JSONB NOT NULL
 );

@@ -1,4 +1,5 @@
 database.ini
+database.json
 
 local_utils
 examples/*

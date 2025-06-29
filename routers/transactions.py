@@ -219,7 +219,7 @@ async def create_transaction(
         "tid": tid,
         "tid_uuid4": uuid4().hex,
         "buyer_id": user_id,
-        "status": "pending",
+        "status": "active",
         "transaction_start": dt.datetime.now().isoformat(),
         "transaction_end": None,
     }

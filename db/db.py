@@ -1,3 +1,4 @@
+import psycopg2
 import json
 import os
 
@@ -30,3 +31,41 @@ database = dict(
     transactions_active=transactions_active,
     transactions_archived=transactions_archived,
 )
+
+
+def db_query(query: str):
+    with open("db/postgres/database.json", "r") as f:
+        db_config = json.load(f)
+
+    with psycopg2.connect(**db_config) as connection:
+        cursor = connection.cursor()
+        cursor.execute(query)
+        results = cursor.fetchall()
+    return results
+
+
+def db_insert(table: str, data: dict):
+    with open("db/postgres/database.json", "r") as f:
+        db_config = json.load(f)
+
+    if not isinstance(data, list):
+        data = [data]
+    columns = ", ".join(data[0].keys())
+    data_json = json.dumps(data, ensure_ascii=False)
+    data_json = data_json.replace("'", "''")
+    with psycopg2.connect(**db_config) as connection:
+        cursor = connection.cursor()
+        command = f"""
+            INSERT INTO {table}
+            SELECT {columns}
+            FROM json_populate_recordset(
+                NULL::{table},
+                '{data_json}'
+            )
+            RETURNING *;
+        """
+        raise Exception(command)
+        cursor.execute()
+        connection.commit()
+        results = cursor.fetchall()
+    return results

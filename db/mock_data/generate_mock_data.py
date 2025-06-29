@@ -1,11 +1,12 @@
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import json
 import os
 from uuid import uuid4
 
 from mock_values.common import CITIES, STREETS
 from mock_values.users import FIRST_NAMES, LAST_NAMES, USER_REVIEWS
+from mock_values.transactions import STATUS
 from mock_values.items import (
     CATEGORIES,
     SIZES,
@@ -25,13 +26,14 @@ os.makedirs(dir_files_db, exist_ok=True)
 
 filepath_users = os.path.join(dir_files_db, "users.json")
 filepath_categories = os.path.join(dir_files_db, "categories.json")
+filepath_status = os.path.join(dir_files_db, "status.json")
 filepath_items = os.path.join(dir_files_db, "items.json")
 filepath_transactions_active = os.path.join(dir_files_db, "transactions_active.json")
 filepath_transactions_archived = os.path.join(
     dir_files_db, "transactions_archived.json"
 )
 
-today = datetime(2025, 6, 11, tzinfo=datetime.timezone.utc)
+today = datetime(2025, 6, 11, tzinfo=timezone.utc)
 six_months_ago = today - timedelta(days=180)
 
 
@@ -63,11 +65,12 @@ def main():
                 "birth_date": random_date(
                     datetime(1975, 1, 1), datetime(2009, 12, 31)
                 ).strftime("%Y-%m-%d"),
-                "country": "Poland",
+                "country": "PL",
                 "city": random.choice(CITIES),
                 "street": random.choice(STREETS),
                 "street_number": str(random.randint(1, 200)),
                 "postal_code": f"{random.randint(10, 99)}-{random.randint(100, 999)}",
+                "addresses": [],
                 "created_at": created_at.strftime("%Y-%m-%dT%H:%M:%S"),
                 "updated_at": created_at.strftime("%Y-%m-%dT%H:%M:%S"),
                 "last_activity": created_at.strftime("%Y-%m-%dT%H:%M:%S"),
@@ -96,6 +99,16 @@ def main():
             {
                 "cid": n,
                 "name": category,
+            }
+        )
+
+    ########### STATUS ###########
+    status = []
+    for n, s in enumerate(STATUS):
+        status.append(
+            {
+                "sid": n,
+                "name": s,
             }
         )
 
@@ -155,7 +168,7 @@ def main():
             "iid": iid,
             "iid_uuid4": uuid4().hex,
             "name": name,
-            "cid": category["cid"],
+            "category_id": category["cid"],
             "seller_id": seller["uid"],
             "seller_rating": seller["rating"],
             "transaction_id": None,
@@ -186,7 +199,7 @@ def main():
 
         items.append(item)
 
-    ########### TRANSACTIONS pending ###########
+    ########### TRANSACTIONS active ###########
     transactions_active = []
     for n in range(4_000):
         item: dict = items[n]
@@ -200,8 +213,8 @@ def main():
             datetime.fromisoformat(item["created_at"]),
             datetime.fromisoformat(item["expires_at"]),
         )
-        status = random.choice(["pending", "finished", "cancelled", "expired"])
-        if status != "pending":
+        stat = random.choice(status)
+        if stat["name"] != "active":
             transaction_end = random_date(
                 transaction_start,
                 datetime.fromisoformat(item["expires_at"]),
@@ -213,7 +226,7 @@ def main():
             "tid": n,
             "tid_uuid4": uuid4().hex,
             "buyer_id": customer["uid"],
-            "status": status,
+            "status_id": stat["sid"],
             "transaction_start": transaction_start.strftime("%Y-%m-%dT%H:%M:%S"),
             "transaction_end": transaction_end.strftime("%Y-%m-%dT%H:%M:%S")
             if transaction_end
@@ -266,6 +279,10 @@ def main():
     with open(filepath_categories, "w") as file:
         json.dump(categories, file, indent=4)
     print("Categories generated:", len(categories))
+
+    with open(filepath_status, "w") as file:
+        json.dump(status, file, indent=4)
+    print("Status generated:", len(status))
 
     with open(filepath_items, "w") as file:
         json.dump(items, file, indent=4)

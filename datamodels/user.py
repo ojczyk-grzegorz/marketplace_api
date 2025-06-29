@@ -32,11 +32,11 @@ class UserCreate(BaseModel):
 
 
 class UserDB(UserCreate):
-    uid: int
-    uid_uuid4: str
+    uid: int | None = None
+    uid_uuid4: str | None = None
 
-    created_at: dt.datetime
-    updated_at: dt.datetime
+    created_at: dt.datetime | None = None
+    updated_at: dt.datetime | None = None
     addresses: list[Address] = []
     reviews: list[Review] = []
     rating: float = 0.0
