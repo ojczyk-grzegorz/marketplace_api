@@ -216,7 +216,7 @@ def main():
             datetime.fromisoformat(item["expires_at"]),
         )
         stat = random.choice(status)
-        if stat["name"] != "active":
+        if stat["name"] not in ["active", "shipping", "disputed"]:
             transaction_end = random_date(
                 transaction_start,
                 datetime.fromisoformat(item["expires_at"]),

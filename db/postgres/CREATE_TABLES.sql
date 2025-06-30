@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS categories CASCADE;
 DROP TABLE IF EXISTS status CASCADE;
 DROP TABLE IF EXISTS transactions_active CASCADE;
-DROP TABLE IF EXISTS transcations_archived CASCADE;
+DROP TABLE IF EXISTS transactions_archived CASCADE;
 
 DROP TABLE IF EXISTS items CASCADE;
 
@@ -102,7 +102,7 @@ CREATE TABLE items (
 );
 
 
-CREATE TABLE transcations_archived (
+CREATE TABLE transactions_archived (
     tid_uuid4 UUID DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
     status VARCHAR(32) NOT NULL,
     transaction_start TIMESTAMPTZ NOT NULL,

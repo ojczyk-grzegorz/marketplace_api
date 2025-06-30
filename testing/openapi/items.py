@@ -6,7 +6,7 @@ ITEM_CREATE = {
             "items": [
                 {
                     "name": "Aetheria Apparel Blue T-Shirt",
-                    "cid": 0,
+                    "category_id": 1,
                     "subcategory": "T-Shirt",
                     "price": 40.99,
                     "condition": "Poor",
@@ -38,7 +38,7 @@ ITEM_PATCH = {
     "single": {
         "summary": "single item example",
         "value": {
-            "iid": 0,
+            "iid": 1,
             "city": "Kielce",
             "street": "Francuska",
             "name": "Update test name",

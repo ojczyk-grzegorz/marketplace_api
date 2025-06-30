@@ -5,19 +5,19 @@ from datamodels.user import UserOut
 
 
 class ItemDB(BaseModel):
-    iid: int
-    iid_uuid4: str
+    iid: int | None = None
+    iid_uuid4: str | None = None
 
-    name: str
-    cid: int
+    name: str | None = None
+    category_id: int | None = None
 
-    seller_id: int
+    seller_id: int | None = None
     seller_rating: float = 0.0
 
     subcategory: str | None = None
 
-    price: float
-    condition: str
+    price: float | None = None
+    condition: str | None = None
     brand: str | None = None
     material: str | None = None
     color: str | None = None
@@ -26,13 +26,13 @@ class ItemDB(BaseModel):
     style: str | None = None
     features: dict | None = None
 
-    city: str
-    street: str
-    delivery: list[str] = Field(min_length=1)
+    city: str | None = None
+    street: str | None = None
+    delivery: list[str] = []
 
-    created_at: dt.datetime
-    updated_at: dt.datetime
-    expires_at: dt.datetime
+    created_at: dt.datetime | None = None
+    updated_at: dt.datetime | None = None
+    expires_at: dt.datetime | None = None
 
     icon: str | None = None
     images: list[str] = []
@@ -93,7 +93,7 @@ class ItemsQuery(BaseModel):
 
 class ItemCreate(BaseModel):
     name: str
-    cid: int
+    category_id: int
 
     subcategory: str | None = None
 
@@ -147,12 +147,12 @@ class ItemUpdate(BaseModel):
 
     city: str | None = None
     street: str | None = None
-    delivery: list[str] | None = None
+    delivery: list[str] = []
 
     expires_at_days: int | None = None
 
     icon: str | None = None
-    images: list[str] | None = None
+    images: list[str] = []
     description: str | None = None
 
 

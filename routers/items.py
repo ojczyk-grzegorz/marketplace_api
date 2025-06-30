@@ -3,7 +3,7 @@ import datetime as dt
 from fastapi import APIRouter, status, Query, Path, Body, Depends
 from auth.auth import oauth2_scheme, validate_access_token, KEY, ALGORITHM
 
-from db.db import database
+from db.db import database, db_search, db_insert, db_update, db_remove
 from datamodels.response import ErrorResponse
 from datamodels.item import (
     ItemDB,
@@ -25,7 +25,7 @@ router = APIRouter(prefix="/items", tags=["Items"])
 @router.get(
     "/query/{category}",
     status_code=status.HTTP_200_OK,
-    response_model=ItemsQuery | ErrorResponse,
+    # response_model=ItemsQuery | ErrorResponse,
     description="Query items based on various filters",
     response_model_exclude_none=True,
 )
@@ -33,6 +33,23 @@ async def get_items(
     category: str = Path(...),
     query_items: QueryItems = Query(QueryItems()),
 ):
+    
+    category_id = db_search(
+        f"""
+        SELECT cid FROM categories WHERE name='{category}'
+        """
+    )[0][0] 
+
+    results = db_search(
+        f"""
+        SELECT row_to_json(items) FROM items WHERE category_id = {category_id} LIMIT 10
+        """
+    )
+
+    print(results)
+
+    return results
+       
     db_items: list[dict] = database["items"]
 
     items = []
@@ -81,10 +98,15 @@ async def get_items(
     description="Get item by its ID",
 )
 async def get_item(iid: int = Path(...)):
-    db_items: list[dict] = database["items"]
-    for item_db in db_items:
-        if item_db.get("iid") == iid:
-            return item_db
+
+    results = db_search(
+        f"""
+        SELECT json_agg(items) FROM items WHERE iid = {iid}
+        """
+    )[0][0]
+
+    if results:
+        return results[0]
 
     return ErrorResponse(
         error="ITEM_NOT_FOUND",
@@ -99,24 +121,29 @@ async def get_item(iid: int = Path(...)):
     description="Get item by its ID",
 )
 async def get_user_items(uid: int = Path(...)):
-    db_users: list[dict] = database["users"]
-    db_items: list[dict] = database["items"]
+    user = db_search(
+        f"""
+        SELECT json_agg(users) FROM users WHERE uid = {uid}
+        """
+    )[0][0]
+    if not user:
+        return ErrorResponse(
+            error="USER_NOT_FOUND",
+            details={"user_id": uid},
+        )
+    
+    results = db_search(
+        f"""
+        SELECT json_agg(items) FROM items WHERE seller_id = {uid}
+        """
+    )[0][0]
 
-    for user in db_users:
-        if user.get("uid") == uid:
-            items = []
-            for item_db in db_items:
-                if item_db.get("seller_id") == uid:
-                    items.append(item_db)
-            return ItemsUser(
-                user=user,
-                items=items,
-            )
-
-    return ErrorResponse(
-        error="USER_NOT_FOUND",
-        details={"user_id": uid},
+    return ItemsUser(
+        user=user[0],
+        items=results
     )
+
+    
 
 
 @router.post(
@@ -132,23 +159,26 @@ async def get_user_items(token: str = Depends(oauth2_scheme)):
         algorithms=[ALGORITHM],
     )
 
-    db_users: list[dict] = database["users"]
-    db_items: list[dict] = database["items"]
+    user = db_search(
+        f"""
+        SELECT json_agg(users) FROM users WHERE uid = {user_id}
+        """
+    )[0][0]
+    if not user:
+        return ErrorResponse(
+            error="USER_NOT_FOUND",
+            details={"user_id": user_id},
+        )
+    
+    results = db_search(
+        f"""
+        SELECT json_agg(items) FROM items WHERE seller_id = {user_id}
+        """
+    )[0][0]
 
-    for user in db_users:
-        if user.get("uid") == user_id:
-            items = []
-            for item_db in db_items:
-                if item_db.get("seller_id") == user_id:
-                    items.append(item_db)
-            return ItemsUser(
-                user=user,
-                items=items,
-            )
-
-    return ErrorResponse(
-        error="USER_NOT_FOUND",
-        details={"user_id": user_id},
+    return ItemsUser(
+        user=user[0],
+        items=results
     )
 
 
@@ -171,42 +201,36 @@ async def create_items(
         algorithms=[ALGORITHM],
     )
 
-    db_users: list[dict] = database["users"]
-    db_items: list[dict] = database["items"]
-
-    for seller in db_users:
-        if seller.get("uid") == user_id:
-            seller = UserDB.model_validate(seller)
-            break
-    else:
+    user = db_search(
+        f"""
+        SELECT json_agg(users) FROM users WHERE uid = {user_id}
+        """
+    )[0][0]
+    if not user:
         return ErrorResponse(
-            error="SELLER_NOT_FOUND",
-            details={"seller_id": req_body.seller_id},
+            error="USER_NOT_FOUND",
+            details={"user_id": user_id},
         )
-
-    item_id = max([x["iid"] for x in db_items], default=0)
-
+    
     items = []
     for n, item in enumerate(req_body.items):
-        iid = item_id + 1 + n
-
         item = ItemDB(
             **item.model_dump(),
-            iid=iid,
-            seller_id=seller.uid,
+            seller_id=user_id,
             created_at=dt.datetime.now(dt.timezone.utc).isoformat(),
             updated_at=dt.datetime.now(dt.timezone.utc).isoformat(),
             expires_at=(
                 dt.datetime.now(dt.timezone.utc)
                 + dt.timedelta(days=item.expires_at_days)
             ).isoformat(),
-        )
+        ).model_dump(exclude_none=True, mode="json")
         items.append(item)
 
-    db_items.extend(items)
+    results = db_insert("items", items)
+
     return ItemsCreated(
-        seller_id=req_body.seller_id,
-        items=items,
+        seller_id=user_id,
+        items=results,
     )
 
 
@@ -229,45 +253,39 @@ async def update_item(
         algorithms=[ALGORITHM],
     )
 
-    db_items: list[dict] = database["items"]
-
-    for item_db in db_items:
-        if item_db["iid"] == item.iid:
-            if item_db["seller_id"] != user_id:
-                return ErrorResponse(
-                    error="ITEM_NOT_OWNED",
-                    details={
-                        "item_id": item.iid,
-                        "user_id": user_id,
-                    },
-                )
-            break
-    else:
+    user = db_search(
+        f"""
+        SELECT json_agg(users) FROM users WHERE uid = {user_id}
+        """
+    )[0][0]
+    if not user:
         return ErrorResponse(
-            error="ITEM_NOT_FOUND",
-            details={"iid": item.iid},
+            error="USER_NOT_FOUND",
+            details={"user_id": user_id},
         )
-
-    item_db.update(
-        {
-            **item.model_dump(exclude_none=True),
-            "updated_at": dt.datetime.now(dt.timezone.utc)
+    item = ItemDB(
+        **item.model_dump(),
+        seller_id=user_id,
+        created_at=dt.datetime.now(dt.timezone.utc).isoformat(),
+        updated_at=dt.datetime.now(dt.timezone.utc).isoformat(),
+        expires_at=(
+            dt.datetime.now(dt.timezone.utc)
             + dt.timedelta(days=item.expires_at_days)
-            if item.expires_at_days
-            else item_db["updated_at"],
-        }
-    )
+        ).isoformat(),
+    ).model_dump(exclude_none=True, mode="json")
+
+    results = db_update("items", item, f"seller_id = {user_id} AND iid = {item["iid"]}")[0]
 
     return ItemsCreated(
         seller_id=user_id,
-        items=[item_db]
+        items=results
     )
 
 
 @router.delete(
     "/remove",
     status_code=status.HTTP_200_OK,
-    response_model=ItemsCreated | ErrorResponse,
+    # response_model=ItemsCreated | ErrorResponse,
     description="Route for deleting an item",
 )
 async def remove_item(
@@ -280,25 +298,8 @@ async def remove_item(
         algorithms=[ALGORITHM],
     )
 
-    db_items: list[dict] = database["items"]
-
-    for n, item_db in enumerate(db_items):
-        if item_db["iid"] == req_body.item_id:
-            if item_db["seller_id"] is None:
-                return ErrorResponse(
-                    error="ITEM_NOT_OWNED",
-                    details={
-                        "item_id": req_body.item_id,
-                        "user_id": req_body.user_id,
-                    },
-                )
-            db_items.pop(n)
-            return ItemsCreated(
-                seller_id=user_id,
-                items=[item_db],
-            )
-
-    return ErrorResponse(
-        error="ITEM_NOT_FOUND",
-        details={"item_id": req_body.item_id},
+    results =  db_remove("items", f"seller_id = {user_id} AND iid = {req_body.item_id}")
+    return ItemsCreated(
+        seller_id=user_id,
+        items=results[0] if results else results
     )
