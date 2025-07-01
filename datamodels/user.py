@@ -23,7 +23,7 @@ class UserCreate(BaseModel):
     phone: str
     first_name: str
     last_name: str
-    birth_date: str
+    birth_date: dt.date
     country: str
     city: str
     street: str

@@ -33,12 +33,11 @@ async def get_items(
     category: str = Path(...),
     query_items: QueryItems = Query(QueryItems()),
 ):
-    
     category_id = db_search(
         f"""
         SELECT cid FROM categories WHERE name='{category}'
         """
-    )[0][0] 
+    )[0][0]
 
     results = db_search(
         f"""
@@ -49,7 +48,7 @@ async def get_items(
     print(results)
 
     return results
-       
+
     db_items: list[dict] = database["items"]
 
     items = []
@@ -98,7 +97,6 @@ async def get_items(
     description="Get item by its ID",
 )
 async def get_item(iid: int = Path(...)):
-
     results = db_search(
         f"""
         SELECT json_agg(items) FROM items WHERE iid = {iid}
@@ -131,19 +129,14 @@ async def get_user_items(uid: int = Path(...)):
             error="USER_NOT_FOUND",
             details={"user_id": uid},
         )
-    
+
     results = db_search(
         f"""
         SELECT json_agg(items) FROM items WHERE seller_id = {uid}
         """
     )[0][0]
 
-    return ItemsUser(
-        user=user[0],
-        items=results
-    )
-
-    
+    return ItemsUser(user=user[0], items=results)
 
 
 @router.post(
@@ -169,17 +162,14 @@ async def get_user_items(token: str = Depends(oauth2_scheme)):
             error="USER_NOT_FOUND",
             details={"user_id": user_id},
         )
-    
+
     results = db_search(
         f"""
         SELECT json_agg(items) FROM items WHERE seller_id = {user_id}
         """
     )[0][0]
 
-    return ItemsUser(
-        user=user[0],
-        items=results
-    )
+    return ItemsUser(user=user[0], items=results)
 
 
 @router.post(
@@ -211,7 +201,7 @@ async def create_items(
             error="USER_NOT_FOUND",
             details={"user_id": user_id},
         )
-    
+
     items = []
     for n, item in enumerate(req_body.items):
         item = ItemDB(
@@ -269,17 +259,15 @@ async def update_item(
         created_at=dt.datetime.now(dt.timezone.utc).isoformat(),
         updated_at=dt.datetime.now(dt.timezone.utc).isoformat(),
         expires_at=(
-            dt.datetime.now(dt.timezone.utc)
-            + dt.timedelta(days=item.expires_at_days)
+            dt.datetime.now(dt.timezone.utc) + dt.timedelta(days=item.expires_at_days)
         ).isoformat(),
     ).model_dump(exclude_none=True, mode="json")
 
-    results = db_update("items", item, f"seller_id = {user_id} AND iid = {item["iid"]}")[0]
+    results = db_update(
+        "items", item, f"seller_id = {user_id} AND iid = {item['iid']}"
+    )[0]
 
-    return ItemsCreated(
-        seller_id=user_id,
-        items=results
-    )
+    return ItemsCreated(seller_id=user_id, items=results)
 
 
 @router.delete(
@@ -289,8 +277,7 @@ async def update_item(
     description="Route for deleting an item",
 )
 async def remove_item(
-    token: str = Depends(oauth2_scheme),
-    req_body: ItemRemove = Body(...)
+    token: str = Depends(oauth2_scheme), req_body: ItemRemove = Body(...)
 ):
     user_id: int = validate_access_token(
         token=token,
@@ -298,8 +285,5 @@ async def remove_item(
         algorithms=[ALGORITHM],
     )
 
-    results =  db_remove("items", f"seller_id = {user_id} AND iid = {req_body.item_id}")
-    return ItemsCreated(
-        seller_id=user_id,
-        items=results[0] if results else results
-    )
+    results = db_remove("items", f"seller_id = {user_id} AND iid = {req_body.item_id}")
+    return ItemsCreated(seller_id=user_id, items=results[0] if results else results)

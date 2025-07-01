@@ -46,31 +46,29 @@ def db_search(query: str):
     return results
 
 
-def db_insert(table: str, data: dict | list[dict]):
+def db_insert(table: str, data: dict, columns_out: list[str]):
     with open("db/postgres/database.json", "r") as f:
         db_config = json.load(f)
-
-    if not isinstance(data, list):
-        data = [data]
-    columns = ", ".join(data[0].keys())
+    
+    columns_insert_sql = ", ".join(data.keys())
     data_json = json.dumps(data, ensure_ascii=False)
     data_json = data_json.replace("'", "''")
+
     with psycopg2.connect(**db_config) as connection:
         cursor = connection.cursor()
         query = f"""
-            INSERT INTO {table} ({columns})
-                SELECT {columns}
-                FROM json_populate_recordset(
+            INSERT INTO {table} ({columns_insert_sql})
+                SELECT {columns_insert_sql}
+                FROM json_populate_record(
                     NULL::{table},
                     '{data_json}'
                 )
-            RETURNING row_to_json({table});
+            RETURNING {", ".join(columns_out)}
         """
-        # raise Exception(query)
         cursor.execute(query)
         connection.commit()
-        results = cursor.fetchone()
-    return results
+        results = cursor.fetchall()
+    return dict(zip(columns_out, results[0]))
 
 
 def parse_to_update(data: dict) -> str:
@@ -86,7 +84,7 @@ def parse_to_update(data: dict) -> str:
             value = "'" + json.dumps(value, ensure_ascii=False).replace("'", "''") + "'"
         parsed_data += f"{key} = {value}, "
     return parsed_data[:-2]  # Remove the last comma and space
-        
+
 
 def db_update(table: str, data: dict, where: str):
     with open("db/postgres/database.json", "r") as f:

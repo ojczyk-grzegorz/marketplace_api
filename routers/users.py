@@ -13,19 +13,25 @@ from testing.openapi.users import USER_CREATE, USER_PATCH
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
+def get_user_by_id(user_id: int, columns: list[str]) -> dict | None:
+    results = db_search(f"SELECT {', '.join(columns)} FROM users WHERE uid = {user_id}")
+    if results:
+        return dict(zip(columns, results[0]))
+    return None
+
+
 @router.get(
     "/user/{user_id}",
     status_code=status.HTTP_200_OK,
     response_model=UserOut | ErrorResponse,
     description="Route for getting user by ID",
 )
-async def get_user(
-    user_id: int = Path(...)
-):
-    results = db_search(f"SELECT json_agg(users) FROM users WHERE uid = {user_id}")[0][0][0]
-    if results:
-        return results
+async def get_user(user_id: int = Path(...)):
+    columns = UserOut.model_fields.keys()
+    user = get_user_by_id(user_id, columns)
 
+    if user:
+        return user
     return ErrorResponse(error="USER_NOT_FOUND", details={"user_id": user_id})
 
 
@@ -41,10 +47,12 @@ async def get_user_me(token: str = Depends(oauth2_scheme)):
         secret_key=KEY,
         algorithms=[ALGORITHM],
     )
-    results = db_search(f"SELECT json_agg(users) FROM users WHERE uid = {user_id}")[0][0]
-    if results:
-        return results[0]
 
+    columns = UserDB.model_fields.keys()
+    user = get_user_by_id(user_id, columns)
+
+    if user:
+        return user
     return ErrorResponse(error="USER_NOT_FOUND", details={"user_id": user_id})
 
 
@@ -57,14 +65,13 @@ async def get_user_me(token: str = Depends(oauth2_scheme)):
 async def create_customers(
     user: UserCreate = Body(..., openapi_examples=USER_CREATE),
 ):
-    results = db_search(f"SELECT json_agg(users) FROM users WHERE email = '{user.email}'")
+    results = db_search(
+        f"SELECT uid FROM users WHERE email = '{user.email}' LIMIT 1"
+    )
     if results:
-        return ErrorResponse(
-            error="USER_ALREADY_EXISTS", details={"email": user.email}
-        )
+        return ErrorResponse(error="USER_ALREADY_EXISTS", details={"email": user.email})
 
     created_at = dt.datetime.now(dt.timezone.utc).isoformat()
-
     user = UserDB(
         **user.model_dump(exclude_none=True),
         created_at=created_at,
@@ -79,16 +86,16 @@ async def create_customers(
         rating=0.0,
         avatar=None,
         last_activity=created_at,
-    )
+    ).model_dump(exclude_none=True, exclude_unset=True, mode="json")
 
-    results = db_insert("users", user.model_dump(exclude_none=True, exclude_unset=True, mode="json"))
-    return results[0][0]
+    user = db_insert("users", user, UserDB.model_fields.keys())
+    return user
 
 
 @router.patch(
     "/update",
     status_code=status.HTTP_200_OK,
-    response_model=UserOut | ErrorResponse,
+    response_model=UserDB | ErrorResponse,
     description="Route for creating user",
 )
 async def update_customers(
@@ -109,7 +116,7 @@ async def update_customers(
         where=f"uid = {user_id}",
     )
     if results:
-        return results[0][0] 
+        return results[0][0]
     return ErrorResponse(error="USER_NOT_FOUND", details={"uid": user.uid})
 
 
@@ -127,7 +134,7 @@ async def update_customers(
         secret_key=KEY,
         algorithms=[ALGORITHM],
     )
-    
+
     results = db_search(f"""
         SELECT json_agg(transactions_active)
         FROM transactions_active
@@ -139,11 +146,8 @@ async def update_customers(
     if results:
         return ErrorResponse(
             error="Close active transactions before removing user",
-            details=dict(
-                transactions=results
-            )
+            details=dict(transactions=results),
         )
-    
 
     tids = db_search(f"""
         SELECT tid
@@ -186,14 +190,14 @@ async def update_customers(
 
         db_remove(
             table="items",
-            where=f"transaction_id IN ({", ".join(str(x[0]) for x in tids)})"
+            where=f"transaction_id IN ({', '.join(str(x[0]) for x in tids)})",
         )
 
         print([", ".join(str(x) for x in tids)])
 
         db_remove(
             table="transactions_active",
-            where=f"buyer_id = {user_id} AND transaction_end IS NOT NULL"
+            where=f"buyer_id = {user_id} AND transaction_end IS NOT NULL",
         )
 
     results = db_search(f"""
@@ -201,18 +205,13 @@ async def update_customers(
         FROM items
         WHERE seller_id = {user_id}
     """)[0][0]
-    
+
     if results:
         return ErrorResponse(
             error="Remove active items and close all transactions before removing user",
-            details=dict(
-                items=results
-            )
+            details=dict(items=results),
         )
-    
-    
-    
-    
+
     results = db_remove(table="users", where=f"uid = {user_id}")[0][0]
     if results:
         return {"message": "User removed successfully", "uid": user_id}

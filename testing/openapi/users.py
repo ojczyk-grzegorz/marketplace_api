@@ -3,7 +3,7 @@ USER_CREATE = {
         "value": {
             "email": "jakub15.nowak@example.com",
             "password_hash": "password123",
-            "phone": "+48634489566",
+            "phone": "+48999999999",
             "first_name": "Jakub",
             "last_name": "Nowak",
             "birth_date": "1998-11-21",

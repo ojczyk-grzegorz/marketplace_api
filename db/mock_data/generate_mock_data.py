@@ -271,8 +271,8 @@ def main():
     #             break
 
     #     transactions_archived.append(transaction)
-        # items.pop(n)
-        # transactions_active.pop(tn)
+    # items.pop(n)
+    # transactions_active.pop(tn)
 
     with open(filepath_users, "w") as file:
         json.dump(users, file, indent=4)
@@ -298,17 +298,24 @@ def main():
         json.dump(transactions_active, file, indent=4)
     print("Active transactions generated:", len(transactions_active))
 
-
     with open("db/postgres/database.json", "r") as file:
         database_config = json.load(file)
 
     recreate_tables(database_config, "db/postgres/CREATE_TABLES.sql")
 
-    insert_table_json(database_config, "db/mock_data/users.json", remove=["uid", "uid_uuid4"])
+    insert_table_json(
+        database_config, "db/mock_data/users.json", remove=["uid", "uid_uuid4"]
+    )
     insert_table_json(database_config, "db/mock_data/categories.json", remove=["cid"])
     insert_table_json(database_config, "db/mock_data/status.json", remove=["sid"])
-    insert_table_json(database_config, "db/mock_data/transactions_active.json", remove=["tid", "tid_uuid4"])
-    insert_table_json(database_config, "db/mock_data/items.json", remove=["iid", "iid_uuid4"])
+    insert_table_json(
+        database_config,
+        "db/mock_data/transactions_active.json",
+        remove=["tid", "tid_uuid4"],
+    )
+    insert_table_json(
+        database_config, "db/mock_data/items.json", remove=["iid", "iid_uuid4"]
+    )
 
 
 def recreate_tables(db_config: dict, create_tables_sql: str = "CREATE_TABLES.sql"):
@@ -328,7 +335,7 @@ def insert_table_json(db_config: dict, filepath: str, remove: list[str] = []):
         for item in data:
             if key in item:
                 del item[key]
-    
+
     columns = ", ".join(data[0].keys())
     data_json = json.dumps(data).replace("'", "''")
     table_name = filepath.split("/")[-1].split(".")[0]
@@ -349,5 +356,3 @@ def insert_table_json(db_config: dict, filepath: str, remove: list[str] = []):
 
 if __name__ == "__main__":
     main()
-
-
