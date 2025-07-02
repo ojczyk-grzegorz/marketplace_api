@@ -156,9 +156,12 @@ def main():
 
         sold_at = random_date(
             datetime.fromisoformat(item["created_at"]),
-            datetime.fromisoformat(item["expires_at"]),
+            today,
         )
-
+        finilized = random_date(
+            sold_at,
+            today,
+        ).isoformat() 
         transaction = dict(
             tid=n + 1,
             tid_uuid4=uuid4().hex,
@@ -168,7 +171,7 @@ def main():
             buyer_uid_uuid4=buyer["uid_uuid4"],
             seller_snapshot=seller,
             buyer_snapshot=buyer,
-            finilized=random.choice([True, True, True, True, False]),
+            finilized=random.choice([finilized, finilized, finilized, finilized, None]),
         )
         transactions.append(transaction)
 

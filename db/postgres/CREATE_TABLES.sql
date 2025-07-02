@@ -69,5 +69,5 @@ CREATE TABLE transactions (
     buyer_uid_uuid4 UUID NOT NULL,
     seller_snapshot JSONB NOT NULL,
     buyer_snapshot JSONB NOT NULL,
-    finilized BOOLEAN NOT NULL DEFAULT FALSE
+    finilized TIMESTAMPTZ DEFAULT NULL
 );

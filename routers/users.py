@@ -199,7 +199,7 @@ async def user_remove(
     transaction_ids = db_search_simple(
         "transactions",
         ["tid"],
-        f"finilized = FALSE AND (buyer_uid_uuid4 = '{user_id_uuid4}' OR seller_uid_uuid4 = '{user_id_uuid4}')",
+        f"finilized IS NULL AND (buyer_uid_uuid4 = '{user_id_uuid4}' OR seller_uid_uuid4 = '{user_id_uuid4}')",
     )
     if transaction_ids:
         return ErrorResponse(

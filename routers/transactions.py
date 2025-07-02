@@ -70,7 +70,7 @@ async def transaction_create(
         buyer_uid_uuid4=buyer["uid_uuid4"],
         seller_snapshot=seller,
         buyer_snapshot=buyer,
-        finilized=False,
+        finilized=None,
     )
 
     transactions = db_insert(
@@ -112,8 +112,8 @@ async def transaction_finilize(
 
     transactions = db_update(
         "transactions",
-        {"finilized": True},
-        f"tid = {req_body.transaction_id} AND buyer_uid_uuid4 = '{buyer_uid_uuid4}' AND finilized = FALSE",
+        {"finilized": dt.datetime.now(dt.timezone.utc).isoformat()},
+        f"tid = {req_body.transaction_id} AND buyer_uid_uuid4 = '{buyer_uid_uuid4}' AND finilized IS NULL",
         TransactionDBOut.model_fields.keys(),
     )
     if not transactions:

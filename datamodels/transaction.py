@@ -13,7 +13,7 @@ class TransactionDBIn(BaseModel):
     buyer_uid_uuid4: str
     seller_snapshot: dict
     buyer_snapshot: dict
-    finilized: bool
+    finilized: dt.datetime | None = None
 
 
 class TransactionDBOut(BaseModel):
@@ -23,7 +23,7 @@ class TransactionDBOut(BaseModel):
     item: dict
     seller_uid_uuid4: str
     buyer_uid_uuid4: str
-    finilized: bool
+    finilized: dt.datetime | None = None
 
 
 class TransactionFinilize(BaseModel):
