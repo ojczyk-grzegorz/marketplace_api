@@ -1,0 +1,9 @@
+uvicorn
+fastapi
+python-multipart
+ruff
+pydantic
+pydantic[email]
+pyjwt
+passlib
+psycopg2-binary
