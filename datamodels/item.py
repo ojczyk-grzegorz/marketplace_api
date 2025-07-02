@@ -24,7 +24,7 @@ class ItemDB(BaseModel):
     pattern: str | None = None
     size: str | None = None
     style: str | None = None
-    features: dict | None = None
+    features_specific: dict | None = None
 
     city: str | None = None
     street: str | None = None
@@ -54,7 +54,7 @@ class QueryItems(BaseModel):
     size: list[str] | None = None
     style: list[str] | None = None
     price: tuple[float, float] = (0.01, 1_000_000.0)
-    features: dict | None = None
+    features_specific: dict | None = None
 
 
 class ItemDBToList(BaseModel):
@@ -73,7 +73,7 @@ class ItemDBToList(BaseModel):
     pattern: str | None = None
     size: str | None = None
     style: str | None = None
-    features: dict | None = None
+    features_specific: dict | None = None
 
     city: str
     delivery: list[str] = Field(min_length=1)
@@ -105,7 +105,7 @@ class ItemCreate(BaseModel):
     pattern: str | None = None
     size: str | None = None
     style: str | None = None
-    features: dict | None = None
+    features_specific: dict | None = None
 
     city: str
     street: str
@@ -118,14 +118,9 @@ class ItemCreate(BaseModel):
     description: str | None = None
 
 
-class ItemsCreate(BaseModel):
-    seller_id: int
-    items: list[ItemCreate]
-
-
-class ItemsCreated(BaseModel):
-    seller_id: int
-    items: list[ItemDB]
+class ItemCreated(BaseModel):
+    seller: UserOut
+    item: ItemDB
 
 
 class ItemUpdate(BaseModel):
@@ -143,7 +138,7 @@ class ItemUpdate(BaseModel):
     pattern: str | None = None
     size: str | None = None
     style: str | None = None
-    features: dict | None = None
+    features_specific: dict | None = None
 
     city: str | None = None
     street: str | None = None
@@ -156,5 +151,5 @@ class ItemUpdate(BaseModel):
     description: str | None = None
 
 
-class ItemRemove(BaseModel):
-    item_id: int
+class ItemsRemove(BaseModel):
+    item_ids: list[int]

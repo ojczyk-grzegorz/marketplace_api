@@ -35,88 +35,75 @@ database = dict(
 )
 
 
-def db_search(query: str):
+def parse_value_to_sql(value) -> str:
+    if isinstance(value, Number):
+        value = str(value)
+    elif isinstance(value, str):
+        value = "'" + value.replace("'", "''") + "'"
+    elif value is None:
+        value = "NULL"
+    else:
+        value = "'" + json.dumps(value, ensure_ascii=False).replace("'", "''") + "'"
+    return value
+
+
+def db_query(query: str):
     with open("db/postgres/database.json", "r") as f:
         db_config = json.load(f)
 
     with psycopg2.connect(**db_config) as connection:
         cursor = connection.cursor()
         cursor.execute(query)
+        connection.commit()
         results = cursor.fetchall()
     return results
+
+
+def db_search_simple(
+    table: str, columns: list[str], where: str = "", other: str = ""
+) -> list[dict]:
+    query = f"SELECT {', '.join(columns)} FROM {table} WHERE {where} {other}"
+    results = db_query(query)
+    return [dict(zip(columns, x)) for x in results] if results else []
 
 
 def db_insert(table: str, data: dict, columns_out: list[str]):
-    with open("db/postgres/database.json", "r") as f:
-        db_config = json.load(f)
-    
-    columns_insert_sql = ", ".join(data.keys())
-    data_json = json.dumps(data, ensure_ascii=False)
-    data_json = data_json.replace("'", "''")
+    columns = []
+    values = []
+    for k, v in data.items():
+        columns.append(k)
+        values.append(parse_value_to_sql(v))
 
-    with psycopg2.connect(**db_config) as connection:
-        cursor = connection.cursor()
-        query = f"""
-            INSERT INTO {table} ({columns_insert_sql})
-                SELECT {columns_insert_sql}
-                FROM json_populate_record(
-                    NULL::{table},
-                    '{data_json}'
-                )
-            RETURNING {", ".join(columns_out)}
-        """
-        cursor.execute(query)
-        connection.commit()
-        results = cursor.fetchall()
-    return dict(zip(columns_out, results[0]))
+    query = f"""
+        INSERT INTO {table} ({", ".join(columns)})
+        VALUES ({", ".join(values)})
+        RETURNING {", ".join(columns_out)}
+    """
+
+    results = db_query(query)
+    return dict(zip(columns_out, results[0])) if results else None
 
 
-def parse_to_update(data: dict) -> str:
-    parsed_data = ""
-    for key, value in data.items():
-        if isinstance(value, str):
-            value = "'" + value.replace("'", "''") + "'"
-        elif value is None:
-            value = "NULL"
-        elif isinstance(value, Number):
-            value = str(value)
-        else:
-            value = "'" + json.dumps(value, ensure_ascii=False).replace("'", "''") + "'"
-        parsed_data += f"{key} = {value}, "
-    return parsed_data[:-2]  # Remove the last comma and space
+def db_update(table: str, data: dict, where: str, columns_out: list[str]):
+    data = ", ".join(f"{k} = {parse_value_to_sql(v)}" for k, v in data.items())
+
+    query = f"""
+        UPDATE {table}
+        SET {data}
+        WHERE {where}
+        RETURNING {", ".join(columns_out)}
+    """
+
+    results = db_query(query)
+    return dict(zip(columns_out, results[0])) if results else None
 
 
-def db_update(table: str, data: dict, where: str):
-    with open("db/postgres/database.json", "r") as f:
-        db_config = json.load(f)
+def db_remove(table: str, where: str, columns_out: list[str]):
+    query = f"""
+        DELETE FROM {table}
+        WHERE {where}
+        RETURNING {", ".join(columns_out)}
+    """
 
-    data: str = parse_to_update(data)
-    with psycopg2.connect(**db_config) as connection:
-        cursor = connection.cursor()
-        query = f"""
-            UPDATE {table}
-            SET {data}
-            WHERE {where}
-            RETURNING row_to_json({table});
-        """
-        cursor.execute(query)
-        connection.commit()
-        results = cursor.fetchall()
-    return results
-
-
-def db_remove(table: str, where: str):
-    with open("db/postgres/database.json", "r") as f:
-        db_config = json.load(f)
-
-    with psycopg2.connect(**db_config) as connection:
-        cursor = connection.cursor()
-        query = f"""
-            DELETE FROM {table}
-            WHERE {where}
-            RETURNING row_to_json({table});
-        """
-        cursor.execute(query)
-        connection.commit()
-        results = cursor.fetchall()
-    return results
+    results = db_query(query)
+    return [dict(zip(columns_out, result)) for result in results] if results else None

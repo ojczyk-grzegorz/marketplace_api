@@ -3,91 +3,106 @@ import datetime as dt
 from fastapi import APIRouter, status, Query, Path, Body, Depends
 from auth.auth import oauth2_scheme, validate_access_token, KEY, ALGORITHM
 
-from db.db import database, db_search, db_insert, db_update, db_remove
+from db.db import database, db_query, db_search_simple, db_insert, db_update, db_remove
 from datamodels.response import ErrorResponse
 from datamodels.item import (
     ItemDB,
+    ItemDBToList,
     QueryItems,
     ItemsUser,
     ItemsQuery,
-    ItemsCreate,
-    ItemsCreated,
+    ItemCreate,
     ItemUpdate,
-    ItemRemove,
+    ItemsRemove,
 )
-from datamodels.user import UserDB
+from datamodels.user import UserOut
 from testing.openapi.items import ITEM_CREATE, ITEM_PATCH
 
 
 router = APIRouter(prefix="/items", tags=["Items"])
 
 
+def get_user_items(user_id: int):
+    users = db_search_simple(
+        "users",
+        UserOut.model_fields.keys(),
+        f"uid = {user_id}",
+    )
+    if not users:
+        return ErrorResponse(
+            error="USER_NOT_FOUND",
+            details={"user_id": user_id},
+        )
+    items = db_search_simple(
+        "items",
+        ItemDBToList.model_fields.keys(),
+        f"seller_id = {user_id}",
+    )
+
+    return ItemsUser(user=users[0], items=items)
+
+
+def get_query_value(value):
+    if isinstance(value, str):
+        return f"'{value}'"
+    else:
+        return str(value)
+
+
 @router.get(
     "/query/{category}",
     status_code=status.HTTP_200_OK,
-    # response_model=ItemsQuery | ErrorResponse,
+    response_model=ItemsQuery | ErrorResponse,
     description="Query items based on various filters",
     response_model_exclude_none=True,
 )
 async def get_items(
-    category: str = Path(...),
+    category: str = Path(...), 
     query_items: QueryItems = Query(QueryItems()),
 ):
-    category_id = db_search(
-        f"""
-        SELECT cid FROM categories WHERE name='{category}'
-        """
-    )[0][0]
-
-    results = db_search(
-        f"""
-        SELECT row_to_json(items) FROM items WHERE category_id = {category_id} LIMIT 10
-        """
+    category_ids = db_search_simple(
+        "categories",
+        ["cid"],
+        f"name = '{category}'",
     )
+    if not category_ids:
+        return ErrorResponse(
+            error="CATEGORY_NOT_FOUND",
+            details={"category": category},
+        )
+    category_id = category_ids[0]["cid"]
 
-    print(results)
-
-    return results
-
-    db_items: list[dict] = database["items"]
-
-    items = []
-    features = {
-        **query_items.model_dump(exclude_none=True, exclude=["limit", "features"]),
-        **(query_items.features or {}),
+    features_specific = {
+        **query_items.model_dump(
+            exclude_none=True, exclude=["limit", "features_specific"]
+        ),
+        **(query_items.features_specific or {}),
     }
 
-    for item in db_items:
-        qualified = True
-        for key, value in features.items():
-            if not qualified:
-                break
+    filters = []
+    for key, value in features_specific.items():
+        if isinstance(value, list):
+            flt = f"{key} IN ({', '.join(get_query_value(x) for x in value)})"
+        elif isinstance(value, tuple):
+            flt = f"{key} BETWEEN {get_query_value(value[0])} AND {get_query_value(value[1])}"
+        else:
+            flt = f"{key} = {get_query_value(value)}"
 
-            item_value = item.get(key, item["features_specific"].get(key))
-            if item_value is None:
-                qualified = False
-            elif isinstance(value, list):
-                if item_value not in value:
-                    qualified = False
-            elif isinstance(value, tuple):
-                if value[0] > item_value or item_value > value[1]:
-                    qualified = False
-            elif value != item_value:
-                qualified = False
+        filters.append(flt)
+    if filters:
+        filter_str = " AND ".join(filters)
+    
+    items = db_search_simple(
+        "items",
+        ItemDBToList.model_fields.keys(),
+        f"category_id = {category_id} AND ({filter_str})",
+        f"LIMIT {query_items.limit}"
+    )
 
-        if qualified:
-            items.append(item)
-
-        if len(items) >= query_items.limit:
-            break
-
-    if not items:
-        return ErrorResponse(
-            error="ITEMS_NOT_FOUND",
-            details={"query": query_items, "category": category},
-        )
-
-    return ItemsQuery(q=query_items, items=items)
+    return ItemsQuery(
+        q=query_items,
+        items=items,
+    )
 
 
 @router.get(
@@ -97,14 +112,14 @@ async def get_items(
     description="Get item by its ID",
 )
 async def get_item(iid: int = Path(...)):
-    results = db_search(
-        f"""
-        SELECT json_agg(items) FROM items WHERE iid = {iid}
-        """
-    )[0][0]
+    items = db_search_simple(
+        "items",
+        ItemDB.model_fields.keys(),
+        f"iid = {iid}",
+    )
 
-    if results:
-        return results[0]
+    if items:
+        return items[0]
 
     return ErrorResponse(
         error="ITEM_NOT_FOUND",
@@ -119,24 +134,8 @@ async def get_item(iid: int = Path(...)):
     description="Get item by its ID",
 )
 async def get_user_items(uid: int = Path(...)):
-    user = db_search(
-        f"""
-        SELECT json_agg(users) FROM users WHERE uid = {uid}
-        """
-    )[0][0]
-    if not user:
-        return ErrorResponse(
-            error="USER_NOT_FOUND",
-            details={"user_id": uid},
-        )
-
-    results = db_search(
-        f"""
-        SELECT json_agg(items) FROM items WHERE seller_id = {uid}
-        """
-    )[0][0]
-
-    return ItemsUser(user=user[0], items=results)
+    resp = get_user_items(uid)
+    return resp
 
 
 @router.post(
@@ -152,35 +151,19 @@ async def get_user_items(token: str = Depends(oauth2_scheme)):
         algorithms=[ALGORITHM],
     )
 
-    user = db_search(
-        f"""
-        SELECT json_agg(users) FROM users WHERE uid = {user_id}
-        """
-    )[0][0]
-    if not user:
-        return ErrorResponse(
-            error="USER_NOT_FOUND",
-            details={"user_id": user_id},
-        )
-
-    results = db_search(
-        f"""
-        SELECT json_agg(items) FROM items WHERE seller_id = {user_id}
-        """
-    )[0][0]
-
-    return ItemsUser(user=user[0], items=results)
+    resp = get_user_items(user_id)
+    return resp
 
 
 @router.post(
     "/create",
     status_code=status.HTTP_200_OK,
-    response_model=ItemsCreated | ErrorResponse,
+    response_model=ItemDB | ErrorResponse,
     description="Route for creating an item",
 )
 async def create_items(
     token: str = Depends(oauth2_scheme),
-    req_body: ItemsCreate = Body(
+    item: ItemCreate = Body(
         ...,
         openapi_examples=ITEM_CREATE,
     ),
@@ -191,43 +174,36 @@ async def create_items(
         algorithms=[ALGORITHM],
     )
 
-    user = db_search(
-        f"""
-        SELECT json_agg(users) FROM users WHERE uid = {user_id}
-        """
-    )[0][0]
-    if not user:
+    users = db_search_simple(
+        "users",
+        UserOut.model_fields.keys(),
+        f"uid = {user_id}",
+    )
+
+    if not users:
         return ErrorResponse(
             error="USER_NOT_FOUND",
             details={"user_id": user_id},
         )
 
-    items = []
-    for n, item in enumerate(req_body.items):
-        item = ItemDB(
-            **item.model_dump(),
-            seller_id=user_id,
-            created_at=dt.datetime.now(dt.timezone.utc).isoformat(),
-            updated_at=dt.datetime.now(dt.timezone.utc).isoformat(),
-            expires_at=(
-                dt.datetime.now(dt.timezone.utc)
-                + dt.timedelta(days=item.expires_at_days)
-            ).isoformat(),
-        ).model_dump(exclude_none=True, mode="json")
-        items.append(item)
-
-    results = db_insert("items", items)
-
-    return ItemsCreated(
+    item = ItemDB(
+        **item.model_dump(),
         seller_id=user_id,
-        items=results,
-    )
+        created_at=dt.datetime.now(dt.timezone.utc).isoformat(),
+        updated_at=dt.datetime.now(dt.timezone.utc).isoformat(),
+        expires_at=(
+            dt.datetime.now(dt.timezone.utc) + dt.timedelta(days=item.expires_at_days)
+        ).isoformat(),
+    ).model_dump(exclude_none=True, mode="json")
+
+    item: dict = db_insert("items", item, ItemDB.model_fields.keys())
+    return item
 
 
 @router.patch(
     "/update",
     status_code=status.HTTP_200_OK,
-    response_model=ItemsCreated | ErrorResponse,
+    response_model=ItemDB | ErrorResponse,
     description="Route for patching an item",
 )
 async def update_item(
@@ -243,41 +219,52 @@ async def update_item(
         algorithms=[ALGORITHM],
     )
 
-    user = db_search(
-        f"""
-        SELECT json_agg(users) FROM users WHERE uid = {user_id}
-        """
-    )[0][0]
-    if not user:
+    users = db_search_simple(
+        "users",
+        UserOut.model_fields.keys(),
+        f"uid = {user_id}",
+    )
+    if not users:
         return ErrorResponse(
             error="USER_NOT_FOUND",
             details={"user_id": user_id},
         )
+    now = dt.datetime.now(dt.timezone.utc)
+    expires_at = (
+        now + dt.timedelta(days=item.expires_at_days) if item.expires_at_days else None
+    )
+    item_id = item.iid
     item = ItemDB(
         **item.model_dump(),
         seller_id=user_id,
-        created_at=dt.datetime.now(dt.timezone.utc).isoformat(),
-        updated_at=dt.datetime.now(dt.timezone.utc).isoformat(),
-        expires_at=(
-            dt.datetime.now(dt.timezone.utc) + dt.timedelta(days=item.expires_at_days)
-        ).isoformat(),
+        updated_at=now.isoformat(),
+        expires_at=expires_at.isoformat() if expires_at else None,
     ).model_dump(exclude_none=True, mode="json")
 
-    results = db_update(
-        "items", item, f"seller_id = {user_id} AND iid = {item['iid']}"
-    )[0]
+    item: dict = db_update(
+        "items",
+        item,
+        f"seller_id = {user_id} AND iid = {item_id}",
+        ItemDB.model_fields.keys(),
+    )
 
-    return ItemsCreated(seller_id=user_id, items=results)
+    if not item:
+        return ErrorResponse(
+            error="ITEM_NOT_FOUND",
+            details={"item_id": item_id},
+        )
+
+    return item
 
 
 @router.delete(
     "/remove",
     status_code=status.HTTP_200_OK,
-    # response_model=ItemsCreated | ErrorResponse,
+    response_model=list[dict] | ErrorResponse,
     description="Route for deleting an item",
 )
 async def remove_item(
-    token: str = Depends(oauth2_scheme), req_body: ItemRemove = Body(...)
+    token: str = Depends(oauth2_scheme), req_body: ItemsRemove = Body(...)
 ):
     user_id: int = validate_access_token(
         token=token,
@@ -285,5 +272,19 @@ async def remove_item(
         algorithms=[ALGORITHM],
     )
 
-    results = db_remove("items", f"seller_id = {user_id} AND iid = {req_body.item_id}")
-    return ItemsCreated(seller_id=user_id, items=results[0] if results else results)
+    users = db_search_simple(
+        "users",
+        UserOut.model_fields.keys(),
+        f"uid = {user_id}",
+    )
+    if not users:
+        return ErrorResponse(
+            error="USER_NOT_FOUND",
+            details={"user_id": user_id},
+        )
+    items = db_remove(
+        "items",
+        f"seller_id = {user_id} AND iid IN ({', '.join(str(x) for x in req_body.item_ids)})",
+        columns_out=["iid", "name"],
+    )
+    return items

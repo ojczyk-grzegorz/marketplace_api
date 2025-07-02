@@ -3,7 +3,7 @@ steps
 - data models
 - mock data
 - postgres basics
-- features(auth, querying, ...)
+- features_specific(auth, querying, ...)
 - errors
 - logging
 - configs

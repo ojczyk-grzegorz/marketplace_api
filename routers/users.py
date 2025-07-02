@@ -3,7 +3,7 @@ import datetime as dt
 from fastapi import APIRouter, Path, Body, status, Depends
 
 
-from db.db import database, db_search, db_insert, db_update, db_remove
+from db.db import db_query, db_search_simple, db_insert, db_update, db_remove
 from datamodels.user import UserCreate, UserDB, UserPatch, UserOut, Address
 from datamodels.response import ErrorResponse
 from auth.auth import validate_access_token, KEY, ALGORITHM, oauth2_scheme
@@ -14,10 +14,79 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 
 def get_user_by_id(user_id: int, columns: list[str]) -> dict | None:
-    results = db_search(f"SELECT {', '.join(columns)} FROM users WHERE uid = {user_id}")
-    if results:
-        return dict(zip(columns, results[0]))
-    return None
+    users = db_search_simple("users", columns, f"uid = {user_id}")
+    return users[0] if users else None
+
+
+def get_user_insert_data(user: UserCreate) -> dict:
+    created_at = dt.datetime.now(dt.timezone.utc).isoformat()
+
+    user = UserDB(
+        **user.model_dump(exclude_none=True),
+        created_at=created_at,
+        updated_at=created_at,
+        addresses=[
+            Address(
+                type="home",
+                **user.model_dump(exclude_none=True, exclude_unset=True),
+            )
+        ],
+        reviews=[],
+        rating=0.0,
+        avatar=None,
+        last_activity=created_at,
+    ).model_dump(exclude_none=True, exclude_unset=True, mode="json")
+
+    return user
+
+
+def move_closed_transactions_to_archive(user_id: int):
+    transactions_closed_ids = db_search_simple(
+        "transactions_active",
+        ["tid"],
+        f"buyer_id = {user_id} AND transaction_end IS NOT NULL",
+    )
+    if not transactions_closed_ids:
+        return
+
+    db_query(f"""
+        INSERT INTO transactions_archived
+        (
+            SELECT
+                tac.tid_uuid4,
+                st.name AS status,
+                tac.transaction_start,
+                tac.transaction_end,
+                it.iid_uuid4 AS item_id_uuid4,
+                row_to_json(it) AS item_snapshot,
+                usb.uid_uuid4 AS buyer_id_uuid4,
+                row_to_json(usb) AS buyer_snapshot,
+                uss.uid_uuid4 AS seller_id_uuid4,
+                row_to_json(uss) AS seller_snapshot
+            FROM transactions_active AS tac
+            JOIN items AS it ON it.transaction_id = tac.tid
+            JOIN status AS st ON st.sid = tac.status_id
+            JOIN users AS usb ON usb.uid = tac.buyer_id
+            JOIN users AS uss ON uss.uid = it.seller_id
+            WHERE (
+                buyer_id = {user_id}
+                AND transaction_end IS NOT NULL
+            )
+        )
+        RETURNING tid_uuid4
+    """)
+
+    db_remove(
+        table="items",
+        where=f"transaction_id IN ({', '.join(str(x['tid']) for x in transactions_closed_ids)})",
+        columns_out=["iid"],
+    )
+
+    db_remove(
+        table="transactions_active",
+        where=f"buyer_id = {user_id} AND transaction_end IS NOT NULL",
+        columns_out=["tid"],
+    )
 
 
 @router.get(
@@ -62,33 +131,24 @@ async def get_user_me(token: str = Depends(oauth2_scheme)):
     response_model=UserDB | ErrorResponse,
     description="Route for creating user",
 )
-async def create_customers(
+async def user_create(
     user: UserCreate = Body(..., openapi_examples=USER_CREATE),
 ):
-    results = db_search(
-        f"SELECT uid FROM users WHERE email = '{user.email}' LIMIT 1"
+    results = db_query(
+        f"SELECT email, phone FROM users WHERE email = '{user.email}' OR phone = '{user.phone}' LIMIT 1"
     )
     if results:
-        return ErrorResponse(error="USER_ALREADY_EXISTS", details={"email": user.email})
+        details = dict(
+            email=(user.email, results[0][0]), phone=(user.phone, results[0][1])
+        )
+        return ErrorResponse(
+            error="USER_ALREADY_EXISTS",
+            details={k: v[0] for k, v in details.items() if v[0] == v[1]},
+        )
 
-    created_at = dt.datetime.now(dt.timezone.utc).isoformat()
-    user = UserDB(
-        **user.model_dump(exclude_none=True),
-        created_at=created_at,
-        updated_at=created_at,
-        addresses=[
-            Address(
-                type="home",
-                **user.model_dump(exclude_none=True, exclude_unset=True),
-            )
-        ],
-        reviews=[],
-        rating=0.0,
-        avatar=None,
-        last_activity=created_at,
-    ).model_dump(exclude_none=True, exclude_unset=True, mode="json")
+    user: dict = get_user_insert_data(user)
+    user: dict = db_insert("users", user, UserDB.model_fields.keys())
 
-    user = db_insert("users", user, UserDB.model_fields.keys())
     return user
 
 
@@ -98,7 +158,7 @@ async def create_customers(
     response_model=UserDB | ErrorResponse,
     description="Route for creating user",
 )
-async def update_customers(
+async def user_update(
     token: str = Depends(oauth2_scheme),
     user: UserPatch = Body(
         ...,
@@ -110,23 +170,28 @@ async def update_customers(
         secret_key=KEY,
         algorithms=[ALGORITHM],
     )
-    results = db_update(
+    user = UserDB(
+        **user.model_dump(exclude_none=True),
+        updated_at=dt.datetime.now(dt.timezone.utc).isoformat(),
+    )
+    user = db_update(
         table="users",
         data=user.model_dump(exclude_none=True, exclude_unset=True),
         where=f"uid = {user_id}",
+        columns_out=UserDB.model_fields.keys(),
     )
-    if results:
-        return results[0][0]
+    if user:
+        return user
     return ErrorResponse(error="USER_NOT_FOUND", details={"uid": user.uid})
 
 
 @router.delete(
     "/remove",
     status_code=status.HTTP_200_OK,
-    # response_model=dict | ErrorResponse,
+    response_model=dict | ErrorResponse,
     description="Route for creating user",
 )
-async def update_customers(
+async def user_remove(
     token: str = Depends(oauth2_scheme),
 ):
     user_id = validate_access_token(
@@ -135,84 +200,27 @@ async def update_customers(
         algorithms=[ALGORITHM],
     )
 
-    results = db_search(f"""
-        SELECT json_agg(transactions_active)
-        FROM transactions_active
-        WHERE (
-            buyer_id = {user_id}
-            AND transaction_end IS NULL
-        )
-    """)[0][0]
-    if results:
+    transactions_active_ids = db_search_simple(
+        "transactions_active",
+        ["tid"],
+        f"buyer_id = {user_id} AND transaction_end IS NULL",
+    )
+    if transactions_active_ids:
         return ErrorResponse(
             error="Close active transactions before removing user",
-            details=dict(transactions=results),
+            details=dict(transaction_ids=transactions_active_ids),
         )
 
-    tids = db_search(f"""
-        SELECT tid
-        FROM transactions_active
-        WHERE (
-            buyer_id = {user_id}
-            AND transaction_end IS NOT NULL
-        );
-    """)
-    if tids:
-        results = db_search(
-            f"""
-                INSERT INTO transactions_archived
-                (
-                    SELECT
-                        tac.tid_uuid4,
-                        st.name AS status,
-                        tac.transaction_start,
-                        tac.transaction_end,
-                        it.iid_uuid4 AS item_id_uuid4,
-                        row_to_json(it) AS item_snapshot,
-                        usb.uid_uuid4 AS buyer_id_uuid4,
-                        row_to_json(usb) AS buyer_snapshot,
-                        uss.uid_uuid4 AS seller_id_uuid4,
-                        row_to_json(uss) AS seller_snapshot
-                    FROM transactions_active AS tac
-                    JOIN items AS it ON it.transaction_id = tac.tid
-                    JOIN status AS st ON st.sid = tac.status_id
-                    JOIN users AS usb ON usb.uid = tac.buyer_id
-                    JOIN users AS uss ON uss.uid = it.seller_id
-                    WHERE (
-                        buyer_id = 2
-                        AND transaction_end IS NOT NULL
-                    )
-                )
-                RETURNING row_to_json(transactions_archived);
+    move_closed_transactions_to_archive(user_id)
 
-            """
-        )
-
-        db_remove(
-            table="items",
-            where=f"transaction_id IN ({', '.join(str(x[0]) for x in tids)})",
-        )
-
-        print([", ".join(str(x) for x in tids)])
-
-        db_remove(
-            table="transactions_active",
-            where=f"buyer_id = {user_id} AND transaction_end IS NOT NULL",
-        )
-
-    results = db_search(f"""
-        SELECT json_agg(items)
-        FROM items
-        WHERE seller_id = {user_id}
-    """)[0][0]
-
-    if results:
+    item_ids = db_search_simple("items", ["iid"], f"seller_id = {user_id}")
+    if item_ids:
         return ErrorResponse(
-            error="Remove active items and close all transactions before removing user",
-            details=dict(items=results),
+            error="Remove user items before removing user",
+            details=dict(item_ids=item_ids),
         )
 
-    results = db_remove(table="users", where=f"uid = {user_id}")[0][0]
+    results = db_remove(table="users", where=f"uid = {user_id}", columns_out=["uid"])
     if results:
         return {"message": "User removed successfully", "uid": user_id}
     return ErrorResponse(error="USER_NOT_FOUND", details={"uid": user_id})

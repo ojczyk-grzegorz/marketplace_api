@@ -140,7 +140,7 @@ def main():
         for feature, values in subcategory.get("features_specific", {}).items():
             features_specific[feature] = random.choice(values)
 
-        features = {
+        features_specific = {
             **features_common,
             **features_specific,
         }
@@ -158,7 +158,9 @@ def main():
         join_sent: str = random.choice(joins_sent)
 
         desc = list(set(random.choices(DESCRIPTIONS, k=random.randint(2, 6))))
-        feat = list(set(random.choices(list(features.items()), k=len(desc) - 1)))
+        feat = list(
+            set(random.choices(list(features_specific.items()), k=len(desc) - 1))
+        )
         description = []
         for d, f in zip(desc, feat):
             (description.append(d),)
