@@ -57,7 +57,7 @@ def get_query_value(value):
     response_model_exclude_none=True,
 )
 async def get_items(
-    category: str = Path(...), 
+    category: str = Path(...),
     query_items: QueryItems = Query(QueryItems()),
 ):
     category_ids = db_search_simple(
@@ -91,12 +91,12 @@ async def get_items(
         filters.append(flt)
     if filters:
         filter_str = " AND ".join(filters)
-    
+
     items = db_search_simple(
         "items",
         ItemDBToList.model_fields.keys(),
         f"category_id = {category_id} AND ({filter_str})",
-        f"LIMIT {query_items.limit}"
+        f"LIMIT {query_items.limit}",
     )
 
     return ItemsQuery(

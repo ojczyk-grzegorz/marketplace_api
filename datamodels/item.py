@@ -1,42 +1,44 @@
 import datetime as dt
 from pydantic import BaseModel, Field
 
-from datamodels.user import UserOut
+from datamodels.user import UserDBOut
 
 
-class ItemDB(BaseModel):
+class ItemDBToList(BaseModel):
     iid: int | None = None
     iid_uuid4: str | None = None
 
     name: str | None = None
-    category_id: int | None = None
-
     seller_id: int | None = None
-    seller_rating: float = 0.0
-
-    subcategory: str | None = None
-
     price: float | None = None
-    condition: str | None = None
+
+    category: str | None = None
+    type: str | None = None
+    style: str | None = None
     brand: str | None = None
+    condition: str | None = None
     material: str | None = None
     color: str | None = None
     pattern: str | None = None
-    size: str | None = None
-    style: str | None = None
-    features_specific: dict | None = None
+    size: float | None = None
 
+    width: str | None = None
+    fastener: str | None = None
+    heel: str | None = None
+    toe: str | None = None
+
+    country: str | None = None
     city: str | None = None
-    street: str | None = None
-    delivery: list[str] = []
 
+    icon: str | None = None
+
+
+class ItemDB(ItemDBToList):
     created_at: dt.datetime | None = None
     updated_at: dt.datetime | None = None
     expires_at: dt.datetime | None = None
 
-    icon: str | None = None
     images: list[str] = []
-    interested: int = 0
     description: str | None = None
 
 
@@ -46,43 +48,30 @@ class QueryItems(BaseModel):
         ge=1,
         le=50,
     )
-    subcategory: list[str] | None = None
+
+    price: tuple[float, float] = (0.01, 1_000_000.0)
+
+    category: list[str] | None = None
+    type: str | None = None
+    style: list[str] | None = None
     brand: list[str] | None = None
+    condition: str | None = None
     material: list[str] | None = None
     color: list[str] | None = None
     pattern: list[str] | None = None
-    size: list[str] | None = None
-    style: list[str] | None = None
-    price: tuple[float, float] = (0.01, 1_000_000.0)
-    features_specific: dict | None = None
+    size: list[float] | None = None
 
+    width: list[str] | None = None
+    fastener: list[str] | None = None
+    heel: list[str] | None = None
+    toe: list[str] | None = None
 
-class ItemDBToList(BaseModel):
-    iid: int
-    name: str
-
-    seller_rating: float = 0.0
-
-    subcategory: str | None = None
-
-    price: float
-    condition: str
-    brand: str | None = None
-    material: str | None = None
-    color: str | None = None
-    pattern: str | None = None
-    size: str | None = None
-    style: str | None = None
-    features_specific: dict | None = None
-
-    city: str
-    delivery: list[str] = Field(min_length=1)
-
-    icon: str | None = None
+    country: list[str] | None = None
+    city: list[str] | None = None
 
 
 class ItemsUser(BaseModel):
-    user: UserOut
+    user: UserDBOut
     items: list[ItemDBToList]
 
 
@@ -93,63 +82,50 @@ class ItemsQuery(BaseModel):
 
 class ItemCreate(BaseModel):
     name: str
-    category_id: int
-
-    subcategory: str | None = None
-
     price: float
-    condition: str
+
+    category: str | None = None
+    type: str | None = None
+    style: str | None = None
     brand: str | None = None
+    condition: str
     material: str | None = None
     color: str | None = None
     pattern: str | None = None
-    size: str | None = None
-    style: str | None = None
-    features_specific: dict | None = None
+    size: float | None = None
 
+    width: str | None = None
+    fastener: str | None = None
+    heel: str | None = None
+    toe: str | None = None
+
+    country: str
     city: str
-    street: str
-    delivery: list[str] = Field(min_length=1)
 
-    expires_at_days: int
+    expires_at: dt.datetime
 
     icon: str | None = None
     images: list[str] = []
     description: str | None = None
 
 
-class ItemCreated(BaseModel):
-    seller: UserOut
-    item: ItemDB
-
-
-class ItemUpdate(BaseModel):
+class ItemUpdate(ItemCreate):
     iid: int
 
     name: str | None = None
-
-    subcategory: str | None = None
-
     price: float | None = None
+
     condition: str | None = None
-    brand: str | None = None
-    material: str | None = None
-    color: str | None = None
-    pattern: str | None = None
-    size: str | None = None
-    style: str | None = None
-    features_specific: dict | None = None
 
     city: str | None = None
     street: str | None = None
-    delivery: list[str] = []
 
-    expires_at_days: int | None = None
+    expires_at: dt.datetime | None = None
 
     icon: str | None = None
-    images: list[str] = []
+    images: list[str] | None = None
     description: str | None = None
 
 
-class ItemsRemove(BaseModel):
-    item_ids: list[int]
+class ItemRemove(BaseModel):
+    item_id: int

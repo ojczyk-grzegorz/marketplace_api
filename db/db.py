@@ -1,38 +1,6 @@
 import psycopg2
 import json
-import os
-
 from numbers import Number
-
-dir_files_db = os.path.dirname(os.path.abspath(__file__))
-
-filepath_items = os.path.join(dir_files_db, "mock_data", "items.json")
-filepath_users = os.path.join(dir_files_db, "mock_data", "users.json")
-filepath_transactions_active = os.path.join(
-    dir_files_db, "mock_data", "transactions_active.json"
-)
-filepath_transactions_archived = os.path.join(
-    dir_files_db, "mock_data", "transactions_archived.json"
-)
-
-with open(filepath_items, "r") as f:
-    items = json.load(f)
-
-with open(filepath_users, "r") as f:
-    users: list = json.load(f)
-
-with open(filepath_transactions_active, "r") as f:
-    transactions_active: list = json.load(f)
-
-with open(filepath_transactions_archived, "r") as f:
-    transactions_archived: list = json.load(f)
-
-database = dict(
-    items=items,
-    users=users,
-    transactions_active=transactions_active,
-    transactions_archived=transactions_archived,
-)
 
 
 def parse_value_to_sql(value) -> str:
@@ -62,9 +30,10 @@ def db_query(query: str):
 def db_search_simple(
     table: str, columns: list[str], where: str = "", other: str = ""
 ) -> list[dict]:
-    query = f"SELECT {', '.join(columns)} FROM {table} WHERE {where} {other}"
+    where = f"WHERE {where}" if where else ""
+    query = f"SELECT {', '.join(columns)} FROM {table} {where} {other}"
     results = db_query(query)
-    return [dict(zip(columns, x)) for x in results] if results else []
+    return [dict(zip(columns, x)) for x in results]
 
 
 def db_insert(table: str, data: dict, columns_out: list[str]):
@@ -81,7 +50,7 @@ def db_insert(table: str, data: dict, columns_out: list[str]):
     """
 
     results = db_query(query)
-    return dict(zip(columns_out, results[0])) if results else None
+    return [dict(zip(columns_out, result)) for result in results]
 
 
 def db_update(table: str, data: dict, where: str, columns_out: list[str]):
@@ -95,7 +64,7 @@ def db_update(table: str, data: dict, where: str, columns_out: list[str]):
     """
 
     results = db_query(query)
-    return dict(zip(columns_out, results[0])) if results else None
+    return [dict(zip(columns_out, result)) for result in results]
 
 
 def db_remove(table: str, where: str, columns_out: list[str]):
@@ -106,4 +75,4 @@ def db_remove(table: str, where: str, columns_out: list[str]):
     """
 
     results = db_query(query)
-    return [dict(zip(columns_out, result)) for result in results] if results else None
+    return [dict(zip(columns_out, result)) for result in results]

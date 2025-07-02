@@ -2,24 +2,9 @@ import datetime as dt
 from pydantic import BaseModel, EmailStr
 
 
-class Address(BaseModel):
-    type: str = ""
-    country: str | None = None
-    city: str | None = None
-    street: str | None = None
-    street_number: str | None = None
-    postal_code: str | None = None
-
-
-class Review(BaseModel):
-    rating: float
-    comment: str
-    created_at: dt.datetime
-
-
 class UserCreate(BaseModel):
     email: EmailStr
-    password_hash: str
+    password: str
     phone: str
     first_name: str
     last_name: str
@@ -31,45 +16,54 @@ class UserCreate(BaseModel):
     postal_code: str
 
 
-class UserDB(UserCreate):
-    uid: int | None = None
-    uid_uuid4: str | None = None
-
-    created_at: dt.datetime | None = None
-    updated_at: dt.datetime | None = None
-    addresses: list[Address] = []
-    reviews: list[Review] = []
-    rating: float = 0.0
-    avatar: str | None = None
-    last_activity: dt.datetime
-
-
-class UserPatch(BaseModel):
+class UserUpdate(BaseModel):
     email: EmailStr | None = None
-    password_hash: str | None = None
+    password: str | None = None
     phone: str | None = None
     first_name: str | None = None
     last_name: str | None = None
-    birth_date: str | None = None
+    birth_date: dt.date | None = None
     country: str | None = None
     city: str | None = None
     street: str | None = None
     street_number: str | None = None
     postal_code: str | None = None
-    addresses: list[Address] | None = None
-    avatar: str | None = None
 
 
-class UserOut(BaseModel):
-    uid: int
-    email: EmailStr
-    phone: str
-    first_name: str
-    last_name: str
-    country: str
-    city: str
-    created_at: dt.datetime
-    reviews: list[Review] | None = None
-    rating: float = 0.0
-    avatar: str | None = None
-    last_activity: dt.datetime
+class UserDBIn(BaseModel):
+    email: EmailStr | None = None
+    phone: str | None = None
+    first_name: str | None = None
+    last_name: str | None = None
+    birth_date: dt.date | None = None
+    country: str | None = None
+    city: str | None = None
+    street: str | None = None
+    street_number: str | None = None
+    postal_code: str | None = None
+
+    created_at: dt.datetime | None = None
+    updated_at: dt.datetime | None = None
+    password_hash: str | None = None
+
+
+class UserDBOut(BaseModel):
+    uid: int | None = None
+    uid_uuid4: str | None = None
+
+    email: EmailStr | None = None
+    phone: str | None = None
+    first_name: str | None = None
+    last_name: str | None = None
+    country: str | None = None
+    city: str | None = None
+
+    created_at: dt.datetime | None = None
+    updated_at: dt.datetime | None = None
+
+
+class UserDBOutDetailed(UserDBOut):
+    birth_date: dt.date | None = None
+    street: str | None = None
+    street_number: str | None = None
+    postal_code: str | None = None

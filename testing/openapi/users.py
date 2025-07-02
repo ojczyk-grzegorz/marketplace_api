@@ -1,32 +1,34 @@
 USER_CREATE = {
     "good": {
         "value": {
-            "email": "jakub15.nowak@example.com",
-            "password_hash": "password123",
-            "phone": "+48999999999",
-            "first_name": "Jakub",
-            "last_name": "Nowak",
-            "birth_date": "1998-11-21",
+            "email": "adam.piotrowski@example.com",
+            "phone": "+48708315166",
+            "password": "password",
+            "first_name": "Adam",
+            "last_name": "Piotrowski",
+            "birth_date": "2008-07-29",
             "country": "PL",
-            "city": "Ruda \u015al\u0105ska",
-            "street": "W\u0142oska",
-            "street_number": "38",
-            "postal_code": "49-201",
+            "city": "Radom",
+            "street": "Holenderska",
+            "street_number": "21",
+            "postal_code": "10-708",
         }
     },
     "bad": {
         "value": {
-            "email": "jakub.nowak@example.com",
-            "password_hash": "password123",
-            "phone": "+48999999999",
-            "first_name": "Jakub",
-            "last_name": "Nowak",
-            "birth_date": "1998-11-21",
+            "email": "adam.baran@example.com",
+            "phone": "+48725792650",
+            "password": "password",
+            "first_name": "Adam",
+            "last_name": "Baran",
             "country": "PL",
-            "city": "Ruda \u015al\u0105ska",
-            "street": "W\u0142oska",
-            "street_number": "38",
-            "postal_code": "49-201",
+            "city": "Lublin",
+            "created_at": "2025-03-21T00:00:00Z",
+            "updated_at": "2025-03-21T00:00:00Z",
+            "birth_date": "1976-10-25",
+            "street": "Słoweńska",
+            "street_number": "125",
+            "postal_code": "61-902",
         }
     },
 }
@@ -35,16 +37,16 @@ USER_CREATE = {
 USER_PATCH = {
     "good": {
         "value": {
-            "email": "jakub22.nowak@example.com",
-            "phone": "+48634489566",
-            "first_name": "Jakub",
-            "last_name": "Nowak",
-            "birth_date": "1998-11-21",
+            "email": "adam.sadowski@example.com",
+            "phone": "+48679530542",
+            "first_name": "Adam",
+            "last_name": "Sadowski",
+            "birth_date": "1982-03-07",
             "country": "PL",
-            "city": "Ruda \u015al\u0105ska",
-            "street": "W\u0142oska",
-            "street_number": "38",
-            "postal_code": "49-201",
+            "city": "Bydgoszcz",
+            "street": "Hiszpa\u0144ska",
+            "street_number": "164",
+            "postal_code": "67-487",
         }
     }
 }

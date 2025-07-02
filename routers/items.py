@@ -3,7 +3,7 @@ import datetime as dt
 from fastapi import APIRouter, status, Query, Path, Body, Depends
 from auth.auth import oauth2_scheme, validate_access_token, KEY, ALGORITHM
 
-from db.db import database, db_query, db_search_simple, db_insert, db_update, db_remove
+from db.db import db_search_simple, db_insert, db_update, db_remove
 from datamodels.response import ErrorResponse
 from datamodels.item import (
     ItemDB,
@@ -13,33 +13,13 @@ from datamodels.item import (
     ItemsQuery,
     ItemCreate,
     ItemUpdate,
-    ItemsRemove,
+    ItemRemove,
 )
-from datamodels.user import UserOut
-from testing.openapi.items import ITEM_CREATE, ITEM_PATCH
+from datamodels.user import UserDBOut
+from testing.openapi.items import ITEM_CREATE, ITEM_PATCH, ITEM_DELETE
 
 
 router = APIRouter(prefix="/items", tags=["Items"])
-
-
-def get_user_items(user_id: int):
-    users = db_search_simple(
-        "users",
-        UserOut.model_fields.keys(),
-        f"uid = {user_id}",
-    )
-    if not users:
-        return ErrorResponse(
-            error="USER_NOT_FOUND",
-            details={"user_id": user_id},
-        )
-    items = db_search_simple(
-        "items",
-        ItemDBToList.model_fields.keys(),
-        f"seller_id = {user_id}",
-    )
-
-    return ItemsUser(user=users[0], items=items)
 
 
 def get_query_value(value):
@@ -50,37 +30,19 @@ def get_query_value(value):
 
 
 @router.get(
-    "/query/{category}",
+    "/query",
     status_code=status.HTTP_200_OK,
     response_model=ItemsQuery | ErrorResponse,
     description="Query items based on various filters",
     response_model_exclude_none=True,
 )
 async def get_items(
-    category: str = Path(...), 
     query_items: QueryItems = Query(QueryItems()),
 ):
-    category_ids = db_search_simple(
-        "categories",
-        ["cid"],
-        f"name = '{category}'",
-    )
-    if not category_ids:
-        return ErrorResponse(
-            error="CATEGORY_NOT_FOUND",
-            details={"category": category},
-        )
-    category_id = category_ids[0]["cid"]
-
-    features_specific = {
-        **query_items.model_dump(
-            exclude_none=True, exclude=["limit", "features_specific"]
-        ),
-        **(query_items.features_specific or {}),
-    }
-
     filters = []
-    for key, value in features_specific.items():
+    for key, value in query_items.model_dump(
+        exclude_none=True, exclude=["limit", "features_specific"]
+    ).items():
         if isinstance(value, list):
             flt = f"{key} IN ({', '.join(get_query_value(x) for x in value)})"
         elif isinstance(value, tuple):
@@ -89,14 +51,12 @@ async def get_items(
             flt = f"{key} = {get_query_value(value)}"
 
         filters.append(flt)
-    if filters:
-        filter_str = " AND ".join(filters)
-    
+
     items = db_search_simple(
         "items",
         ItemDBToList.model_fields.keys(),
-        f"category_id = {category_id} AND ({filter_str})",
-        f"LIMIT {query_items.limit}"
+        " AND ".join(filters),
+        f"LIMIT {query_items.limit}",
     )
 
     return ItemsQuery(
@@ -106,7 +66,7 @@ async def get_items(
 
 
 @router.get(
-    "/{iid}",
+    "/item/{iid}",
     status_code=status.HTTP_200_OK,
     response_model=ItemDB | ErrorResponse,
     description="Get item by its ID",
@@ -134,5 +94,148 @@ async def get_item(iid: int = Path(...)):
     description="Get item by its ID",
 )
 async def get_user_items(uid: int = Path(...)):
-    resp = get_user_items(uid)
-    return resp
+    users = db_search_simple(
+        "users",
+        UserDBOut.model_fields.keys(),
+        f"uid = {uid}",
+    )
+    if not users:
+        return ErrorResponse(
+            error="USER_NOT_FOUND",
+            details={"user_id": uid},
+        )
+    items = db_search_simple(
+        "items",
+        ItemDBToList.model_fields.keys(),
+        f"seller_id = {uid}",
+    )
+
+    return ItemsUser(user=users[0], items=items)
+
+
+@router.post(
+    "/create",
+    status_code=status.HTTP_200_OK,
+    response_model=ItemDB | ErrorResponse,
+    description="Route for creating an item",
+)
+async def item_create(
+    token: str = Depends(oauth2_scheme),
+    item: ItemCreate = Body(
+        ...,
+        openapi_examples=ITEM_CREATE,
+    ),
+):
+    user_id: int = validate_access_token(
+        token=token,
+        secret_key=KEY,
+        algorithms=[ALGORITHM],
+    )
+    users = db_search_simple(
+        "users",
+        UserDBOut.model_fields.keys(),
+        f"uid = {user_id}",
+    )
+    if not users:
+        return ErrorResponse(
+            error="USER_NOT_FOUND",
+            details={"user_id": user_id},
+        )
+
+    created_at = dt.datetime.now(dt.timezone.utc)
+    if item.expires_at <= created_at:
+        return ErrorResponse(
+            error="INVALID_EXPIRES_AT",
+            details={
+                "expires_at": item.expires_at,
+                "message": "Expiration date must be in the future.",
+            },
+        )
+
+    item = ItemDB(
+        **item.model_dump(),
+        seller_id=user_id,
+        created_at=created_at,
+        updated_at=created_at,
+    ).model_dump(exclude_none=True, mode="json")
+
+    items: dict = db_insert("items", item, ItemDB.model_fields.keys())
+    return items[0]
+
+
+@router.patch(
+    "/update",
+    status_code=status.HTTP_200_OK,
+    response_model=ItemDB | ErrorResponse,
+    description="Route for patching an item",
+)
+async def item_update(
+    token: str = Depends(oauth2_scheme),
+    item: ItemUpdate = Body(
+        ...,
+        openapi_examples=ITEM_PATCH,
+    ),
+):
+    user_id: int = validate_access_token(
+        token=token,
+        secret_key=KEY,
+        algorithms=[ALGORITHM],
+    )
+
+    updated_at = dt.datetime.now(dt.timezone.utc)
+    if item.expires_at <= updated_at:
+        return ErrorResponse(
+            error="INVALID_EXPIRES_AT",
+            details={
+                "expires_at": item.expires_at,
+                "message": "Expiration date must be in the future.",
+            },
+        )
+
+    item = ItemDB(
+        **item.model_dump(),
+        updated_at=dt.datetime.now(dt.timezone.utc),
+    )
+
+    item_id = item.iid
+    items = db_update(
+        "items",
+        item.model_dump(exclude_none=True, mode="json"),
+        f"iid = '{item_id}' AND seller_id = {user_id}",
+        ItemDB.model_fields.keys(),
+    )
+    if not items:
+        return ErrorResponse(
+            error="ITEM_NOT_FOUND",
+            details={"item_id": item_id, "user_id": user_id},
+        )
+    return items[0]
+
+
+@router.delete(
+    "/remove",
+    status_code=status.HTTP_200_OK,
+    response_model=dict | ErrorResponse,
+    description="Route for deleting an item",
+)
+async def item_remove(
+    token: str = Depends(oauth2_scheme),
+    req_body: ItemRemove = Body(..., openapi_examples=ITEM_DELETE),
+):
+    user_id: int = validate_access_token(
+        token=token,
+        secret_key=KEY,
+        algorithms=[ALGORITHM],
+    )
+
+    items = db_remove(
+        "items",
+        f"seller_id = {user_id} AND iid = {req_body.item_id}",
+        columns_out=["iid", "name"],
+    )
+    if not items:
+        return ErrorResponse(
+            error="ITEMS_NOT_FOUND",
+            details={"item_ids": req_body.item_id, "user_id": user_id},
+        )
+    return items[0]

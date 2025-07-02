@@ -1,35 +1,30 @@
 import datetime as dt
-from pydantic import BaseModel, Field
-from typing import Literal
-
-from datamodels.item import ItemDB
-from datamodels.user import UserDB
+from pydantic import BaseModel
 
 
-class TransactionActiveDB(BaseModel):
+class TransactionCreate(BaseModel):
+    item_id: int
+
+
+class TransactionDBIn(BaseModel):
+    sold_at: dt.datetime
+    item: dict
+    seller_uid_uuid4: str
+    buyer_uid_uuid4: str
+    seller_snapshot: dict
+    buyer_snapshot: dict
+    finilized: bool
+
+
+class TransactionDBOut(BaseModel):
     tid: int
     tid_uuid4: str
-
-    buyer_id: int
-    status: Literal["active", "finished", "cancelled", "expired"]
-
-    transaction_start: dt.datetime
-    transaction_end: dt.datetime | None = None
-
-
-class TransactionActiveOut(BaseModel):
-    transaction: TransactionActiveDB
-    item: ItemDB
+    sold_at: dt.datetime
+    item: dict
+    seller_uid_uuid4: str
+    buyer_uid_uuid4: str
+    finilized: bool
 
 
-class TransationArchivedDB(BaseModel):
-    tid_uuid4: str
-    status: Literal["finished", "cancelled", "expired"]
-    transaction_start: dt.datetime
-    transaction_end: dt.datetime
-    item_id_uuid4: str
-    item_snapshot: ItemDB
-    buyer_id_uuid4: str
-    buyer_snapshot: UserDB
-    seller_id_uuid4: str
-    seller_snapshot: UserDB
+class TransactionFinilize(BaseModel):
+    transaction_id: int

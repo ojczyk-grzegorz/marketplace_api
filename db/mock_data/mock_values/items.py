@@ -27,9 +27,30 @@ CONDITIONS = ["New", "Like New", "Very Good", "Good", "Fair", "Poor"]
 # shoes materials
 MATERIALS = ["Leather", "Canvas", "Synthetic", "Suede", "Mesh", "Rubber"]
 # shoes colors
-COLORS = ["Black", "White", "Brown", "Gray", "Navy", "Red", "Green", "Blue", "Yellow", "Pink", "Purple"]
+COLORS = [
+    "Black",
+    "White",
+    "Brown",
+    "Gray",
+    "Navy",
+    "Red",
+    "Green",
+    "Blue",
+    "Yellow",
+    "Pink",
+    "Purple",
+]
 # shoes patterns
-PATTERNS = ["Solid", "Striped", "Polka Dot", "Floral", "Geometric", "Graphic", "Plaid", "Camouflage"]
+PATTERNS = [
+    "Solid",
+    "Striped",
+    "Polka Dot",
+    "Floral",
+    "Geometric",
+    "Graphic",
+    "Plaid",
+    "Camouflage",
+]
 # shoes widths
 WIDTHS = ["Narrow", "Regular", "Wide", "Extra Wide"]
 # shoes fasteners
