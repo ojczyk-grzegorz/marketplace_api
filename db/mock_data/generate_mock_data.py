@@ -7,19 +7,22 @@ from uuid import uuid4
 import psycopg2
 
 from mock_values.common import CITIES, STREETS
-from mock_values.users import FIRST_NAMES, LAST_NAMES, USER_REVIEWS
+from mock_values.users import FIRST_NAMES, LAST_NAMES
 from mock_values.transactions import STATUS
 from mock_values.items import (
     CATEGORIES,
-    SIZES,
+    TYPES,
     STYLES,
+    BRANDS,
     CONDITIONS,
     MATERIALS,
     COLORS,
-    BRANDS,
     PATTERNS,
-    DESCRIPTIONS,
-    DELIVERIES,
+    WIDTHS,
+    FASTENERS,
+    HEELS,
+    TOES,
+    DESCRIPTIONS
 )
 
 
@@ -49,19 +52,18 @@ def random_date(start_date, end_date):
 def main():
     random.seed(0)
 
-    ########### CUSTOMERS ###########
+    ########### USERS ###########
     users = []
     n = 0
     for first_name in FIRST_NAMES:
         for last_name in LAST_NAMES:
-            reviews = list(set(random.choices(USER_REVIEWS, k=random.randint(0, 20))))
             created_at = random_date(six_months_ago, today)
-            customer = {
+            user = {
                 "uid": n + 1,
                 "uid_uuid4": uuid4().hex,
                 "email": f"{first_name.lower()}.{last_name.lower()}@example.com",
-                "password_hash": "password_hash",
                 "phone": f"+48{random.randint(500000000, 799999999)}",
+                "password_hash": "password_hash",
                 "first_name": first_name,
                 "last_name": last_name,
                 "birth_date": random_date(
@@ -72,91 +74,139 @@ def main():
                 "street": random.choice(STREETS),
                 "street_number": str(random.randint(1, 200)),
                 "postal_code": f"{random.randint(10, 99)}-{random.randint(100, 999)}",
-                "addresses": [],
                 "created_at": created_at.strftime("%Y-%m-%dT%H:%M:%S"),
-                "updated_at": created_at.strftime("%Y-%m-%dT%H:%M:%S"),
-                "last_activity": created_at.strftime("%Y-%m-%dT%H:%M:%S"),
-                "reviews": [
-                    {
-                        "rating": review[0],
-                        "comment": review[1],
-                        "created_at": random_date(created_at, today).strftime(
-                            "%Y-%m-%dT%H:%M:%S"
-                        ),
-                    }
-                    for review in reviews
-                ],
-                "rating": round(sum(review[0] for review in reviews) / len(reviews), 1)
-                if reviews
-                else 0.0,
-                "avatar": None,
+                "updated_at": created_at.strftime("%Y-%m-%dT%H:%M:%S")
             }
             n += 1
-            users.append(customer)
+            users.append(user)
 
     ########### CATEGORIES ###########
     categories = []
-    for n, category in enumerate(CATEGORIES):
+    for n, name in enumerate(CATEGORIES):
         categories.append(
             {
                 "cid": n + 1,
-                "name": category,
+                "name": name,
+            }
+        )
+    
+    ########### TYPES ###########
+    types = []
+    for n, name in enumerate(TYPES):
+        types.append(
+            {
+                "tid": n + 1,
+                "name": name,
+            }
+        )
+    ########### STYLES ###########
+    styles = []
+    for n, name in enumerate(STYLES):
+        styles.append(
+            {
+                "sid": n + 1,
+                "name": name,
+            }
+        )
+    ########### BRANDS ###########
+    brands = []
+    for n, name in enumerate(BRANDS):
+        brands.append(
+            {
+                "bid": n + 1,
+                "name": name,
+            }
+        )
+    ########### CONDITIONS ###########
+    conditions = []
+    for n, name in enumerate(CONDITIONS):
+        conditions.append(
+            {
+                "cid": n + 1,
+                "name": name,
+            }
+        )
+    ########### MATERIALS ###########
+    materials = []
+    for n, name in enumerate(MATERIALS):
+        materials.append(
+            {
+                "mid": n + 1,
+                "name": name,
+            }
+        )
+    ########### COLORS ###########
+    colors = []
+    for n, name in enumerate(COLORS):
+        colors.append(
+            {
+                "cid": n + 1,
+                "name": name,
+            }
+        )
+    ########### PATTERNS ###########
+    patterns = []
+    for n, name in enumerate(PATTERNS):
+        patterns.append(
+            {
+                "pid": n + 1,
+                "name": name,
+            }
+        )
+    ########### WIDTHS ###########
+    widths = []
+    for n, name in enumerate(WIDTHS):
+        widths.append(
+            {
+                "wid": n + 1,
+                "name": name,
+            }
+        )
+    ########### FASTENERS ###########
+    fasteners = []
+    for n, name in enumerate(FASTENERS):
+        fasteners.append(
+            {
+                "fid": n + 1,
+                "name": name,
+            }
+        )
+    ########### HEELS ###########
+    heels = []
+    for n, name in enumerate(HEELS):
+        heels.append(
+            {
+                "hid": n + 1,
+                "name": name,
+            }
+        )
+    ########### TOES ###########
+    toes = []
+    for n, name in enumerate(TOES):
+        toes.append(
+            {
+                "tid": n + 1,
+                "name": name,
             }
         )
 
-    ########### STATUS ###########
-    status = []
-    for n, s in enumerate(STATUS):
-        status.append(
-            {
-                "sid": n + 1,
-                "name": s,
-            }
-        )
 
     ########### ITEMS ###########
     items = []
     for n in range(5_000):
-        iid = n + 1
+        seller=users[random.randint(0, len(users) // 3)],
 
+        brand = random.choice(brands)
         category = random.choice(categories)
-        seller = users[random.randint(0, len(users) // 3)]
-        subcategory = random.choice(CATEGORIES[category["name"]])
-
-        price = float(random.randint(1, 300))
-        condition = random.choice(CONDITIONS)
-        brand = random.choice(BRANDS)
-        material = random.choice(MATERIALS)
-        color = random.choice(COLORS)
-        pattern = random.choice(PATTERNS)
-        size = random.choice(SIZES)
-        style = random.choice(STYLES)
-
-        features_common = {}
-        for feature, values in subcategory.get("features_common", {}).items():
-            features_common[feature] = random.choice(values)
-
-        features_specific = {}
-        for feature, values in subcategory.get("features_specific", {}).items():
-            features_specific[feature] = random.choice(values)
-
-        features_specific = {
-            **features_common,
-            **features_specific,
-        }
+        material = random.choice(materials)
+        color = random.choice(colors)
 
         created_at = random_date(six_months_ago, today)
-        updated_at = created_at
-        expires_at = created_at + timedelta(days=random.randint(15, 60))
-
-        name = f"{brand} {color} {subcategory['name']}"
 
         joins_sent = ["\n", ".\n", ". "]
         joins_kv = [" ", " ", ": ", ":", " - ", "-"]
-
         join_kv: str = random.choice(joins_kv)
         join_sent: str = random.choice(joins_sent)
-
         desc = list(set(random.choices(DESCRIPTIONS, k=random.randint(2, 6))))
         feat = list(
             set(random.choices(list(features_specific.items()), k=len(desc) - 1))
@@ -168,40 +218,51 @@ def main():
         description.append(desc[-1])
         description = join_sent.join(description)
 
-        item = {
-            "iid": iid,
-            "iid_uuid4": uuid4().hex,
-            "name": name,
-            "category_id": category["cid"],
-            "seller_id": seller["uid"],
-            "seller_rating": seller["rating"],
-            "transaction_id": None,
-            "subcategory": subcategory["name"],
-            "price": price,
-            "condition": condition,
-            "brand": brand,
-            "material": material,
-            "color": color,
-            "pattern": pattern,
-            "size": size,
-            "style": style,
-            "features_specific": features_specific,
-            "city": seller["city"],
-            "street": seller["street"],
-            "delivery": list(
-                set(random.choices(DELIVERIES, k=random.randint(1, len(DELIVERIES))))
-            ),
-            "created_at": created_at.strftime("%Y-%m-%dT%H:%M:%S"),
-            "updated_at": updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
-            "expires_at": expires_at.strftime("%Y-%m-%dT%H:%M:%S"),
-            "icon": None,
-            "images": [],
-            "interested": random.randint(0, 30),
-            "description": description,
-            **features_common,
-        }
+        item = dict(
+            iid=n+1,
+            iid_uuid4=uuid4().hex,
+            name=f"{brand["name"]} {color["name"]} {material["name"]} {category["name"]}",
+            seller_id=seller["uid"],
+            transaction_id=None,
+            price=float(random.randint(10, 300)),
+            category_id=category["cid"],
+            type_id=random.choice(types)["tid"],
+            style_id=random.choice(styles)["sid"],
+            brand_id=random.choice(brands)["bid"],
+            condition_id=random.choice(conditions)["cid"],
+            material_id=random.choice(materials)["mid"],
+            color_id=random.choice(colors)["cid"],
+            pattern_id=random.choice(patterns)["pid"],
+            size=float(random.randint(30, 60)),
+            
+            width_id=random.choice(widths)["wid"],
+            fastener_id=random.choice(fasteners)["fid"],
+            heel_id=random.choice(heels)["hid"],
+            toe_id=random.choice(toes)["tid"],
+            
+            country=seller["country"],
+            city=seller["city"],
+            
+            created_at=created_at.isoformat(),
+            updated_at=created_at.isoformat(),
+            expires_at=(created_at + timedelta(days=random.randint(15, 60))).isoformat()
 
+            icon=None,
+            images=[],
+            description=description,
+        )
         items.append(item)
+
+
+    ########### STATUS ###########
+    status = []
+    for n, s in enumerate(STATUS):
+        status.append(
+            {
+                "sid": n + 1,
+                "name": s,
+            }
+        )
 
     ########### TRANSACTIONS active ###########
     transactions_active = []
@@ -209,8 +270,8 @@ def main():
         item: dict = items[n]
 
         while True:
-            customer = random.choice(users)
-            if customer["uid"] != item["seller_id"]:
+            user = random.choice(users)
+            if user["uid"] != item["seller_id"]:
                 break
 
         transaction_start = random_date(
@@ -229,7 +290,7 @@ def main():
         transaction = {
             "tid": n + 1,
             "tid_uuid4": uuid4().hex,
-            "buyer_id": customer["uid"],
+            "buyer_id": user["uid"],
             "status_id": stat["sid"],
             "transaction_start": transaction_start.strftime("%Y-%m-%dT%H:%M:%S"),
             "transaction_end": transaction_end.strftime("%Y-%m-%dT%H:%M:%S")

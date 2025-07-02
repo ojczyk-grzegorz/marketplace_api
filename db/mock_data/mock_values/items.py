@@ -1,111 +1,10 @@
-CATEGORIES = {
-    "clothes": [
-        {
-            "name": "T-Shirt",
-            "features_common": {
-                "price": [
-                    10.99,
-                    15.99,
-                    20.99,
-                    25.99,
-                    30.99,
-                    35.99,
-                    40.99,
-                    45.99,
-                    50.99,
-                    55.99,
-                    60.99,
-                ],
-                "size": ["S", "M", "L", "XL"],
-                "pattern": ["Solid", "Striped", "Graphic"],
-            },
-            "features_specific": {
-                "fit": ["Regular", "Slim", "Loose"],
-                "sleeve": ["Short", "Long", "Sleeveless"],
-                "collar": ["Crew", "V-Neck", "Polo"],
-            },
-        },
-        {
-            "name": "Trousers",
-            "features_common": {
-                "price": [
-                    20.99,
-                    25.99,
-                    30.99,
-                    35.99,
-                    40.99,
-                    45.99,
-                    50.99,
-                    55.99,
-                    60.99,
-                    65.99,
-                ],
-                "size": ["S", "M", "L", "XL"],
-                "pattern": ["Solid", "Checked", "Denim"],
-            },
-            "features_specific": {
-                "length": ["Short", "Regular", "Long"],
-                "fit": ["Regular", "Slim", "Loose"],
-                "shape": ["Straight", "Bootcut", "Skinny"],
-                "raise": ["High", "Mid", "Low"],
-            },
-        },
-    ],
-    "shoes": [
-        {
-            "name": "Sneakers",
-            "features_common": {
-                "price": [
-                    29.99,
-                    34.99,
-                    39.99,
-                    44.99,
-                    49.99,
-                    54.99,
-                    59.99,
-                    64.99,
-                    69.99,
-                    74.99,
-                ],
-                "size": ["36", "37", "38", "39", "40", "41", "42", "43", "44", "45"],
-                "color": ["Black", "White", "Red", "Blue", "Green"],
-                "material": ["Leather", "Canvas", "Synthetic"],
-            },
-            "features_specific": {
-                "type": ["Ankle Boots", "Knee-High Boots"],
-            },
-        },
-        {
-            "name": "Boots",
-            "features_common": {
-                "price": [
-                    49.99,
-                    59.99,
-                    69.99,
-                    79.99,
-                    89.99,
-                    99.99,
-                    109.99,
-                    119.99,
-                    129.99,
-                    139.99,
-                ],
-                "size": ["36", "37", "38", "39", "40", "41", "42", "43", "44", "45"],
-                "color": ["Black", "Brown", "Tan"],
-                "material": ["Leather", "Suede"],
-            },
-            "features_specific": {
-                "type": ["Ankle Boots", "Knee-High Boots"],
-            },
-        },
-    ],
-}
-
-SIZES = ["S", "M", "L", "XL", "XXL"]
-CONDITIONS = ["New", "Not Used", "Very Good", "Good", "Fair", "Poor"]
-STYLES = ["Casual", "Sporty", "Fashion"]
-MATERIALS = ["Cotton", "Polyester", "Wool", "Leather", "Denim", "Linen"]
-COLORS = ["Red", "Blue", "Green", "Black", "White", "Yellow", "Pink", "Purple"]
+# shoes categories
+CATEGORIES = ["Sneakers", "Boots", "Sandals", "Loafers", "Heels", "Flats", "Slippers"]
+# shoes types
+TYPES = ["Athletic", "Casual", "Formal", "Outdoor", "Work", "Fashion", "Comfort"]
+# shoes styles
+STYLES = ["Running", "Hiking", "Dress", "Casual", "Sport", "Work", "Fashion"]
+# shoes brands
 BRANDS = [
     "Aetheria Apparel",
     "Terra Nova Threads",
@@ -123,7 +22,24 @@ BRANDS = [
     "Nova Bloom",
     "Evergreen & Elm",
 ]
-PATTERNS = ["Solid", "Striped", "Checked", "Floral", "Geometric", "Graphic"]
+# shoes conditions
+CONDITIONS = ["New", "Like New", "Very Good", "Good", "Fair", "Poor"]
+# shoes materials
+MATERIALS = ["Leather", "Canvas", "Synthetic", "Suede", "Mesh", "Rubber"]
+# shoes colors
+COLORS = ["Black", "White", "Brown", "Gray", "Navy", "Red", "Green", "Blue", "Yellow", "Pink", "Purple"]
+# shoes patterns
+PATTERNS = ["Solid", "Striped", "Polka Dot", "Floral", "Geometric", "Graphic", "Plaid", "Camouflage"]
+# shoes widths
+WIDTHS = ["Narrow", "Regular", "Wide", "Extra Wide"]
+# shoes fasteners
+FASTENERS = ["Laces", "Velcro", "Buckle", "Slip-On", "Zipper", "Elastic"]
+# shoes heels
+HEELS = ["Flat", "Low", "Medium", "High", "Wedge", "Platform"]
+# shoes toes
+TOES = ["Round", "Pointed", "Square", "Almond", "Open", "Closed"]
+
+
 DESCRIPTIONS = [
     "A stylish and comfortable piece for everyday wear",
     "Perfect for casual outings or lounging at home",
@@ -164,5 +80,3 @@ DESCRIPTIONS = [
     "A unique blend of textures and materials for a standout look",
     "A piece that tells a story with its intricate design",
 ]
-
-DELIVERIES = ["Courier", "Postal service", "Parcel box", "Pick-up"]
