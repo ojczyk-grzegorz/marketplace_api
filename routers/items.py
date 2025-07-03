@@ -97,7 +97,7 @@ async def get_user_items(uid: int = Path(...)):
     )
     if not users:
         raise ExcUserNotFound(user_id=uid)
-    
+
     db_items = db_search_simple(
         "items",
         ItemDBToList.model_fields.keys(),

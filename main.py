@@ -3,17 +3,23 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from routers import users, items, auth, transactions
-from exceptions.exceptions import ExcUserNotFound, ExcUserExists, ExcTransactionsFound, ExcItemNotFound, ExcInvalidExpiresAt
+from exceptions.exceptions import (
+    ExcUserNotFound,
+    ExcUserExists,
+    ExcTransactionsFound,
+    ExcItemNotFound,
+    ExcInvalidExpiresAt,
+)
 
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth.router)
@@ -70,7 +76,7 @@ async def handle_transactions_found(request: Request, exc: ExcTransactionsFound)
 
 @app.exception_handler(ExcItemNotFound)
 async def handle_user_not_found(request: Request, exc: ExcItemNotFound):
-    content={
+    content = {
         "code": "ITEM_NOT_FOUND",
         "message": str(exc),
     }

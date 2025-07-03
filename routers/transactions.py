@@ -50,7 +50,7 @@ async def transaction_create(
     )
     if not db_items:
         raise ExcItemNotFound(item_id=req_body.item_id, not_user_id=buyer_id)
-    
+
     db_item = db_items[0]
     sellers = db_search_simple(
         "users",
@@ -107,7 +107,7 @@ async def transaction_finilize(
     )
     if not db_buyers:
         raise ExcUserNotFound(user_id=buyer_id)
-    
+
     db_buyer = db_buyers[0]
     buyer_uid_uuid4 = db_buyer["uid_uuid4"]
 

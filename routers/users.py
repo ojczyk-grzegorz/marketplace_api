@@ -38,7 +38,7 @@ async def get_user(user_id: int = Path(...)):
 
     if not db_user:
         raise ExcUserNotFound(user_id=user_id)
-    
+
     return db_user
 
 
@@ -95,10 +95,8 @@ async def user_create(
 
     db_users: dict = db_insert("users", user, UserDBOutDetailed.model_fields.keys())
     return ResponseSuccess(
-        message="User created successfully",    
-        details=dict(
-            user=db_users[0]
-        ),
+        message="User created successfully",
+        details=dict(user=db_users[0]),
     )
 
 
@@ -143,9 +141,7 @@ async def user_update(
     )
     return ResponseSuccess(
         message="User updated successfully",
-        details=dict(
-            user=db_users[0]
-        ),
+        details=dict(user=db_users[0]),
     )
 
 

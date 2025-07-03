@@ -28,11 +28,13 @@ class ExcTransactionsFound(Exception):
 
 
 class ExcItemNotFound(Exception):
-    def __init__(self, item_id: str, user_id: int | None = None, not_user_id: int | None = None):
+    def __init__(
+        self, item_id: str, user_id: int | None = None, not_user_id: int | None = None
+    ):
         self.item_id = item_id
         self.user_id = user_id
         self.not_user_id = not_user_id
-        
+
         message = f"Item with ID {item_id} not found."
         if user_id is not None:
             message += f" User ID: {user_id}."
@@ -46,4 +48,6 @@ class ExcInvalidExpiresAt(Exception):
     def __init__(self, expires_at: str):
         self.current_time = dt.datetime.now(dt.timezone.utc)
         self.expires_at: dt.datetime = expires_at
-        super().__init__(f"Expiration date {expires_at.isoformat()} must be in the future. Current time is {self.current_time.isoformat()}.")
+        super().__init__(
+            f"Expiration date {expires_at.isoformat()} must be in the future. Current time is {self.current_time.isoformat()}."
+        )

@@ -193,7 +193,11 @@ def main():
     recreate_tables(database_config, "db/postgres/CREATE_TABLES.sql")
 
     insert_table_json(
-        database_config, "db/mock_data/users.json", remove=["uid",]
+        database_config,
+        "db/mock_data/users.json",
+        remove=[
+            "uid",
+        ],
     )
     insert_table_json(
         database_config,
@@ -201,7 +205,11 @@ def main():
         remove=["tid", "tid_uuid4"],
     )
     insert_table_json(
-        database_config, "db/mock_data/items.json", remove=["iid",]
+        database_config,
+        "db/mock_data/items.json",
+        remove=[
+            "iid",
+        ],
     )
 
 
