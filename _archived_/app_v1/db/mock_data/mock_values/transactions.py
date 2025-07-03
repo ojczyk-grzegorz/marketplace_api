@@ -1,1 +1,0 @@
-STATUS = ["active", "shipping", "disputed", "finished", "cancelled", "expired"]
