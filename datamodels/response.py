@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
 
-class ErrorResponse(BaseModel):
-    error: str
+class ResponseSuccess(BaseModel):
+    message: str
     details: dict | None = None

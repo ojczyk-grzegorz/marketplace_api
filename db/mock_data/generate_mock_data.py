@@ -161,7 +161,7 @@ def main():
         finilized = random_date(
             sold_at,
             today,
-        ).isoformat() 
+        ).isoformat()
         transaction = dict(
             tid=n + 1,
             tid_uuid4=uuid4().hex,
@@ -193,7 +193,7 @@ def main():
     recreate_tables(database_config, "db/postgres/CREATE_TABLES.sql")
 
     insert_table_json(
-        database_config, "db/mock_data/users.json", remove=["uid", "uid_uuid4"]
+        database_config, "db/mock_data/users.json", remove=["uid",]
     )
     insert_table_json(
         database_config,
@@ -201,7 +201,7 @@ def main():
         remove=["tid", "tid_uuid4"],
     )
     insert_table_json(
-        database_config, "db/mock_data/items.json", remove=["iid", "iid_uuid4"]
+        database_config, "db/mock_data/items.json", remove=["iid",]
     )
 
 

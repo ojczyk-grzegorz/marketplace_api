@@ -55,7 +55,7 @@ class QueryItems(BaseModel):
     type: str | None = None
     style: list[str] | None = None
     brand: list[str] | None = None
-    condition: str | None = None
+    condition: list[str] | None = None
     material: list[str] | None = None
     color: list[str] | None = None
     pattern: list[str] | None = None

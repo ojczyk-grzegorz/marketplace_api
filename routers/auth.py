@@ -4,7 +4,6 @@ from fastapi import APIRouter, status, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
 from db.db import db_search_simple
-from datamodels.response import ErrorResponse
 from datamodels.auth import Token
 from auth.auth import get_access_token, KEY, ALGORITHM, verify_password
 
@@ -15,7 +14,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 @router.post(
     "/token",
     status_code=status.HTTP_200_OK,
-    response_model=Token | ErrorResponse,
+    response_model=Token,
     description="Route for getting user by ID",
 )
 async def get_token(form: Annotated[OAuth2PasswordRequestForm, Depends()]):

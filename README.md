@@ -1,12 +1,8 @@
 steps
-- endpoints params
-- data models
-- mock data
-- postgres basics
-- features_specific(auth, querying, ...)
 - errors
 - logging
 - configs
+- auth
 - postgres advanced
 - tests
 - deployment
