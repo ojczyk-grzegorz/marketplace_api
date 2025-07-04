@@ -4,6 +4,7 @@ import datetime as dt
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 
+
 KEY = "SECRET"
 ALGORITHM = "HS256"
 

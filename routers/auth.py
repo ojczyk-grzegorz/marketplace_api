@@ -6,6 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from db.db import db_search_simple
 from datamodels.auth import Token
 from auth.auth import get_access_token, KEY, ALGORITHM, verify_password
+from exceptions.exceptions import ExcInvalidCredentials
 
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -26,10 +27,7 @@ async def get_token(form: Annotated[OAuth2PasswordRequestForm, Depends()]):
     )
     user = users[0] if users else None
     if not user or not verify_password(form.password, user["password_hash"]):
-        return ErrorResponse(
-            error="USER_NOT_FOUND",
-            details={"email": form.username},
-        )
+        raise ExcInvalidCredentials()
 
     token = get_access_token(
         data={"user_id": user["uid"]},

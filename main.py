@@ -1,9 +1,10 @@
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, Request, status, APIRouter
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import users, items, auth, transactions
+from routers import home, users, items, auth, transactions
 from exceptions.exceptions import (
+    ExcInvalidCredentials,
     ExcUserNotFound,
     ExcUserExists,
     ExcTransactionsFound,
@@ -13,6 +14,7 @@ from exceptions.exceptions import (
 
 
 app = FastAPI()
+router = APIRouter(prefix="", tags=["Authentication"],)# route_class=TimedRoute)
 
 app.add_middleware(
     CORSMiddleware,
@@ -22,6 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(home.router)
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(items.router)
@@ -34,6 +37,18 @@ app.include_router(transactions.router)
 )
 async def root():
     return {"message": "Application is up and running"}
+
+
+@app.exception_handler(ExcInvalidCredentials)
+async def handle_invalid_credentials(request: Request, exc: ExcInvalidCredentials):
+    return JSONResponse(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        content={
+            "code": "INVALID_CREDENTIALS",
+            "message": str(exc),
+        }
+    )
+
 
 
 @app.exception_handler(ExcUserNotFound)

@@ -1,6 +1,11 @@
 import datetime as dt
 
 
+class ExcInvalidCredentials(Exception):
+    def __init__(self):
+        super().__init__("Invalid credentials provided.")
+
+
 class ExcUserNotFound(Exception):
     def __init__(self, user_id: str):
         self.user_id = user_id
