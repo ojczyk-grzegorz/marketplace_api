@@ -1,6 +1,7 @@
 import datetime as dt
 
-from fastapi import APIRouter, status, Query, Path, Body, Depends
+from fastapi import APIRouter, status, Query, Path, Body, Depends, Request
+from utils.routers import APIRouteLogging
 from auth.auth import oauth2_scheme, validate_access_token, KEY, ALGORITHM
 from datamodels.response import ResponseSuccess
 from exceptions.exceptions import ExcItemNotFound, ExcUserNotFound, ExcInvalidExpiresAt
@@ -19,7 +20,7 @@ from datamodels.user import UserDBOut
 from testing.openapi.items import ITEM_CREATE, ITEM_PATCH, ITEM_DELETE
 
 
-router = APIRouter(prefix="/items", tags=["Items"])
+router = APIRouter(prefix="/items", tags=["Items"], route_class=APIRouteLogging)
 
 
 def get_query_value(value):
@@ -36,9 +37,7 @@ def get_query_value(value):
     description="Query items based on various filters",
     response_model_exclude_none=True,
 )
-async def get_items(
-    query_items: QueryItems = Query(QueryItems()),
-):
+async def get_items(req: Request, query_items: QueryItems = Query(QueryItems())):
     filters = []
     for key, value in query_items.model_dump(
         exclude_none=True, exclude=["limit", "features_specific"]
@@ -57,6 +56,10 @@ async def get_items(
         ItemDBToList.model_fields.keys(),
         " AND ".join(filters),
         f"LIMIT {query_items.limit}",
+        log_kwargs=dict(
+            request_id=req.uuid4,
+            query_tags=["items", "get"],
+        ),
     )
 
     return ItemsQuery(
@@ -71,11 +74,15 @@ async def get_items(
     response_model=ItemDB,
     description="Get item by its ID",
 )
-async def get_item(iid: int = Path(...)):
+async def get_item(req: Request, iid: int = Path(...)):
     db_items = db_search_simple(
         "items",
         ItemDB.model_fields.keys(),
         f"iid = {iid}",
+        log_kwargs=dict(
+            request_id=req.uuid4,
+            query_tags=["items", "get"],
+        ),
     )
 
     if not db_items:
@@ -89,11 +96,15 @@ async def get_item(iid: int = Path(...)):
     response_model=ItemsUser,
     description="Get item by its ID",
 )
-async def get_user_items(uid: int = Path(...)):
+async def get_user_items(req: Request, uid: int = Path(...)):
     users = db_search_simple(
         "users",
         UserDBOut.model_fields.keys(),
         f"uid = {uid}",
+        log_kwargs=dict(
+            request_id=req.uuid4,
+            query_tags=["users", "get"],
+        ),
     )
     if not users:
         raise ExcUserNotFound(user_id=uid)
@@ -102,6 +113,10 @@ async def get_user_items(uid: int = Path(...)):
         "items",
         ItemDBToList.model_fields.keys(),
         f"seller_id = {uid}",
+        log_kwargs=dict(
+            request_id=req.uuid4,
+            query_tags=["items", "get"],
+        ),
     )
 
     return ItemsUser(user=users[0], items=db_items)
@@ -114,6 +129,7 @@ async def get_user_items(uid: int = Path(...)):
     description="Route for creating an item",
 )
 async def item_create(
+    req: Request,
     token: str = Depends(oauth2_scheme),
     item: ItemCreate = Body(
         ...,
@@ -137,7 +153,15 @@ async def item_create(
         updated_at=created_at,
     ).model_dump(exclude_none=True, mode="json")
 
-    db_items: dict = db_insert("items", item, ItemDB.model_fields.keys())
+    db_items: dict = db_insert(
+        "items",
+        item,
+        ItemDB.model_fields.keys(),
+        log_kwargs=dict(
+            request_id=req.uuid4,
+            query_tags=["items", "create"],
+        ),
+    )
     return ResponseSuccess(
         message="Item created successfully",
         details={
@@ -153,6 +177,7 @@ async def item_create(
     description="Route for patching an item",
 )
 async def item_update(
+    req: Request,
     token: str = Depends(oauth2_scheme),
     item: ItemUpdate = Body(
         ...,
@@ -180,6 +205,10 @@ async def item_update(
         item.model_dump(exclude_none=True, mode="json"),
         f"iid = '{item_id}' AND seller_id = {user_id}",
         ItemDB.model_fields.keys(),
+        log_kwargs=dict(
+            request_id=req.uuid4,
+            query_tags=["items", "update"],
+        ),
     )
     if not db_items:
         raise ExcItemNotFound(item_id=item_id, user_id=user_id)
@@ -198,6 +227,7 @@ async def item_update(
     description="Route for deleting an item",
 )
 async def item_remove(
+    req: Request,
     token: str = Depends(oauth2_scheme),
     req_body: ItemRemove = Body(..., openapi_examples=ITEM_DELETE),
 ):
@@ -211,6 +241,10 @@ async def item_remove(
         "items",
         f"seller_id = {user_id} AND iid = {req_body.item_id}",
         columns_out=["iid", "name"],
+        log_kwargs=dict(
+            request_id=req.uuid4,
+            query_tags=["items", "remove"],
+        ),
     )
     if not db_items:
         raise ExcItemNotFound(item_id=req_body.item_id, user_id=user_id)

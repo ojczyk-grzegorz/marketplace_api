@@ -64,10 +64,34 @@ CREATE TABLE transactions (
 	tid SERIAL PRIMARY KEY,
 	tid_uuid4 UUID DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
     sold_at TIMESTAMPTZ NOT NULL,
-    item JSONB NOT NULL,
+    item JSONB,
     seller_uid_uuid4 UUID NOT NULL,
     buyer_uid_uuid4 UUID NOT NULL,
-    seller_snapshot JSONB NOT NULL,
-    buyer_snapshot JSONB NOT NULL,
+    seller_snapshot JSONB,
+    buyer_snapshot JSONB,
     finilized TIMESTAMPTZ DEFAULT NULL
+);
+
+
+DROP TABLE IF EXISTS logs_request CASCADE;
+CREATE TABLE logs_request (
+	rid_uuid4 UUID DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
+    timestamp TIMESTAMPTZ NOT NULL,
+    url TEXT NOT NULL,
+    method VARCHAR(8) NOT NULL,
+    status_code INT NOT NULL,
+    duration_ms NUMERIC NOT NULL,
+    type VARCHAR(16) NOT NULL,
+    http_version VARCHAR(8) NOT NULL,
+    server JSONB,
+    client JSONB,
+    path TEXT NOT NULL,
+    path_params JSONB,
+    asgi_version VARCHAR(16) NOT NULL,
+    asgi_spec_version VARCHAR(16) NOT NULL,
+    request_headers JSONB,
+    request_body JSONB,
+    response_headers JSONB,
+    response_body JSONB,
+    exception JSONB
 );

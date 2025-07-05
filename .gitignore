@@ -1,4 +1,4 @@
-database.ini
+logs/
 database.json
 
 local_utils

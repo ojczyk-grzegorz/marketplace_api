@@ -1,7 +1,7 @@
 TRANSACTION_CREATE = {
     "single": {
         "summary": "single item example",
-        "value": {"item_id": 11},
+        "value": {"transaction_id": 11},
     },
 }
 

@@ -1,9 +1,10 @@
 import datetime as dt
 
-from fastapi import APIRouter, Path, Body, status, Depends
+from fastapi import APIRouter, Path, Body, status, Depends, Request
 
 
 from db.db import db_search_simple, db_insert, db_update, db_remove
+from utils.routers import APIRouteLogging
 from auth.auth import get_password_hash
 from datamodels.user import (
     UserDBOut,
@@ -18,11 +19,19 @@ from auth.auth import validate_access_token, KEY, ALGORITHM, oauth2_scheme
 from testing.openapi.users import USER_PATCH, USER_CREATE
 
 
-router = APIRouter(prefix="/users", tags=["Users"])
+router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRouteLogging)
 
 
-def get_user_by_id(user_id: int, columns_out: list[str]) -> dict | None:
-    users = db_search_simple("users", columns_out, f"uid = {user_id}")
+def get_user_by_id(
+    user_id: int, columns_out: list[str], log_kwargs: dict
+) -> dict | None:
+    users = db_search_simple(
+        "users",
+        columns_out,
+        f"uid = {user_id}",
+        "LIMIT 1",
+        log_kwargs=log_kwargs,
+    )
     return users[0] if users else None
 
 
@@ -70,6 +79,7 @@ async def get_user_me(token: str = Depends(oauth2_scheme)):
     description="Route for creating user",
 )
 async def user_create(
+    req: Request,
     user: UserCreate = Body(..., openapi_examples=USER_CREATE),
 ):
     db_users = db_search_simple(
@@ -77,6 +87,10 @@ async def user_create(
         ["email", "phone"],
         f"email = '{user.email}' OR phone = '{user.phone}'",
         "LIMIT 1",
+        log_kwargs=dict(
+            request_id=req.uuid4,
+            query_tags=["users", "create"],
+        ),
     )
     if db_users:
         raise ExcUserExists(
@@ -93,7 +107,15 @@ async def user_create(
         updated_at=created_at,
     ).model_dump(exclude_none=True, mode="json")
 
-    db_users: dict = db_insert("users", user, UserDBOutDetailed.model_fields.keys())
+    db_users: dict = db_insert(
+        "users",
+        user,
+        UserDBOutDetailed.model_fields.keys(),
+        log_kwargs=dict(
+            request_id=req.uuid4,
+            query_tags=["users", "create"],
+        ),
+    )
     return ResponseSuccess(
         message="User created successfully",
         details=dict(user=db_users[0]),
@@ -107,6 +129,7 @@ async def user_create(
     description="Route for creating user",
 )
 async def user_update(
+    req: Request,
     token: str = Depends(oauth2_scheme),
     user: UserUpdate = Body(
         ...,
@@ -123,6 +146,10 @@ async def user_update(
         ["uid"],
         f"uid = {user_id}",
         "LIMIT 1",
+        log_kwargs=dict(
+            request_id=req.uuid4,
+            query_tags=["users", "update"],
+        ),
     )
     if not db_users:
         raise ExcUserNotFound(user_id=user_id)
@@ -138,6 +165,10 @@ async def user_update(
         data=user,
         where=f"uid = {user_id}",
         columns_out=UserDBOutDetailed.model_fields.keys(),
+        log_kwargs=dict(
+            request_id=req.uuid4,
+            query_tags=["users", "update"],
+        ),
     )
     return ResponseSuccess(
         message="User updated successfully",
@@ -152,6 +183,7 @@ async def user_update(
     description="Route for creating user",
 )
 async def user_remove(
+    req: Request,
     token: str = Depends(oauth2_scheme),
 ):
     user_id = validate_access_token(
@@ -165,6 +197,10 @@ async def user_remove(
         ["uid_uuid4"],
         f"uid = {user_id}",
         "LIMIT 1",
+        log_kwargs=dict(
+            request_id=req.uuid4,
+            query_tags=["users", "remove"],
+        ),
     )
     if not db_users:
         raise ExcUserNotFound(user_id=user_id)
@@ -174,6 +210,10 @@ async def user_remove(
         "transactions",
         ["tid"],
         f"finilized IS NULL AND (buyer_uid_uuid4 = '{uid_uuid4}' OR seller_uid_uuid4 = '{uid_uuid4}')",
+        log_kwargs=dict(
+            request_id=req.uuid4,
+            query_tags=["users", "remove"],
+        ),
     )
     if transaction_ids:
         raise ExcTransactionsFound(
@@ -181,8 +221,24 @@ async def user_remove(
             details=dict(transaction_ids=[t["tid"] for t in transaction_ids]),
         )
 
-    db_remove("items", f"seller_id = {user_id}", columns_out=["iid"])
-    db_users = db_remove(table="users", where=f"uid = {user_id}", columns_out=["email"])
+    db_remove(
+        "items",
+        f"seller_id = {user_id}",
+        columns_out=["iid"],
+        log_kwargs=dict(
+            request_id=req.uuid4,
+            query_tags=["items", "remove"],
+        ),
+    )
+    db_users = db_remove(
+        table="users",
+        where=f"uid = {user_id}",
+        columns_out=["email"],
+        log_kwargs=dict(
+            request_id=req.uuid4,
+            query_tags=["users", "remove"],
+        ),
+    )
 
     return ResponseSuccess(
         message="User removed successfully",
