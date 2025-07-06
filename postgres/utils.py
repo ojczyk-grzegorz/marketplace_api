@@ -127,8 +127,6 @@ def get_mock_items(item_count: int, users: list[dict]) -> list[dict]:
             expires_at=(
                 created_at + timedelta(days=random.randint(15, 60))
             ).isoformat(),
-            icon=None,
-            images=[],
             description=description,
         )
         items.append(item)

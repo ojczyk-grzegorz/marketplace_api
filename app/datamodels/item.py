@@ -30,7 +30,6 @@ class ItemDBToList(BaseModel):
     country: str | None = None
     city: str | None = None
 
-    icon: str | None = None
 
 
 class ItemDB(ItemDBToList):
@@ -38,7 +37,6 @@ class ItemDB(ItemDBToList):
     updated_at: dt.datetime | None = None
     expires_at: dt.datetime | None = None
 
-    images: list[str] = []
     description: str | None = None
 
 
@@ -104,8 +102,6 @@ class ItemCreate(BaseModel):
 
     expires_at: dt.datetime
 
-    icon: str | None = None
-    images: list[str] = []
     description: str | None = None
 
 
@@ -122,8 +118,6 @@ class ItemUpdate(ItemCreate):
 
     expires_at: dt.datetime | None = None
 
-    icon: str | None = None
-    images: list[str] | None = None
     description: str | None = None
 
 

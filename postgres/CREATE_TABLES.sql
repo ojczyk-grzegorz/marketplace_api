@@ -51,8 +51,6 @@ CREATE TABLE items (
     updated_at TIMESTAMPTZ NOT NULL,
     expires_at TIMESTAMPTZ NOT NULL,
 
-    icon TEXT,
-    images JSONB,
     description TEXT,
 
     FOREIGN KEY (seller_id) REFERENCES users(uid)

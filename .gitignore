@@ -2,6 +2,7 @@ secrets/
 configs.json
 logs/
 database.json
+files/
 
 local_utils
 examples/*
