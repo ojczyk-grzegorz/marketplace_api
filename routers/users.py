@@ -23,7 +23,7 @@ router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRouteLogging)
 
 
 def get_user_by_id(
-    user_id: int, columns_out: list[str], log_kwargs: dict
+    user_id: int, columns_out: list[str], log_kwargs: dict = {}
 ) -> dict | None:
     users = db_search_simple(
         "users",
@@ -41,9 +41,16 @@ def get_user_by_id(
     response_model=UserDBOut,
     description="Route for getting user by ID",
 )
-async def get_user(user_id: int = Path(...)):
+async def get_user(req: Request, user_id: int = Path(...)):
     columns_out = UserDBOut.model_fields.keys()
-    db_user = get_user_by_id(user_id, columns_out)
+    db_user = get_user_by_id(
+        user_id,
+        columns_out,
+        log_kwargs=dict(
+            request_id=req.uuid4,
+            query_tags=["users", "get"],
+        ),
+    )
 
     if not db_user:
         raise ExcUserNotFound(user_id=user_id)
@@ -57,7 +64,7 @@ async def get_user(user_id: int = Path(...)):
     response_model=UserDBOutDetailed,
     description="Route for getting user by ID",
 )
-async def get_user_me(token: str = Depends(oauth2_scheme)):
+async def get_user_me(req: Request, token: str = Depends(oauth2_scheme)):
     user_id = validate_access_token(
         token=token,
         secret_key=KEY,
@@ -65,7 +72,14 @@ async def get_user_me(token: str = Depends(oauth2_scheme)):
     )
 
     columns_out = UserDBOutDetailed.model_fields.keys()
-    db_user = get_user_by_id(user_id, columns_out)
+    db_user = get_user_by_id(
+        user_id,
+        columns_out,
+        log_kwargs=dict(
+            request_id=req.uuid4,
+            query_tags=["users", "get_me"],
+        ),
+    )
 
     if not db_user:
         raise ExcUserNotFound(user_id=user_id)

@@ -22,7 +22,7 @@ def parse_value_to_sql(value) -> str:
     return value
 
 
-def db_query(query: str, log_kwargs: dict | None = None) -> list[tuple]:
+def db_query(query: str, log_kwargs: dict = {}) -> list[tuple]:
     with open("db/postgres/database.json", "r") as f:
         db_config = json.load(f)
 
@@ -33,7 +33,7 @@ def db_query(query: str, log_kwargs: dict | None = None) -> list[tuple]:
         connection.commit()
         results = cursor.fetchall()
     duration_ms = (time.perf_counter_ns() - start) / 1_000_000
-    if isinstance(log_kwargs, str):
+    if log_kwargs:
         log = {
             "timestamp": dt.datetime.now(dt.timezone.utc).isoformat(),
             "duration_ms": duration_ms,
@@ -48,7 +48,7 @@ def db_search_simple(
     columns: list[str],
     where: str = "",
     other: str = "",
-    log_kwargs: dict | None = None,
+    log_kwargs: dict = {},
 ) -> list[dict]:
     where = f"WHERE {where}" if where else ""
     query = f"SELECT {', '.join(columns)} FROM {table} {where} {other}"
@@ -60,7 +60,7 @@ def db_insert(
     table: str,
     data: dict | list[dict],
     columns_out: list[str],
-    log_kwargs: dict | None = None,
+    log_kwargs: dict = {},
 ):
     columns = []
     values = []
@@ -92,7 +92,7 @@ def db_update(
     data: dict,
     where: str,
     columns_out: list[str],
-    log_kwargs: dict | None = None,
+    log_kwargs: dict = {},
 ):
     data = ", ".join(f"{k} = {parse_value_to_sql(v)}" for k, v in data.items())
 
@@ -107,9 +107,7 @@ def db_update(
     return [dict(zip(columns_out, result)) for result in results]
 
 
-def db_remove(
-    table: str, where: str, columns_out: list[str], log_kwargs: dict | None = None
-):
+def db_remove(table: str, where: str, columns_out: list[str], log_kwargs: dict = {}):
     query = f"""
         DELETE FROM {table}
         WHERE {where}

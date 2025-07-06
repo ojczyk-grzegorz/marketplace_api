@@ -240,6 +240,9 @@ class APIRouteLogging(APIRoute):
                 ),
             )
 
+            if excepion:
+                print(log_data.model_dump_json(indent=4, exclude_none=True))
+
             dir_logs = "logs"
             os.makedirs(dir_logs, exist_ok=True)
 

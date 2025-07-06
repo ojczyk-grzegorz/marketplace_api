@@ -4,7 +4,6 @@ from fastapi import FastAPI
 
 from routers import users, items, auth, transactions
 from utils.scheduler import lifespan
-from utils.logs import logger
 
 
 app = FastAPI(lifespan=lifespan, tags=["Main"])
@@ -24,4 +23,4 @@ async def root():
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", reload=True, log_level="trace")
+    uvicorn.run("main:app", reload=True, log_level="info")

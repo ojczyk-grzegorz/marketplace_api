@@ -1,6 +1,5 @@
 steps
-- logging
-- configs
+- logging, configs, constants
 - auth
 - postgres advanced (full text search)
 - files
