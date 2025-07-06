@@ -48,7 +48,10 @@ def db_query(query: str, log_kwargs: dict = {}) -> list[tuple]:
         cursor = connection.cursor()
         cursor.execute(query)
         connection.commit()
-        results = cursor.fetchall()
+        try:
+            results = cursor.fetchall()
+        except psycopg2.ProgrammingError:
+            results = []
 
     duration_ms = (time.perf_counter_ns() - start) / 1_000_000
     if log_kwargs:
@@ -115,8 +118,11 @@ def db_insert(
     query = f"""
         INSERT INTO {table} ({", ".join(columns)})
         VALUES {", ".join(values)}
-        RETURNING {", ".join(columns_out) if columns_out else "*"}
     """
+    if columns_out and isinstance(columns_out, str):
+        query += f" RETURNING {columns_out}"
+    elif columns_out and isinstance(columns_out, list):
+        query += f" RETURNING {', '.join(columns_out)}"
 
     results = db_query(query, log_kwargs=log_kwargs)
     return [dict(zip(columns_out, result)) for result in results]

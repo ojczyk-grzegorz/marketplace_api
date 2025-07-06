@@ -1,9 +1,8 @@
 steps
-- auth
 - postgres advanced (full text search)
 - files
 - tests
-- deployment
+- deployment dev / prod
 - debugging
 - CICD
 - ruff
