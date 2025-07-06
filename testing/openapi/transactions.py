@@ -1,18 +1,18 @@
 TRANSACTION_CREATE = {
     "single": {
         "summary": "single item example",
-        "value": {"transaction_id": 11},
+        "value": {"item_id": 1},
     },
 }
 
 
 TRANSACTION_FINILIZE = {
     "t23": {
-        "summary": "single item example",
+        "summary": "transaction ID 23",
         "value": {"transaction_id": 23},
     },
     "t31": {
-        "summary": "single item example",
+        "summary": "transaction ID 31",
         "value": {"transaction_id": 31},
     },
 }

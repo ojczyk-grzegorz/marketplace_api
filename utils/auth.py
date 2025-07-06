@@ -5,22 +5,16 @@ from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 
 
-KEY = "SECRET"
-ALGORITHM = "HS256"
-
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def get_password_hash(password):
-    # return pwd_context.hash(password)
-    return password + "_hash"
+    return pwd_context.hash(password)
 
 
 def verify_password(plain_password, hashed_password):
-    # return pwd_context.verify(plain_password, hashed_password)
-    return get_password_hash(plain_password) == hashed_password
+    return pwd_context.verify(plain_password, hashed_password)
 
 
 def get_access_token(

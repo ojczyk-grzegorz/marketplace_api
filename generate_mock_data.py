@@ -6,9 +6,11 @@ from uuid import uuid4
 
 import psycopg2
 
-from mock_values.common import CITIES, STREETS
-from mock_values.users import FIRST_NAMES, LAST_NAMES
-from mock_values.items import (
+from utils.auth import get_password_hash
+
+from db.mock_data.mock_values.common import CITIES, STREETS
+from db.mock_data.mock_values.users import FIRST_NAMES, LAST_NAMES
+from db.mock_data.mock_values.items import (
     CATEGORIES,
     TYPES,
     STYLES,
@@ -57,7 +59,7 @@ def main():
                 uid_uuid4=uuid4().hex,
                 email=f"{first_name.lower()}.{last_name.lower()}@example.com",
                 phone=f"+48{random.randint(500000000, 799999999)}",
-                password_hash="password_hash",
+                password_hash=get_password_hash("password"),
                 first_name=first_name,
                 last_name=last_name,
                 birth_date=random_date(

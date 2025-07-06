@@ -1,10 +1,10 @@
 import uvicorn
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 
 from routers import users, items, auth, transactions
 from utils.scheduler import lifespan
-
+from utils.configs import get_settings, Settings
 
 app = FastAPI(lifespan=lifespan, tags=["Main"])
 
@@ -16,11 +16,14 @@ app.include_router(transactions.router)
 
 @app.get(
     "/",
-    description="Health check",
+    description="Home page of the API",
 )
-async def root():
-    return {"message": "Application is up and running"}
+async def root(settings: Settings = Depends(get_settings)):
+    return {"message": f"Hello from {settings.app_name}!"}
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", reload=True, log_level="info")
+    uvicorn.run(
+        "main:app",
+        reload=True,
+    )

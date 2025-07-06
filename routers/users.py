@@ -2,10 +2,16 @@ import datetime as dt
 
 from fastapi import APIRouter, Path, Body, status, Depends, Request
 
-
-from db.db import db_search_simple, db_insert, db_update, db_remove
+from utils.db import (
+    db_search_simple,
+    db_insert,
+    db_update,
+    db_remove,
+    db_search_user_by_id,
+)
 from utils.routers import APIRouteLogging
-from auth.auth import get_password_hash
+from utils.configs import get_settings, Settings
+from utils.auth import get_password_hash
 from datamodels.user import (
     UserDBOut,
     UserDBOutDetailed,
@@ -15,24 +21,11 @@ from datamodels.user import (
 )
 from datamodels.response import ResponseSuccess
 from exceptions.exceptions import ExcUserNotFound, ExcUserExists, ExcTransactionsFound
-from auth.auth import validate_access_token, KEY, ALGORITHM, oauth2_scheme
+from utils.auth import validate_access_token, oauth2_scheme
 from testing.openapi.users import USER_PATCH, USER_CREATE
 
 
 router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRouteLogging)
-
-
-def get_user_by_id(
-    user_id: int, columns_out: list[str], log_kwargs: dict = {}
-) -> dict | None:
-    users = db_search_simple(
-        "users",
-        columns_out,
-        f"uid = {user_id}",
-        "LIMIT 1",
-        log_kwargs=log_kwargs,
-    )
-    return users[0] if users else None
 
 
 @router.get(
@@ -41,11 +34,13 @@ def get_user_by_id(
     response_model=UserDBOut,
     description="Route for getting user by ID",
 )
-async def get_user(req: Request, user_id: int = Path(...)):
-    columns_out = UserDBOut.model_fields.keys()
-    db_user = get_user_by_id(
-        user_id,
-        columns_out,
+async def get_user(
+    req: Request, user_id: int = Path(...), settings: Settings = Depends(get_settings)
+):
+    db_user = db_search_user_by_id(
+        table=settings.database.tables.users.name,
+        user_id=user_id,
+        columns=UserDBOut.model_fields.keys(),
         log_kwargs=dict(
             request_id=req.uuid4,
             query_tags=["users", "get"],
@@ -64,17 +59,21 @@ async def get_user(req: Request, user_id: int = Path(...)):
     response_model=UserDBOutDetailed,
     description="Route for getting user by ID",
 )
-async def get_user_me(req: Request, token: str = Depends(oauth2_scheme)):
+async def get_user_me(
+    req: Request,
+    token: str = Depends(oauth2_scheme),
+    settings: Settings = Depends(get_settings),
+):
     user_id = validate_access_token(
         token=token,
-        secret_key=KEY,
-        algorithms=[ALGORITHM],
+        secret_key=settings.auth.secret_key,
+        algorithms=[settings.auth.algorithm],
     )
 
-    columns_out = UserDBOutDetailed.model_fields.keys()
-    db_user = get_user_by_id(
-        user_id,
-        columns_out,
+    db_user = db_search_user_by_id(
+        table=settings.database.tables.users.name,
+        user_id=user_id,
+        columns=UserDBOutDetailed.model_fields.keys(),
         log_kwargs=dict(
             request_id=req.uuid4,
             query_tags=["users", "get_me"],
@@ -95,9 +94,10 @@ async def get_user_me(req: Request, token: str = Depends(oauth2_scheme)):
 async def user_create(
     req: Request,
     user: UserCreate = Body(..., openapi_examples=USER_CREATE),
+    settings: Settings = Depends(get_settings),
 ):
     db_users = db_search_simple(
-        "users",
+        settings.database.tables.users.name,
         ["email", "phone"],
         f"email = '{user.email}' OR phone = '{user.phone}'",
         "LIMIT 1",
@@ -122,7 +122,7 @@ async def user_create(
     ).model_dump(exclude_none=True, mode="json")
 
     db_users: dict = db_insert(
-        "users",
+        settings.database.tables.users.name,
         user,
         UserDBOutDetailed.model_fields.keys(),
         log_kwargs=dict(
@@ -149,14 +149,15 @@ async def user_update(
         ...,
         openapi_examples=USER_PATCH,
     ),
+    settings: Settings = Depends(get_settings),
 ):
     user_id = validate_access_token(
         token=token,
-        secret_key=KEY,
-        algorithms=[ALGORITHM],
+        secret_key=settings.auth.secret_key,
+        algorithms=[settings.auth.algorithm],
     )
     db_users = db_search_simple(
-        "users",
+        settings.database.tables.users.name,
         ["uid"],
         f"uid = {user_id}",
         "LIMIT 1",
@@ -175,7 +176,7 @@ async def user_update(
     ).model_dump(exclude_none=True, mode="json")
 
     db_users = db_update(
-        table="users",
+        table=settings.database.tables.users.name,
         data=user,
         where=f"uid = {user_id}",
         columns_out=UserDBOutDetailed.model_fields.keys(),
@@ -199,15 +200,16 @@ async def user_update(
 async def user_remove(
     req: Request,
     token: str = Depends(oauth2_scheme),
+    settings: Settings = Depends(get_settings),
 ):
     user_id = validate_access_token(
         token=token,
-        secret_key=KEY,
-        algorithms=[ALGORITHM],
+        secret_key=settings.auth.secret_key,
+        algorithms=[settings.auth.algorithm],
     )
 
     db_users = db_search_simple(
-        "users",
+        settings.database.tables.users.name,
         ["uid_uuid4"],
         f"uid = {user_id}",
         "LIMIT 1",
@@ -221,7 +223,7 @@ async def user_remove(
 
     uid_uuid4 = db_users[0]["uid_uuid4"]
     transaction_ids = db_search_simple(
-        "transactions",
+        settings.database.tables.transactions.name,
         ["tid"],
         f"finilized IS NULL AND (buyer_uid_uuid4 = '{uid_uuid4}' OR seller_uid_uuid4 = '{uid_uuid4}')",
         log_kwargs=dict(
@@ -236,7 +238,7 @@ async def user_remove(
         )
 
     db_remove(
-        "items",
+        settings.database.tables.items.name,
         f"seller_id = {user_id}",
         columns_out=["iid"],
         log_kwargs=dict(
@@ -245,7 +247,7 @@ async def user_remove(
         ),
     )
     db_users = db_remove(
-        table="users",
+        table=settings.database.tables.users.name,
         where=f"uid = {user_id}",
         columns_out=["email"],
         log_kwargs=dict(
