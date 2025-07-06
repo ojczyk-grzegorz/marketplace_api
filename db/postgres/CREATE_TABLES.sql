@@ -75,7 +75,7 @@ CREATE TABLE transactions (
 
 DROP TABLE IF EXISTS logs_request CASCADE;
 CREATE TABLE logs_request (
-	rid_uuid4 UUID DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
+	rid_uuid4 UUID UNIQUE NOT NULL PRIMARY KEY,
     timestamp TIMESTAMPTZ NOT NULL,
     url TEXT NOT NULL,
     method VARCHAR(8) NOT NULL,
@@ -94,4 +94,13 @@ CREATE TABLE logs_request (
     response_headers JSONB,
     response_body JSONB,
     exception JSONB
+);
+
+
+DROP TABLE IF EXISTS logs_query CASCADE;
+CREATE TABLE logs_query (
+	lid SERIAL PRIMARY KEY,
+    timestamp TIMESTAMPTZ NOT NULL,
+    duration_ms NUMERIC NOT NULL,
+    query_details JSONB
 );
