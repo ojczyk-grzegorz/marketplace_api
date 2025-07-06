@@ -5,7 +5,7 @@ database.json
 
 local_utils
 examples/*
-db/mock_data/*.json
+postgres/mock_data/*.json
 
 
 **/.svelte-kit/
