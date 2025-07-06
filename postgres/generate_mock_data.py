@@ -1,6 +1,10 @@
 import random
 import json
 import os
+import sys
+
+base_dir = os.path.dirname(os.path.dirname(__file__))
+sys.path.append(base_dir)
 
 from app.utils.configs import get_settings
 from app.utils.db import db_query, db_insert
