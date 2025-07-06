@@ -3,12 +3,12 @@ from typing import Annotated
 from fastapi import APIRouter, status, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
 
-from utils.routers import APIRouteLogging
-from utils.configs import get_settings, Settings
-from utils.db import db_search_simple
-from datamodels.auth import Token
-from utils.auth import get_access_token, verify_password
-from exceptions.exceptions import ExcInvalidCredentials
+from app.utils.routers import APIRouteLogging
+from app.utils.configs import get_settings, Settings
+from app.utils.db import db_search_simple
+from app.utils.auth import get_access_token, verify_password
+from app.datamodels.auth import Token
+from app.exceptions.exceptions import ExcInvalidCredentials
 
 
 router = APIRouter(prefix="/auth", tags=["Authentication"], route_class=APIRouteLogging)

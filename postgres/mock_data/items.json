@@ -1,7 +1,7 @@
 [
     {
         "iid": 1,
-        "iid_uuid4": "b8bfe60bda554b0587136a02fe59dc45",
+        "iid_uuid4": "62117f177800487fbe58dc9ff208abb9",
         "name": "Solstice Supply Co. Purple Suede Flats",
         "seller_id": 5,
         "price": 259.0,
@@ -25,11 +25,11 @@
         "expires_at": "2025-06-20T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "An item that embodies the spirit of adventure and exploration. size:52.0. A piece that reflects the latest fashion trends. style:Running. Perfect for casual outings or lounging at home. fastener:Velcro. A piece that adds a pop of color to any outfit. type:Athletic. A comfortable and chic option for any occasion"
+        "description": "A piece that adds a pop of color to any outfit. type:Athletic. A piece that reflects the latest fashion trends. style:Running. Perfect for casual outings or lounging at home. fastener:Velcro. An item that embodies the spirit of adventure and exploration. size:52.0. A comfortable and chic option for any occasion"
     },
     {
         "iid": 2,
-        "iid_uuid4": "e5411abdb54145c8b2692e368f884d5f",
+        "iid_uuid4": "6d740207bcb7424fbfee3d6caf150008",
         "name": "Phantom Fit Blue Leather Sneakers",
         "seller_id": 10,
         "price": 119.0,
@@ -57,7 +57,7 @@
     },
     {
         "iid": 3,
-        "iid_uuid4": "161b41d0821847c5a448d1eadd32a241",
+        "iid_uuid4": "44335bb6cbee4286b7554768e6758543",
         "name": "Phantom Fit Yellow Rubber Sneakers",
         "seller_id": 12,
         "price": 68.0,
@@ -81,11 +81,11 @@
         "expires_at": "2025-05-07T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A unique item that stands out in any collection.\ncondition Like New.\nA piece that celebrates individuality and self-expression.\nheel Medium.\nA stylish and comfortable piece for everyday wear.\nwidth Regular.\nA stylish option for both casual and formal occasions"
+        "description": "A unique item that stands out in any collection.\nwidth Regular.\nDesigned with a modern aesthetic in mind.\ncondition Like New.\nA piece that celebrates individuality and self-expression.\nheel Medium.\nA stylish option for both casual and formal occasions"
     },
     {
         "iid": 4,
-        "iid_uuid4": "04072ad626704585a59dca920f493aea",
+        "iid_uuid4": "ed752258891e46cc997b8bd19222cc97",
         "name": "Nova Bloom Black Leather Sneakers",
         "seller_id": 5,
         "price": 57.0,
@@ -109,11 +109,11 @@
         "expires_at": "2025-07-17T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A must-have addition to any wardrobe.\ntype-Casual.\nA piece that tells a story with its design and materials.\nstyle-Work.\nA fusion of traditional and modern styles.\nheel-Flat.\nA versatile item that can be styled in multiple ways.\npattern-Graphic.\nLightweight and breathable for all-day comfort"
+        "description": "A fusion of traditional and modern styles.\nstyle-Work.\nLightweight and breathable for all-day comfort.\nheel-Flat.\nA must-have addition to any wardrobe.\npattern-Graphic.\nA piece that tells a story with its design and materials.\ntype-Casual.\nA versatile item that can be styled in multiple ways"
     },
     {
         "iid": 5,
-        "iid_uuid4": "63060234cd44491aad8882f6d0b1064b",
+        "iid_uuid4": "c6b5c68e194f41b0b5dcb7e39ca064c5",
         "name": "Aetheria Apparel Brown Synthetic Sneakers",
         "seller_id": 10,
         "price": 65.0,
@@ -137,11 +137,11 @@
         "expires_at": "2025-06-08T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A timeless design that never goes out of fashion.\nheel Flat.\nA piece that inspires confidence and creativity.\ncondition Very Good.\nA versatile item that can be worn year-round"
+        "description": "A piece that inspires confidence and creativity.\nheel Flat.\nA timeless design that never goes out of fashion.\ncondition Very Good.\nA versatile item that can be worn year-round"
     },
     {
         "iid": 6,
-        "iid_uuid4": "cb4e18b9bef040848f62a67aaec6a5c9",
+        "iid_uuid4": "27248c55402f4afc9d4bb0593cfee72c",
         "name": "Evergreen & Elm Red Suede Loafers",
         "seller_id": 9,
         "price": 43.0,
@@ -165,11 +165,11 @@
         "expires_at": "2025-02-03T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A stylish option for both casual and formal occasions.\ntoe: Almond.\nLightweight and breathable for all-day comfort.\nwidth: Narrow.\nA piece that celebrates individuality and self-expression"
+        "description": "Lightweight and breathable for all-day comfort.\nwidth: Narrow.\nA piece that celebrates individuality and self-expression.\ntoe: Almond.\nA stylish option for both casual and formal occasions"
     },
     {
         "iid": 7,
-        "iid_uuid4": "0d84ad01c04c46d8b15f7758194527ce",
+        "iid_uuid4": "10dea066545845eaa07eca1825ccc2c2",
         "name": "Cascade Clothiers Green Leather Boots",
         "seller_id": 4,
         "price": 24.0,
@@ -193,11 +193,11 @@
         "expires_at": "2025-05-16T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "Features unique details that set it apart from the rest\nstyle:Running\nA fusion of traditional and modern styles\nheel:Platform\nA piece that tells a story with its intricate design"
+        "description": "A fusion of traditional and modern styles\nheel:Platform\nCombines fashion and functionality seamlessly\nstyle:Running\nFeatures unique details that set it apart from the rest"
     },
     {
         "iid": 8,
-        "iid_uuid4": "bfaf3f6345fd4ece8735ddb0c464c6f8",
+        "iid_uuid4": "353e5fe88992427088df641df5f43bf9",
         "name": "Phantom Fit White Canvas Flats",
         "seller_id": 8,
         "price": 175.0,
@@ -221,11 +221,11 @@
         "expires_at": "2025-03-11T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A statement piece that adds flair to any outfit.\nsize 50.0.\nA fusion of traditional and modern styles.\npattern Floral.\nA versatile item that can be dressed up or down.\nwidth Narrow.\nA unique blend of colors and patterns for a standout look"
+        "description": "A fusion of traditional and modern styles.\nwidth Narrow.\nA piece that combines comfort and sophistication.\npattern Floral.\nA unique blend of colors and patterns for a standout look.\nsize 50.0.\nA versatile item that can be dressed up or down"
     },
     {
         "iid": 9,
-        "iid_uuid4": "16886b22195d4a51afb5bf98ad002a51",
+        "iid_uuid4": "dec6772f38664f6893d8371db00829ef",
         "name": "Wilde Folk Goods Yellow Canvas Flats",
         "seller_id": 8,
         "price": 53.0,
@@ -253,7 +253,7 @@
     },
     {
         "iid": 10,
-        "iid_uuid4": "25e211042700428a96ec3c236188dfee",
+        "iid_uuid4": "e181d6f7231944f497007ce74860e511",
         "name": "Terra Nova Threads Black Canvas Boots",
         "seller_id": 1,
         "price": 256.0,
@@ -277,11 +277,11 @@
         "expires_at": "2025-06-15T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A timeless classic that will never go out of style.\ntoe - Almond.\nAn item that embodies the spirit of adventure and exploration.\nwidth - Regular.\nA unique item that stands out in any collection.\nsize - 57.0.\nCrafted with attention to detail and quality craftsmanship.\nstyle - Running.\nA piece that brings a touch of elegance to any outfit.\nfastener - Velcro.\nA piece that tells a story with its intricate design"
+        "description": "A unique item that stands out in any collection.\nstyle - Running.\nA piece that brings a touch of elegance to any outfit.\nwidth - Regular.\nA timeless classic that will never go out of style.\nsize - 57.0.\nA piece that tells a story with its intricate design.\ntoe - Almond.\nCrafted with attention to detail and quality craftsmanship.\nfastener - Velcro.\nAn item that embodies the spirit of adventure and exploration"
     },
     {
         "iid": 11,
-        "iid_uuid4": "d54a8f311d7646fc97b34578aa015092",
+        "iid_uuid4": "46a89eec59824507b31765d6f91ee7e7",
         "name": "Meridian Mode Purple Leather Boots",
         "seller_id": 10,
         "price": 261.0,
@@ -305,11 +305,11 @@
         "expires_at": "2025-07-11T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A unique item that stands out in any collection.\npattern: Geometric.\nDesigned with a modern aesthetic in mind.\nheel: Flat.\nA versatile item that can be styled in multiple ways.\ntype: Athletic.\nCrafted with high-quality materials for durability"
+        "description": "A unique item that stands out in any collection.\ntype: Athletic.\nDesigned with a modern aesthetic in mind.\nheel: Flat.\nA versatile item that can be styled in multiple ways.\npattern: Geometric.\nOffers a perfect blend of comfort and style"
     },
     {
         "iid": 12,
-        "iid_uuid4": "4753605673dc49b5a6068caa3eca689b",
+        "iid_uuid4": "0fec104bea924255a55a839cb0b0b2bc",
         "name": "Terra Nova Threads Brown Rubber Flats",
         "seller_id": 12,
         "price": 63.0,
@@ -333,11 +333,11 @@
         "expires_at": "2025-05-31T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "Perfect for casual outings or lounging at home\nwidth:Extra Wide\nA piece that celebrates individuality and self-expression"
+        "description": "A piece that celebrates individuality and self-expression\nwidth:Extra Wide\nPerfect for casual outings or lounging at home"
     },
     {
         "iid": 13,
-        "iid_uuid4": "cd3a70ff6d58480f8f270a50fbe2b8fd",
+        "iid_uuid4": "861b172b1aec4dfab1b56337345ee81e",
         "name": "Wilde Folk Goods Green Canvas Sandals",
         "seller_id": 9,
         "price": 75.0,
@@ -365,7 +365,7 @@
     },
     {
         "iid": 14,
-        "iid_uuid4": "82d2036daaa041e88c21b8dc3d8496e2",
+        "iid_uuid4": "0178524112274034991a75bcf3831a79",
         "name": "Evergreen & Elm White Rubber Flats",
         "seller_id": 5,
         "price": 140.0,
@@ -393,7 +393,7 @@
     },
     {
         "iid": 15,
-        "iid_uuid4": "3a73d39dfa5c4981985b1c16c7efc5db",
+        "iid_uuid4": "dfb504d3dba34df3a13e9a056eb75c62",
         "name": "Wilde Folk Goods Gray Mesh Heels",
         "seller_id": 9,
         "price": 25.0,
@@ -421,7 +421,7 @@
     },
     {
         "iid": 16,
-        "iid_uuid4": "cf82bfd6717f46e6898a19c173ecc4de",
+        "iid_uuid4": "b172c802f576449192581589b351ad6b",
         "name": "Wilde Folk Goods Blue Leather Loafers",
         "seller_id": 7,
         "price": 116.0,
@@ -445,11 +445,11 @@
         "expires_at": "2025-04-12T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A stylish and comfortable piece for everyday wear.\ntype: Comfort.\nA piece that tells a story with its intricate design.\ntoe: Square.\nA piece that combines comfort and sophistication"
+        "description": "A stylish and comfortable piece for everyday wear.\ntype: Comfort.\nA piece that combines comfort and sophistication.\ntoe: Square.\nA piece that tells a story with its intricate design"
     },
     {
         "iid": 17,
-        "iid_uuid4": "ed979c1addd54e50b4478d1a8393fdde",
+        "iid_uuid4": "9c11b7c2d7c947b598fe579174fbbb1f",
         "name": "Wilde Folk Goods White Rubber Flats",
         "seller_id": 4,
         "price": 293.0,
@@ -473,11 +473,11 @@
         "expires_at": "2025-05-19T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A unique blend of textures and materials for a standout look\ncondition:Very Good\nDesigned with a modern aesthetic in mind\nsize:52.0\nA statement piece that adds flair to any outfit"
+        "description": "A unique blend of textures and materials for a standout look\ncondition:Very Good\nA statement piece that adds flair to any outfit\nsize:52.0\nDesigned with a modern aesthetic in mind"
     },
     {
         "iid": 18,
-        "iid_uuid4": "7b836ef74ff5448faba076d276746a12",
+        "iid_uuid4": "90ea02764f424d44bfd7e5f1fa8b1925",
         "name": "Vesper Collective White Leather Heels",
         "seller_id": 6,
         "price": 49.0,
@@ -501,11 +501,11 @@
         "expires_at": "2025-07-14T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "Available in a range of sizes to fit every body type\ntype Work\nPerfect for casual outings or lounging at home\nstyle Sport\nA timeless design that never goes out of fashion"
+        "description": "Available in a range of sizes to fit every body type\nstyle Sport\nPerfect for casual outings or lounging at home\ntype Work\nA timeless design that never goes out of fashion"
     },
     {
         "iid": 19,
-        "iid_uuid4": "50fbdb687dc040688e5d21090a54d654",
+        "iid_uuid4": "709dca37d2eb4c4da38e84880f5879c0",
         "name": "Vesper Collective Yellow Synthetic Loafers",
         "seller_id": 2,
         "price": 151.0,
@@ -529,11 +529,11 @@
         "expires_at": "2025-06-10T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "Available in a range of sizes to fit every body type. heel: Low. A must-have addition to any wardrobe. condition: Like New. Made with sustainable practices in mind. size: 39.0. A piece that inspires confidence and creativity. toe: Almond. Crafted with high-quality materials for durability"
+        "description": "Available in a range of sizes to fit every body type. heel: Low. A piece that inspires confidence and creativity. toe: Almond. Made with sustainable practices in mind. size: 39.0. A must-have addition to any wardrobe. condition: Like New. Crafted with high-quality materials for durability"
     },
     {
         "iid": 20,
-        "iid_uuid4": "894712a5d8aa4e45b1447b5d41c13b57",
+        "iid_uuid4": "5253c59ec9e84eb3b92446ee612fde0a",
         "name": "Meridian Mode Blue Canvas Flats",
         "seller_id": 9,
         "price": 239.0,
@@ -557,11 +557,11 @@
         "expires_at": "2025-04-05T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A unique blend of colors and patterns for a standout look.\ntype: Outdoor.\nA must-have addition to any wardrobe"
+        "description": "A must-have addition to any wardrobe.\ntype: Outdoor.\nA unique blend of colors and patterns for a standout look"
     },
     {
         "iid": 21,
-        "iid_uuid4": "c6510bda10154d3e922ad21362eaf169",
+        "iid_uuid4": "2a89b9f423fb430089c5f8347131c9dc",
         "name": "Aetheria Apparel White Synthetic Boots",
         "seller_id": 8,
         "price": 212.0,
@@ -585,11 +585,11 @@
         "expires_at": "2025-04-10T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A stylish and comfortable piece for everyday wear.\ntype - Comfort.\nOffers a perfect blend of comfort and style.\ntoe - Almond.\nA versatile item that can be styled in multiple ways.\npattern - Polka Dot.\nA piece that brings a touch of elegance to any outfit"
+        "description": "A stylish and comfortable piece for everyday wear.\ntype - Comfort.\nA piece that brings a touch of elegance to any outfit.\ntoe - Almond.\nA versatile item that can be styled in multiple ways.\npattern - Polka Dot.\nOffers a perfect blend of comfort and style"
     },
     {
         "iid": 22,
-        "iid_uuid4": "cd4a77b19590422bb918ae9853972cf5",
+        "iid_uuid4": "bab6260aa6894ebb81a00e0ae97d5b11",
         "name": "Cascade Clothiers Navy Synthetic Sandals",
         "seller_id": 2,
         "price": 93.0,
@@ -613,11 +613,11 @@
         "expires_at": "2025-04-27T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A piece that tells a story with its design and materials.\ntoe - Square.\nAn essential piece for any fashion-forward individual"
+        "description": "An essential piece for any fashion-forward individual.\ntoe - Square.\nA piece that tells a story with its design and materials"
     },
     {
         "iid": 23,
-        "iid_uuid4": "067832cf81b04a5ab4053d062273acf8",
+        "iid_uuid4": "12634761c3dc4dd89e19dd3b3827d429",
         "name": "Nova Bloom Yellow Synthetic Sandals",
         "seller_id": 7,
         "price": 296.0,
@@ -641,11 +641,11 @@
         "expires_at": "2025-07-11T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "An item that embodies the spirit of adventure and exploration.\nsize-47.0.\nDesigned with a modern aesthetic in mind.\npattern-Floral.\nA classic design with a contemporary twist.\nstyle-Sport.\nIdeal for layering or wearing on its own"
+        "description": "An item that embodies the spirit of adventure and exploration.\nstyle-Sport.\nA classic design with a contemporary twist.\npattern-Floral.\nIdeal for layering or wearing on its own.\nsize-47.0.\nDesigned with a modern aesthetic in mind"
     },
     {
         "iid": 24,
-        "iid_uuid4": "ff80b8c2118441649fe8362172ee7254",
+        "iid_uuid4": "d49cfed47a524fed971be037f4ad135a",
         "name": "Luminary Loft Green Suede Flats",
         "seller_id": 5,
         "price": 44.0,
@@ -669,11 +669,11 @@
         "expires_at": "2025-07-10T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A stylish and comfortable piece for everyday wear. type Casual. Perfect for transitioning between seasons. size 45.0. A piece that adds a pop of color to any outfit"
+        "description": "A stylish and comfortable piece for everyday wear. size 45.0. A piece that adds a pop of color to any outfit. type Casual. Perfect for transitioning between seasons"
     },
     {
         "iid": 25,
-        "iid_uuid4": "5c295d0a9840496fbb5dade34c9fa34c",
+        "iid_uuid4": "dbad7c25f57c430bb486165442acee2d",
         "name": "Wilde Folk Goods Green Rubber Flats",
         "seller_id": 2,
         "price": 96.0,
@@ -697,11 +697,11 @@
         "expires_at": "2025-05-12T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A timeless classic that will never go out of style\nsize-49.0\nOffers a perfect blend of comfort and style\ncondition-New\nDesigned with a modern aesthetic in mind"
+        "description": "Designed with a modern aesthetic in mind\nsize-49.0\nOffers a perfect blend of comfort and style\ncondition-New\nA timeless classic that will never go out of style"
     },
     {
         "iid": 26,
-        "iid_uuid4": "9ed962400ad3405ca80da8e5015c0ac3",
+        "iid_uuid4": "77099d7bffc146e29b75ea283a1419d7",
         "name": "Wilde Folk Goods Brown Suede Flats",
         "seller_id": 7,
         "price": 196.0,
@@ -725,11 +725,11 @@
         "expires_at": "2025-05-31T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A unique item that stands out in any collection.\ntype:Outdoor.\nA must-have addition to any wardrobe.\nwidth:Regular.\nA classic design with a contemporary twist.\ntoe:Square.\nA piece that inspires confidence and creativity.\nheel:High.\nA comfortable and chic option for any occasion"
+        "description": "A unique item that stands out in any collection.\nheel:High.\nA classic design with a contemporary twist.\ntoe:Square.\nA piece that inspires confidence and creativity.\nwidth:Regular.\nA must-have addition to any wardrobe.\ntype:Outdoor.\nA comfortable and chic option for any occasion"
     },
     {
         "iid": 27,
-        "iid_uuid4": "9ecb8f5ac4de453eb8f8e76fd0e01bb9",
+        "iid_uuid4": "3d5e358756df452dbd1c898ed93315e0",
         "name": "Wilde Folk Goods Gray Canvas Flats",
         "seller_id": 12,
         "price": 189.0,
@@ -753,11 +753,11 @@
         "expires_at": "2025-04-11T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A piece that tells a story with its design and materials. pattern-Striped. A classic design with a contemporary twist. type-Work. A versatile item that can be styled in multiple ways. condition-Fair. A piece that brings a touch of elegance to any outfit. size-52.0. Perfect for transitioning between seasons"
+        "description": "A piece that brings a touch of elegance to any outfit. condition-Fair. A classic design with a contemporary twist. pattern-Striped. Perfect for transitioning between seasons. type-Work. A piece that inspires confidence and creativity. size-52.0. A versatile item that can be styled in multiple ways"
     },
     {
         "iid": 28,
-        "iid_uuid4": "6ab145a6a73741a1b539bc87dc2b3084",
+        "iid_uuid4": "a5a217b9627243618e904a4759b27fef",
         "name": "Wilde Folk Goods White Canvas Sneakers",
         "seller_id": 5,
         "price": 284.0,
@@ -781,11 +781,11 @@
         "expires_at": "2025-04-10T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A versatile item that can be dressed up or down. condition: Poor. A piece that celebrates individuality and self-expression"
+        "description": "A piece that celebrates individuality and self-expression. condition: Poor. A versatile item that can be dressed up or down"
     },
     {
         "iid": 29,
-        "iid_uuid4": "d81e203041054baa83bd7e1ee3e3f037",
+        "iid_uuid4": "cf40da7dbeee4225b0c72668de7c1824",
         "name": "Obsidian Weave Black Mesh Sneakers",
         "seller_id": 6,
         "price": 47.0,
@@ -809,11 +809,11 @@
         "expires_at": "2025-06-11T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "An essential piece for any fashion-forward individual. type-Casual. A timeless design that never goes out of fashion. fastener-Velcro. A versatile item that can be worn year-round. toe-Square. A statement piece that adds flair to any outfit"
+        "description": "An essential piece for any fashion-forward individual. type-Casual. A statement piece that adds flair to any outfit. toe-Square. A versatile item that can be worn year-round. fastener-Velcro. A timeless design that never goes out of fashion"
     },
     {
         "iid": 30,
-        "iid_uuid4": "b1df45bab01c4a389e0f4b1a81b29fe0",
+        "iid_uuid4": "3b7dbb5a1a1044deb741039a78d830fc",
         "name": "Echo Garb Black Suede Flats",
         "seller_id": 8,
         "price": 211.0,
@@ -841,7 +841,7 @@
     },
     {
         "iid": 31,
-        "iid_uuid4": "c08347a9ed404acfa95794ba4dd9f9dd",
+        "iid_uuid4": "efdbd021547845c1ad087b1b1ef0aef5",
         "name": "Kinetic Stitch Brown Canvas Loafers",
         "seller_id": 3,
         "price": 60.0,
@@ -865,11 +865,11 @@
         "expires_at": "2025-06-30T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "Crafted with attention to detail and quality craftsmanship. type Comfort. Perfect for transitioning between seasons. width Extra Wide. A piece that reflects the latest fashion trends. condition Very Good. A versatile item that can be styled in multiple ways"
+        "description": "A piece that reflects the latest fashion trends. width Extra Wide. A versatile item that can be styled in multiple ways. type Comfort. Perfect for transitioning between seasons. condition Very Good. Crafted with attention to detail and quality craftsmanship"
     },
     {
         "iid": 32,
-        "iid_uuid4": "e47d3bfaae1c438c88343a8d1ae10a30",
+        "iid_uuid4": "ff0aeaa83d5e434ba63499965ea32fb3",
         "name": "Solstice Supply Co. Navy Canvas Boots",
         "seller_id": 12,
         "price": 255.0,
@@ -893,11 +893,11 @@
         "expires_at": "2025-05-27T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A statement piece that adds flair to any outfit. fastener Laces. A piece that brings a touch of elegance to any outfit. size 57.0. Combines fashion and functionality seamlessly. condition New. A comfortable and chic option for any occasion"
+        "description": "A piece that brings a touch of elegance to any outfit. fastener Laces. A statement piece that adds flair to any outfit. size 57.0. Combines fashion and functionality seamlessly. condition New. A comfortable and chic option for any occasion"
     },
     {
         "iid": 33,
-        "iid_uuid4": "88b0b8ca0e5549e694c8a709927dbc56",
+        "iid_uuid4": "1700496849cd4890a5c38b3ea52276cc",
         "name": "Vesper Collective Yellow Leather Boots",
         "seller_id": 10,
         "price": 119.0,
@@ -925,7 +925,7 @@
     },
     {
         "iid": 34,
-        "iid_uuid4": "5c5dc95cfc514deb8ef8aaf50cd14314",
+        "iid_uuid4": "4b77ea14ee1148458138c44826e64cd2",
         "name": "Vesper Collective Green Canvas Slippers",
         "seller_id": 12,
         "price": 50.0,
@@ -949,11 +949,11 @@
         "expires_at": "2025-06-27T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A stylish and comfortable piece for everyday wear.\nsize - 50.0.\nA versatile item that can be styled in multiple ways.\ncondition - Fair.\nA piece that brings a touch of elegance to any outfit.\ntoe - Round.\nPerfect for transitioning between seasons"
+        "description": "Perfect for transitioning between seasons.\ncondition - Fair.\nA piece that brings a touch of elegance to any outfit.\ntoe - Round.\nCombines fashion and functionality seamlessly.\nsize - 50.0.\nA stylish and comfortable piece for everyday wear"
     },
     {
         "iid": 35,
-        "iid_uuid4": "1b2369674c004d5caabf2cb9bc5fd351",
+        "iid_uuid4": "af4fe59172414b6aa02112b76036b889",
         "name": "Meridian Mode Gray Rubber Loafers",
         "seller_id": 3,
         "price": 87.0,
@@ -977,11 +977,11 @@
         "expires_at": "2025-04-27T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "An essential piece for any fashion-forward individual.\nsize: 60.0.\nA timeless design that never goes out of fashion.\npattern: Plaid.\nA piece that brings a touch of elegance to any outfit"
+        "description": "A piece that brings a touch of elegance to any outfit.\npattern: Plaid.\nAn essential piece for any fashion-forward individual.\nsize: 60.0.\nA timeless design that never goes out of fashion"
     },
     {
         "iid": 36,
-        "iid_uuid4": "85840a32bc6c439eb843328295b59bd0",
+        "iid_uuid4": "77972c5b545f41a6ae0196a26cf4acf4",
         "name": "Echo Garb Black Leather Flats",
         "seller_id": 1,
         "price": 282.0,
@@ -1005,11 +1005,11 @@
         "expires_at": "2025-07-11T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A statement piece that adds flair to any outfit\nfastener Laces\nA classic design with a contemporary twist\npattern Floral\nMade with sustainable practices in mind\ncondition New\nFeatures unique details that set it apart from the rest"
+        "description": "A classic design with a contemporary twist\nfastener Laces\nFeatures unique details that set it apart from the rest\npattern Floral\nMade with sustainable practices in mind\ncondition New\nA statement piece that adds flair to any outfit"
     },
     {
         "iid": 37,
-        "iid_uuid4": "d43955ec93d94cc5bda5ec8dc04254bc",
+        "iid_uuid4": "007214376ef645d38b7fbf6fde64372a",
         "name": "Echo Garb Pink Leather Slippers",
         "seller_id": 12,
         "price": 96.0,
@@ -1033,11 +1033,11 @@
         "expires_at": "2025-06-05T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "An essential piece for any fashion-forward individual.\ntype Athletic.\nA piece that combines comfort and sophistication"
+        "description": "A piece that combines comfort and sophistication.\ntype Athletic.\nAn essential piece for any fashion-forward individual"
     },
     {
         "iid": 38,
-        "iid_uuid4": "1bb1baa2e44544eabdd146d6e8e2e16a",
+        "iid_uuid4": "fe3ab6d30448489fa2f0efd70278c32c",
         "name": "Vesper Collective Green Leather Flats",
         "seller_id": 9,
         "price": 217.0,
@@ -1061,11 +1061,11 @@
         "expires_at": "2025-04-15T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "Perfect for casual outings or lounging at home. condition: New. A versatile item that can be dressed up or down. pattern: Camouflage. A piece that embodies the essence of modern fashion. style: Sport. A timeless design that never goes out of fashion"
+        "description": "A piece that embodies the essence of modern fashion. style: Sport. A timeless design that never goes out of fashion. pattern: Camouflage. Perfect for casual outings or lounging at home. condition: New. A versatile item that can be dressed up or down"
     },
     {
         "iid": 39,
-        "iid_uuid4": "a915460b12254389b736f861620e8c0c",
+        "iid_uuid4": "f87268677cb545c3b5820e7651d344bd",
         "name": "Phantom Fit Black Suede Loafers",
         "seller_id": 5,
         "price": 116.0,
@@ -1089,11 +1089,11 @@
         "expires_at": "2025-06-05T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "A statement piece that adds flair to any outfit\nfastener-Elastic\nAn essential piece for any fashion-forward individual\ntoe-Almond\nOffers a perfect blend of comfort and style"
+        "description": "A statement piece that adds flair to any outfit\ntoe-Almond\nPerfect for casual outings or lounging at home\nfastener-Elastic\nOffers a perfect blend of comfort and style"
     },
     {
         "iid": 40,
-        "iid_uuid4": "7a9ff44c55624848bd12dc1ea8f38d51",
+        "iid_uuid4": "051b523b2bf14bcea187628514be02ad",
         "name": "Luminary Loft Gray Synthetic Loafers",
         "seller_id": 9,
         "price": 236.0,
@@ -1117,6 +1117,6 @@
         "expires_at": "2025-01-30T00:00:00+00:00",
         "icon": null,
         "images": [],
-        "description": "Available in a range of sizes to fit every body type\nwidth - Wide\nA statement piece that adds flair to any outfit\nheel - Low\nIdeal for layering or wearing on its own\npattern - Floral\nA timeless design that never goes out of fashion\nstyle - Sport\nA unique blend of colors and patterns for a standout look"
+        "description": "A timeless design that never goes out of fashion\nheel - Low\nAvailable in a range of sizes to fit every body type\nstyle - Sport\nA unique blend of colors and patterns for a standout look\npattern - Floral\nIdeal for layering or wearing on its own\nwidth - Wide\nA statement piece that adds flair to any outfit"
     }
 ]

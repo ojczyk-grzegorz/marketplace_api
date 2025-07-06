@@ -7,7 +7,7 @@ import time
 import json
 import datetime as dt
 
-from utils.configs import Settings, get_settings
+from app.utils.configs import Settings, get_settings
 
 
 def parse_value_to_sql(value) -> str:

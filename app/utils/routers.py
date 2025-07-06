@@ -10,9 +10,9 @@ from fastapi import Request, Response, status, HTTPException
 from fastapi.routing import APIRoute
 from fastapi.responses import JSONResponse
 
-from datamodels.log import LogRequest
+from app.datamodels.log import LogRequest
 
-from exceptions.exceptions import (
+from app.exceptions.exceptions import (
     ExcInvalidCredentials,
     ExcUserNotFound,
     ExcUserExists,

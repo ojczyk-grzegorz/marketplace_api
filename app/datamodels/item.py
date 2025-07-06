@@ -1,7 +1,7 @@
 import datetime as dt
 from pydantic import BaseModel, Field
 
-from datamodels.user import UserDBOut
+from app.datamodels.user import UserDBOut
 
 
 class ItemDBToList(BaseModel):

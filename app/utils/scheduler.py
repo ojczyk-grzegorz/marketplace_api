@@ -6,8 +6,8 @@ from fastapi import FastAPI
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from contextlib import asynccontextmanager
 
-from datamodels.log import LogRequest
-from utils.db import db_insert
+from app.datamodels.log import LogRequest
+from app.utils.db import db_insert
 
 
 scheduler = AsyncIOScheduler(timezone=dt.timezone.utc)

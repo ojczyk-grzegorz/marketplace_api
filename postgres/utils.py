@@ -5,7 +5,7 @@ from uuid import uuid4
 
 import psycopg2
 
-from utils.auth import get_password_hash
+from app.utils.auth import get_password_hash
 
 from postgres.mock_values import (
     CITIES,
@@ -172,39 +172,3 @@ def get_mock_transactions(transaction_count: int, users: list[dict], items: list
         transactions.append(transaction)
     return transactions
 
-
-
-def recreate_tables(db_config: dict, create_tables_sql: str = "CREATE_TABLES.sql"):
-    with open(create_tables_sql, "r") as file:
-        create_tables_query = file.read()
-
-    with psycopg2.connect(**db_config) as connection:
-        cursor = connection.cursor()
-        cursor.execute(create_tables_query)
-        connection.commit()
-
-
-def insert_table_json(db_config: dict, filepath: str, remove: list[str] = []):
-    with open(filepath, "r") as file:
-        data: list[dict] = json.load(file)
-    for key in remove:
-        for item in data:
-            if key in item:
-                del item[key]
-
-    columns = ", ".join(data[0].keys())
-    data_json = json.dumps(data).replace("'", "''")
-    table_name = filepath.split("/")[-1].split(".")[0]
-
-    with psycopg2.connect(**db_config) as connection:
-        cursor = connection.cursor()
-        cursor.execute(f"""
-            INSERT INTO {table_name} ({columns})
-            SELECT {columns}
-            FROM json_populate_recordset(
-                NULL::{table_name},
-                '{data_json}'
-            )
-            RETURNING *;
-        """)
-        connection.commit()

@@ -1,0 +1,20 @@
+from fastapi import FastAPI, Depends
+
+from app.routers import users, items, auth, transactions
+from app.utils.scheduler import lifespan
+from app.utils.configs import get_settings, Settings
+
+app = FastAPI(lifespan=lifespan, tags=["Main"])
+
+app.include_router(auth.router)
+app.include_router(users.router)
+app.include_router(items.router)
+app.include_router(transactions.router)
+
+
+@app.get(
+    "/",
+    description="Home page of the API",
+)
+async def root(settings: Settings = Depends(get_settings)):
+    return {"message": f"Hello from {settings.app_name}!"}

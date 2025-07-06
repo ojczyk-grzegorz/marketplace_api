@@ -2,27 +2,27 @@ import datetime as dt
 
 from fastapi import APIRouter, Path, Body, status, Depends, Request
 
-from utils.db import (
+from app.utils.db import (
     db_search_simple,
     db_insert,
     db_update,
     db_remove,
     db_search_user_by_id,
 )
-from utils.routers import APIRouteLogging
-from utils.configs import get_settings, Settings
-from utils.auth import get_password_hash
-from datamodels.user import (
+from app.utils.routers import APIRouteLogging
+from app.utils.configs import get_settings, Settings
+from app.utils.auth import get_password_hash
+from app.datamodels.user import (
     UserDBOut,
     UserDBOutDetailed,
     UserCreate,
     UserUpdate,
     UserDBIn,
 )
-from datamodels.response import ResponseSuccess
-from exceptions.exceptions import ExcUserNotFound, ExcUserExists, ExcTransactionsFound
-from utils.auth import validate_access_token, oauth2_scheme
-from testing.openapi.users import USER_PATCH, USER_CREATE
+from app.datamodels.response import ResponseSuccess
+from app.exceptions.exceptions import ExcUserNotFound, ExcUserExists, ExcTransactionsFound
+from app.utils.auth import validate_access_token, oauth2_scheme
+from app.testing.openapi.users import USER_PATCH, USER_CREATE
 
 
 router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRouteLogging)

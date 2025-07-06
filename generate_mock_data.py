@@ -2,8 +2,8 @@ import random
 import json
 import os
 
-from utils.configs import get_settings
-from utils.db import db_query, db_insert
+from app.utils.configs import get_settings
+from app.utils.db import db_query, db_insert
 from postgres.utils import get_mock_users, get_mock_items, get_mock_transactions
 
 
