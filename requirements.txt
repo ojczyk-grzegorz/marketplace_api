@@ -5,6 +5,7 @@ python-multipart
 ruff
 pydantic
 pydantic[email]
+pydantic-settings
 pyjwt
 passlib
 psycopg2-binary
