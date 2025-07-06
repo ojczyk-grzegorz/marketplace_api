@@ -247,7 +247,9 @@ class APIRouteLogging(APIRoute):
             os.makedirs(dir_logs, exist_ok=True)
 
             timestamp = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M")
-            with open(os.path.join(dir_logs, timestamp + ".json"), "a") as log_file:
+            with open(
+                os.path.join(dir_logs, "logs_request", timestamp + ".log"), "a"
+            ) as log_file:
                 log_file.write("\n" + log_data.model_dump_json())
 
             return response
