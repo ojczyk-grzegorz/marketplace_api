@@ -311,4 +311,3 @@ DESCRIPTIONS = [
     "A unique blend of textures and materials for a standout look",
     "A piece that tells a story with its intricate design",
 ]
-

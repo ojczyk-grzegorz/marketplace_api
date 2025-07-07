@@ -20,7 +20,11 @@ from app.datamodels.user import (
     UserDBIn,
 )
 from app.datamodels.response import ResponseSuccess
-from app.exceptions.exceptions import ExcUserNotFound, ExcUserExists, ExcTransactionsFound
+from app.exceptions.exceptions import (
+    ExcUserNotFound,
+    ExcUserExists,
+    ExcTransactionsFound,
+)
 from app.utils.auth import validate_access_token, oauth2_scheme
 from app.testing.openapi.users import USER_PATCH, USER_CREATE
 

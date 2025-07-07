@@ -31,7 +31,6 @@ class ItemDBToList(BaseModel):
     city: str | None = None
 
 
-
 class ItemDB(ItemDBToList):
     created_at: dt.datetime | None = None
     updated_at: dt.datetime | None = None

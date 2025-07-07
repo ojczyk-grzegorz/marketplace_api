@@ -1,13 +1,9 @@
 import random
 from datetime import datetime, timedelta, timezone
-import json
 from uuid import uuid4
 
-import psycopg2
-
 from app.utils.auth import get_password_hash
-
-from postgres.mock_values import (
+from postgres.utils.mock_values import (
     CITIES,
     STREETS,
     FIRST_NAMES,
@@ -24,7 +20,7 @@ from postgres.mock_values import (
     FASTENERS,
     HEELS,
     TOES,
-    DESCRIPTIONS
+    DESCRIPTIONS,
 )
 
 
@@ -133,7 +129,9 @@ def get_mock_items(item_count: int, users: list[dict]) -> list[dict]:
     return items
 
 
-def get_mock_transactions(transaction_count: int, users: list[dict], items: list[dict]) -> list[dict]:
+def get_mock_transactions(
+    transaction_count: int, users: list[dict], items: list[dict]
+) -> list[dict]:
     transactions = []
     for n in range(transaction_count):
         item: dict = items.pop()
@@ -169,4 +167,3 @@ def get_mock_transactions(transaction_count: int, users: list[dict], items: list
         )
         transactions.append(transaction)
     return transactions
-

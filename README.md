@@ -1,8 +1,10 @@
 steps
-- postgres advanced (full text search)
 - tests
 - deployment dev / prod (debugging, logging)
-
+- sql alchemy
+- postgres advanced (full text search)
+- pagination
+- postgres config
 
 https://www.youtube.com/watch?v=tiBeLLv5GJo
 https://stackoverflow.com/questions/69670125/how-to-log-raw-http-request-response-in-fastapi
