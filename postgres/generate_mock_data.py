@@ -52,6 +52,12 @@ def main():
     db_query(create_tables_query, log_kwargs={})
 
     settings = get_settings()
+    for user in users:
+        user.pop("uid")
+    for item in items:
+        item.pop("iid")
+    for transaction in transactions:
+        transaction.pop("tid")
     db_insert(settings.database.tables.users.name, users, columns_out=[], log_kwargs={})
 
     db_insert(settings.database.tables.items.name, items, columns_out=[], log_kwargs={})
