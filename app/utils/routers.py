@@ -111,7 +111,6 @@ def get_log_request(
         ),
     )
 
-    print(log_request.model_dump_json(indent=4))
     return log_request
 
 
