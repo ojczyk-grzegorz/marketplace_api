@@ -23,8 +23,8 @@ router = APIRouter(prefix="/auth", tags=["Authentication"], route_class=APIRoute
 async def get_token(
     form: Annotated[OAuth2PasswordRequestForm, Depends()],
     req: Request,
-    settings: Settings = Depends(get_settings),
 ):
+    settings: Settings = get_settings()
     users = db_search_simple(
         settings.database.tables.users.name,
         ["uid", "email", "password_hash"],

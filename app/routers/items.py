@@ -24,7 +24,7 @@ from app.datamodels.item import (
     ItemRemove,
 )
 from app.datamodels.user import UserDBOut
-from app.testing.openapi.items import ITEM_CREATE, ITEM_PATCH, ITEM_DELETE
+from tests.openapi.items import ITEM_CREATE, ITEM_PATCH, ITEM_DELETE
 
 
 router = APIRouter(prefix="/items", tags=["Items"], route_class=APIRouteLogging)
@@ -40,8 +40,9 @@ router = APIRouter(prefix="/items", tags=["Items"], route_class=APIRouteLogging)
 async def get_items(
     req: Request,
     query_items: QueryItems = Query(QueryItems()),
-    settings: Settings = Depends(get_settings),
 ):
+    settings: Settings = get_settings()
+
     filters = []
     for column, value in query_items.model_dump(
         exclude_none=True, exclude=["limit", "features_specific"]
@@ -73,8 +74,10 @@ async def get_items(
     description="Get item by its ID",
 )
 async def get_item(
-    req: Request, iid: int = Path(...), settings: Settings = Depends(get_settings)
+    req: Request,
+    iid: int = Path(...),
 ):
+    settings: Settings = get_settings()
     db_items = db_search_simple(
         table=settings.database.tables.items.name,
         columns=ItemDB.model_fields.keys(),
@@ -97,8 +100,10 @@ async def get_item(
     description="Get item by its ID",
 )
 async def get_user_items(
-    req: Request, uid: int = Path(...), settings: Settings = Depends(get_settings)
+    req: Request,
+    uid: int = Path(...),
 ):
+    settings: Settings = get_settings()
     users = db_search_simple(
         table=settings.database.tables.users.name,
         columns=UserDBOut.model_fields.keys(),
@@ -137,8 +142,8 @@ async def item_create(
         ...,
         openapi_examples=ITEM_CREATE,
     ),
-    settings: Settings = Depends(get_settings),
 ):
+    settings: Settings = get_settings()
     user_id: int = validate_access_token(
         token=token,
         secret_key=settings.auth.secret_key,
@@ -186,8 +191,8 @@ async def item_update(
         ...,
         openapi_examples=ITEM_PATCH,
     ),
-    settings: Settings = Depends(get_settings),
 ):
+    settings: Settings = get_settings()
     user_id: int = validate_access_token(
         token=token,
         secret_key=settings.auth.secret_key,
@@ -234,8 +239,8 @@ async def item_remove(
     req: Request,
     token: str = Depends(oauth2_scheme),
     req_body: ItemRemove = Body(..., openapi_examples=ITEM_DELETE),
-    settings: Settings = Depends(get_settings),
 ):
+    settings: Settings = get_settings()
     user_id: int = validate_access_token(
         token=token,
         secret_key=settings.auth.secret_key,

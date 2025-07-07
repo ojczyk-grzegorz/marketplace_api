@@ -38,8 +38,8 @@ class Settings(BaseSettings):
 
 
 @lru_cache()
-def get_settings() -> Settings:
-    with open("secrets/configs.json", "r") as f:
+def get_settings(filepath: str = "secrets/configs.json") -> Settings:
+    with open(filepath, "r") as f:
         settings_data = json.load(f)
         settings = Settings.model_validate(settings_data)
     return settings

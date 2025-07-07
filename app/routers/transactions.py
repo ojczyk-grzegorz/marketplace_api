@@ -20,7 +20,7 @@ from app.datamodels.transaction import (
 )
 from app.datamodels.item import ItemDB
 from app.datamodels.user import UserDBOutDetailed
-from app.testing.openapi.transactions import TRANSACTION_CREATE, TRANSACTION_FINILIZE
+from tests.openapi.transactions import TRANSACTION_CREATE, TRANSACTION_FINILIZE
 
 
 router = APIRouter(
@@ -37,8 +37,8 @@ async def transaction_create(
     req: Request,
     token: str = Depends(oauth2_scheme),
     req_body: TransactionCreate = Body(..., openapi_examples=TRANSACTION_CREATE),
-    settings: Settings = Depends(get_settings),
 ):
+    settings: Settings = get_settings()
     buyer_id: int = validate_access_token(
         token=token,
         secret_key=settings.auth.secret_key,
@@ -121,8 +121,8 @@ async def transaction_finilize(
     req: Request,
     token: str = Depends(oauth2_scheme),
     req_body: TransactionFinilize = Body(..., openapi_examples=TRANSACTION_FINILIZE),
-    settings: Settings = Depends(get_settings),
 ):
+    settings: Settings = get_settings()
     buyer_id: int = validate_access_token(
         token=token,
         secret_key=settings.auth.secret_key,

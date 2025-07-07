@@ -26,7 +26,7 @@ from app.exceptions.exceptions import (
     ExcTransactionsFound,
 )
 from app.utils.auth import validate_access_token, oauth2_scheme
-from app.testing.openapi.users import USER_PATCH, USER_CREATE
+from tests.openapi.users import USER_PATCH, USER_CREATE
 
 
 router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRouteLogging)
@@ -39,8 +39,10 @@ router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRouteLogging)
     description="Route for getting user by ID",
 )
 async def get_user(
-    req: Request, user_id: int = Path(...), settings: Settings = Depends(get_settings)
+    req: Request,
+    user_id: int = Path(...),
 ):
+    settings: Settings = get_settings()
     db_user = db_search_user_by_id(
         table=settings.database.tables.users.name,
         user_id=user_id,
@@ -66,8 +68,8 @@ async def get_user(
 async def get_user_me(
     req: Request,
     token: str = Depends(oauth2_scheme),
-    settings: Settings = Depends(get_settings),
 ):
+    settings: Settings = get_settings()
     user_id = validate_access_token(
         token=token,
         secret_key=settings.auth.secret_key,
@@ -98,8 +100,8 @@ async def get_user_me(
 async def user_create(
     req: Request,
     user: UserCreate = Body(..., openapi_examples=USER_CREATE),
-    settings: Settings = Depends(get_settings),
 ):
+    settings: Settings = get_settings()
     db_users = db_search_simple(
         settings.database.tables.users.name,
         ["email", "phone"],
@@ -153,8 +155,8 @@ async def user_update(
         ...,
         openapi_examples=USER_PATCH,
     ),
-    settings: Settings = Depends(get_settings),
 ):
+    settings: Settings = get_settings()
     user_id = validate_access_token(
         token=token,
         secret_key=settings.auth.secret_key,
@@ -204,8 +206,8 @@ async def user_update(
 async def user_remove(
     req: Request,
     token: str = Depends(oauth2_scheme),
-    settings: Settings = Depends(get_settings),
 ):
+    settings: Settings = get_settings()
     user_id = validate_access_token(
         token=token,
         secret_key=settings.auth.secret_key,

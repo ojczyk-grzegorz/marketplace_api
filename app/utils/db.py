@@ -4,10 +4,10 @@ import psycopg2
 import json
 from numbers import Number
 import time
-import json
 import datetime as dt
 
 from app.utils.configs import Settings, get_settings
+from app.constants.constants import DIR_LOGS_QUERY
 
 
 def parse_value_to_sql(value) -> str:
@@ -19,6 +19,7 @@ def parse_value_to_sql(value) -> str:
         value = "NULL"
     else:
         value = "'" + json.dumps(value, ensure_ascii=False).replace("'", "''") + "'"
+
     if value == "''":
         value = "NULL"
     return value
@@ -48,6 +49,7 @@ def db_query(query: str, log_kwargs: dict = {}) -> list[tuple]:
         cursor = connection.cursor()
         cursor.execute(query)
         connection.commit()
+
         try:
             results = cursor.fetchall()
         except psycopg2.ProgrammingError:
@@ -61,9 +63,7 @@ def db_query(query: str, log_kwargs: dict = {}) -> list[tuple]:
             "query_details": log_kwargs,
         }
         timestamp = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M")
-        with open(
-            os.path.join("logs", "logs_query", timestamp + ".log"), "a"
-        ) as log_file:
+        with open(os.path.join(DIR_LOGS_QUERY, timestamp + ".log"), "a") as log_file:
             log_file.write("\n" + json.dumps(log, ensure_ascii=False))
     return results
 
@@ -121,7 +121,7 @@ def db_insert(
     """
     if columns_out and isinstance(columns_out, str):
         query += f" RETURNING {columns_out}"
-    elif columns_out and isinstance(columns_out, list):
+    elif columns_out:
         query += f" RETURNING {', '.join(columns_out)}"
 
     results = db_query(query, log_kwargs=log_kwargs)

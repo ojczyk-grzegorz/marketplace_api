@@ -6,21 +6,13 @@ from typing import Callable
 import json
 import traceback
 
-from fastapi import Request, Response, status, HTTPException
+from fastapi import Request, Response
 from fastapi.routing import APIRoute
-from fastapi.responses import JSONResponse
 
 from app.datamodels.log import LogRequest
+from app.constants.constants import DIR_LOGS_REQUEST
 
-from app.exceptions.exceptions import (
-    ExcInvalidCredentials,
-    ExcUserNotFound,
-    ExcUserExists,
-    ExcTransactionsFound,
-    ExcTransactionActiveNotFound,
-    ExcItemNotFound,
-    ExcInvalidExpiresAt,
-)
+from app.exceptions.handlers import EXCEPTION_HANDLERS, handle_exception
 
 
 def custom_serializer(obj):
@@ -34,13 +26,110 @@ def custom_serializer(obj):
         return str(obj)
 
 
+def redact_headers(headers: dict) -> dict:
+    redacted_headers = {}
+    for key, value in headers.items():
+        if key.lower() in ["authorization", "cookie"]:
+            redacted_headers[key] = "<redacted>"
+        else:
+            redacted_headers[key] = value
+    return redacted_headers
+
+
+def redact_request_body(body: bytes) -> dict:
+    try:
+        body = body.decode("utf-8")
+        return json.loads(body)
+    except json.JSONDecodeError:
+        if body.startswith("grant_type=password"):
+            return {"request_body": "<redacted>"}
+        return body
+
+
+def redact_response_body(body: bytes) -> dict:
+    try:
+        body = body.decode("utf-8")
+        response_body = json.loads(body)
+        if isinstance(response_body, dict) and "access_token" in response_body:
+            response_body["access_token"] = "<redacted>"
+        return response_body
+    except json.JSONDecodeError:
+        return body.decode("utf-8")
+
+
+def get_log_request(
+    request_headers: dict,
+    request: Request,
+    request_body: dict,
+    response: Response,
+    response_headers: dict,
+    response_body: dict,
+    duration_ms: float,
+    exception: Exception = None,
+) -> LogRequest:
+    trcb = []
+    if exception:
+        for obj in traceback.format_exception(
+            # !!!!!!!
+            type(exception),
+            exception,
+            exception.__traceback__,
+        ):
+            obj: str
+            lines = obj.split("\n")
+            for line in lines:
+                trcb.append(line)
+
+    log_request = LogRequest(
+        rid_uuid4=request.uuid4,
+        timestamp=request.timestamp,
+        url=str(request.url),
+        method=request.method,
+        status_code=response.status_code,
+        duration_ms=duration_ms,
+        type=request.scope.get("type"),
+        http_version=request.scope.get("http_version"),
+        server=request.scope.get("server"),
+        client=request.scope.get("client"),
+        path=request.scope.get("path"),
+        path_params=request.path_params,
+        asgi_version=request.scope.get("asgi", {}).get("version"),
+        asgi_spec_version=request.scope.get("asgi", {}).get("spec_version"),
+        request_headers=request_headers,
+        request_body=request_body,
+        response_headers=response_headers,
+        response_body=response_body,
+        exception=(
+            None
+            if not exception
+            else dict(
+                type=type(exception).__name__,
+                message=str(exception),
+                args=exception.log_args if hasattr(exception, "log_args") else {},
+                traceback=trcb,
+            )
+        ),
+    )
+
+    print(log_request.model_dump_json(indent=4))
+    return log_request
+
+
+def save_log_request(log_request: LogRequest) -> None:
+    os.makedirs(DIR_LOGS_REQUEST, exist_ok=True)
+
+    timestamp = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M")
+    with open(os.path.join(DIR_LOGS_REQUEST, timestamp + ".log"), "a") as log_file:
+        log_file.write("\n" + log_request.model_dump_json())
+
+
 class APIRouteLogging(APIRoute):
     def get_route_handler(self) -> Callable:
         original_route_handler = super().get_route_handler()
 
         async def custom_route_handler(request: Request) -> Response:
             request_uuid4 = uuid4().hex
-            timestamp = dt.datetime.now(dt.timezone.utc).isoformat()
+            timestamp = dt.datetime.now(dt.timezone.utc)
 
             request.uuid4 = request_uuid4
             request.timestamp = timestamp
@@ -48,209 +137,40 @@ class APIRouteLogging(APIRoute):
             request_body = await request.body()
             start = time.perf_counter_ns()
 
-            excepion = None
+            exception = None
             try:
                 response: Response = await original_route_handler(request)
-            except ExcInvalidCredentials as exc:
-                excepion = exc
-                response = JSONResponse(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    content={
-                        "code": "INVALID_CREDENTIALS",
-                        "message": str(exc),
-                    },
-                )
-
-            except ExcUserNotFound as exc:
-                excepion = exc
-                response = JSONResponse(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    content={
-                        "code": "USER_NOT_FOUND",
-                        "message": str(exc),
-                        "details": {
-                            "user_id": exc.user_id,
-                        },
-                    },
-                )
-
-            except ExcUserExists as exc:
-                excepion = exc
-                details = {}
-                if exc.email:
-                    details["email"] = exc.email
-                if exc.phone:
-                    details["phone"] = exc.phone
-                content = {
-                    "code": "USER_EXISTS",
-                    "message": str(exc),
-                    "details": details,
-                }
-
-                response = JSONResponse(
-                    status_code=status.HTTP_409_CONFLICT, content=content
-                )
-
-            except ExcTransactionsFound as exc:
-                excepion = exc
-                response = JSONResponse(
-                    status_code=status.HTTP_409_CONFLICT,
-                    content={
-                        "code": "TRANSACTIONS_FOUND",
-                        "message": str(exc),
-                        "details": exc.details,
-                    },
-                )
-
-            except ExcTransactionActiveNotFound as exc:
-                excepion = exc
-                content = {
-                    "code": "TRANSACTION_NOT_FOUND",
-                    "message": str(exc),
-                }
-
-                details = {
-                    "transaction_id": exc.transaction_id,
-                    "user_id_uuid4": exc.user_id_uuid4,
-                }
-                content["details"] = details
-
-                response = JSONResponse(
-                    status_code=404,
-                    content=content,
-                )
-
-            except ExcItemNotFound as exc:
-                excepion = exc
-                content = {
-                    "code": "ITEM_NOT_FOUND",
-                    "message": str(exc),
-                }
-
-                details = {"item_id": exc.item_id}
-                if exc.user_id is not None:
-                    details["user_id"] = exc.user_id
-                if exc.not_user_id is not None:
-                    details["not_user_id"] = exc.not_user_id
-                content["details"] = details
-
-                response = JSONResponse(
-                    status_code=404,
-                    content=content,
-                )
-
-            except ExcInvalidExpiresAt as exc:
-                excepion = exc
-                response = JSONResponse(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content={
-                        "code": "INVALID_EXPIRES_AT",
-                        "message": str(exc),
-                        "details": {
-                            "expires_at": exc.expires_at.isoformat(),
-                            "current_time": exc.current_time.isoformat(),
-                        },
-                    },
-                )
-
-            except HTTPException as exc:
-                excepion = exc
-                response = JSONResponse(
-                    status_code=exc.status_code,
-                    content={"code": exc.detail},
-                )
-
             except Exception as exc:
-                excepion = exc
-                response = JSONResponse(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    content={
-                        "code": "INTERNAL_SERVER_ERROR",
-                        "message": "An unexpected error occurred",
-                    },
-                )
+                exception = exc
+                handler = EXCEPTION_HANDLERS.get(type(exc), handle_exception)
+                response = handler(request, exception)
 
             duration_ms = round((time.perf_counter_ns() - start) / 1_000_000, 2)
-            request_headers = dict(request.headers)
-            if "authorization" in request_headers:
-                request_headers["authorization"] = "<redacted>"
-            if "cookie" in request_headers:
-                request_headers["cookie"] = "<redacted>"
 
-            request_body = request_body
-            if isinstance(request_body, bytes):
-                try:
-                    request_body = json.loads(request_body.decode("utf-8"))
-                except json.JSONDecodeError:
-                    request_body = request_body.decode("utf-8")
-                    if request_body.startswith("grant_type=password"):
-                        request_body = {"request_body": "<redacted>"}
+            request_headers = redact_headers(dict(request.headers))
+            request_body = (
+                redact_request_body(request_body)
+                if isinstance(request_body, bytes)
+                else request_body
+            )
             response_headers = dict(response.headers)
-            response_body = response.body
-            if isinstance(response_body, bytes):
-                try:
-                    response_body = json.loads(response_body.decode("utf-8"))
-                    if (
-                        isinstance(response_body, dict)
-                        and "access_token" in response_body
-                    ):
-                        response_body["access_token"] = "<redacted>"
-
-                except json.JSONDecodeError:
-                    response_body = response_body.decode("utf-8")
-
-            trcb = []
-            if excepion:
-                for obj in traceback.format_exception(
-                    type(excepion), excepion, excepion.__traceback__
-                ):
-                    obj: str
-                    lines = obj.split("\n")
-                    for line in lines:
-                        trcb.append(line)
-
-            log_data = LogRequest(
-                rid_uuid4=request_uuid4,
-                timestamp=timestamp,
-                url=str(request.url),
-                method=request.method,
-                status_code=response.status_code,
-                duration_ms=duration_ms,
-                type=request.scope.get("type"),
-                http_version=request.scope.get("http_version"),
-                server=request.scope.get("server"),
-                client=request.scope.get("client"),
-                path=request.scope.get("path"),
-                path_params=request.path_params,
-                asgi_version=request.scope.get("asgi", {}).get("version"),
-                asgi_spec_version=request.scope.get("asgi", {}).get("spec_version"),
-                request_headers=request_headers,
-                request_body=request_body,
-                response_headers=response_headers,
-                response_body=response_body,
-                exception=(
-                    None
-                    if not excepion
-                    else dict(
-                        type=type(excepion).__name__,
-                        message=str(excepion),
-                        args=excepion.log_args if hasattr(excepion, "log_args") else {},
-                        traceback=trcb,
-                    )
-                ),
+            response_body = (
+                redact_response_body(response.body)
+                if isinstance(response.body, bytes)
+                else response.body
             )
 
-            if excepion:
-                print(log_data.model_dump_json(indent=4, exclude_none=True))
-
-            dir_logs = "logs"
-            os.makedirs(dir_logs, exist_ok=True)
-
-            timestamp = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M")
-            with open(
-                os.path.join(dir_logs, "logs_request", timestamp + ".log"), "a"
-            ) as log_file:
-                log_file.write("\n" + log_data.model_dump_json())
+            log_request = get_log_request(
+                request_headers=request_headers,
+                request=request,
+                request_body=request_body,
+                response=response,
+                response_headers=response_headers,
+                response_body=response_body,
+                duration_ms=duration_ms,
+                exception=exception,
+            )
+            save_log_request(log_request)
 
             return response
 
