@@ -49,6 +49,7 @@ def handler_user_exists(request: Request, excepion: ExcUserExists) -> JSONRespon
     if excepion.phone:
         details["phone"] = excepion.phone
     content = {
+        "request_id": request.uuid4,
         "code": "USER_EXISTS",
         "message": str(excepion),
         "details": details,
@@ -77,6 +78,7 @@ def handle_transaction_active_not_found(
     request: Request, excepion: ExcTransactionActiveNotFound
 ) -> JSONResponse:
     content = {
+        "request_id": request.uuid4,
         "code": "TRANSACTION_NOT_FOUND",
         "message": str(excepion),
     }
@@ -96,6 +98,7 @@ def handle_transaction_active_not_found(
 
 def handle_item_not_found(request: Request, excepion: ExcItemNotFound) -> JSONResponse:
     content = {
+        "request_id": request.uuid4,
         "code": "ITEM_NOT_FOUND",
         "message": str(excepion),
     }
@@ -135,8 +138,7 @@ def handle_invalid_expires_at(
 def handle_http_exception(request: Request, excepion: HTTPException) -> JSONResponse:
     response = JSONResponse(
         status_code=excepion.status_code,
-        content={
-            "request_id": request.uuid4,"code": excepion.detail},
+        content={"request_id": request.uuid4, "code": excepion.detail},
     )
     return response
 

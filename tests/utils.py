@@ -1,4 +1,6 @@
-CONFIGS_JSON = """{
+from app.utils.configs import Settings
+
+TEST_CONFIGS_JSON = """{
     "app_name": "app_name",
     "database": {
         "host": "localhost",
@@ -30,3 +32,6 @@ CONFIGS_JSON = """{
         "access_token_expire_minutes": 30
     }
 }"""
+
+
+TEST_SETTINGS = Settings.model_validate_json(TEST_CONFIGS_JSON)

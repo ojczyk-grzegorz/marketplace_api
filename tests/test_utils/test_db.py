@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 import psycopg2
 
-from tests.test_utils.utils import CONFIGS_JSON
+from tests.utils import TEST_SETTINGS
 
 from app.utils.configs import Settings
 from app.utils.db import (
@@ -76,9 +76,7 @@ def test_db_query(mocker, exception, results_expected, log_kwargs):
     file = Mock()
 
     mocker.patch("psycopg2.connect").return_value.__enter__.return_value = connection
-    mocker.patch(
-        "app.utils.db.get_settings"
-    ).return_value = Settings.model_validate_json(CONFIGS_JSON)
+    mocker.patch("app.utils.db.get_settings").return_value = TEST_SETTINGS
     mocker.patch("builtins.open").return_value.__enter__.return_value = file
 
     query = "SELECT * FROM table"

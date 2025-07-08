@@ -26,9 +26,9 @@ def test_password_hash(password, password_verify, expected):
 @pytest.mark.parametrize(
     "expire_minutes, sleep_time_seconds, override, exception",
     [
-        (1, 1, None, None),
-        (1 / 60, 2, None, jwt.exceptions.ExpiredSignatureError),
-        (1, 1, "eyJhbGc.eyJ1c2Vy.g3to2hM", jwt.exceptions.DecodeError),
+        (1, 0.01, None, None),
+        (1 / 6000, 0.02, None, jwt.exceptions.ExpiredSignatureError),
+        (1, 0.01, "eyJhbGc.eyJ1c2Vy.g3to2hM", jwt.exceptions.DecodeError),
     ],
 )
 def test_get_token(expire_minutes, sleep_time_seconds, override, exception):

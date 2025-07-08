@@ -36,6 +36,7 @@ router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRouteLogging)
     "/user/{user_id}",
     status_code=status.HTTP_200_OK,
     response_model=UserDBOut,
+    response_model_exclude_none=True,
     description="Route for getting user by ID",
 )
 async def get_user(
@@ -63,6 +64,7 @@ async def get_user(
     "/me",
     status_code=status.HTTP_200_OK,
     response_model=UserDBOutDetailed,
+    response_model_exclude_none=True,
     description="Route for getting user by ID",
 )
 async def get_user_me(
@@ -95,6 +97,7 @@ async def get_user_me(
     "/create",
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseSuccess,
+    response_model_exclude_none=True,
     description="Route for creating user",
 )
 async def user_create(
@@ -146,6 +149,7 @@ async def user_create(
     "/update",
     status_code=status.HTTP_200_OK,
     response_model=ResponseSuccess,
+    response_model_exclude_none=True,
     description="Route for creating user",
 )
 async def user_update(
@@ -201,6 +205,7 @@ async def user_update(
     "/remove",
     status_code=status.HTTP_202_ACCEPTED,
     response_model=ResponseSuccess,
+    response_model_exclude_none=True,
     description="Route for creating user",
 )
 async def user_remove(
