@@ -26,7 +26,7 @@ async def get_token(
 ):
     settings: Settings = get_settings()
     users = db_search_simple(
-        settings.database.tables.users.name,
+        settings.db_table_users,
         ["uid", "email", "password_hash"],
         f"email = '{form.username}'",
         "LIMIT 1",
@@ -41,9 +41,9 @@ async def get_token(
 
     token = get_access_token(
         data={"user_id": user["uid"]},
-        secret_key=settings.auth.secret_key,
-        algorithm=settings.auth.algorithm,
-        expire_minutes=settings.auth.access_token_expire_minutes,
+        secret_key=settings.auth_secret_key,
+        algorithm=settings.auth_algorithm,
+        expire_minutes=settings.auth_access_token_expire_minutes,
     )
 
     return Token(

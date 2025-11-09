@@ -41,11 +41,11 @@ async def transaction_create(
     settings: Settings = get_settings()
     buyer_id: int = validate_access_token(
         token=token,
-        secret_key=settings.auth.secret_key,
-        algorithms=[settings.auth.algorithm],
+        secret_key=settings.auth_secret_key,
+        algorithms=[settings.auth_algorithm],
     )
     buyers = db_search_simple(
-        table=settings.database.tables.users.name,
+        table=settings.db_table_users,
         columns=UserDBOutDetailed.model_fields.keys(),
         where=f"uid = {buyer_id}",
         log_kwargs=dict(
@@ -58,7 +58,7 @@ async def transaction_create(
     buyer = buyers[0]
 
     db_items = db_remove(
-        table=settings.database.tables.items.name,
+        table=settings.db_table_items,
         where=f"seller_id = {buyer_id} AND iid != {req_body.item_id}",
         columns_out=ItemDB.model_fields.keys(),
         log_kwargs=dict(
@@ -71,7 +71,7 @@ async def transaction_create(
 
     db_item = db_items[0]
     sellers = db_search_simple(
-        table=settings.database.tables.users.name,
+        table=settings.db_table_users,
         columns=UserDBOutDetailed.model_fields.keys(),
         where=f"uid = {db_item['seller_id']}",
         log_kwargs=dict(
@@ -92,7 +92,7 @@ async def transaction_create(
     )
 
     db_transactions = db_insert(
-        table=settings.database.tables.transactions.name,
+        table=settings.db_table_transactions,
         data=transaction.model_dump(exclude_none=True, mode="json"),
         columns_out=TransactionDBOut.model_fields.keys(),
         log_kwargs=dict(
@@ -125,11 +125,11 @@ async def transaction_finilize(
     settings: Settings = get_settings()
     buyer_id: int = validate_access_token(
         token=token,
-        secret_key=settings.auth.secret_key,
-        algorithms=[settings.auth.algorithm],
+        secret_key=settings.auth_secret_key,
+        algorithms=[settings.auth_algorithm],
     )
     db_buyers = db_search_simple(
-        table=settings.database.tables.users.name,
+        table=settings.db_table_users,
         columns=UserDBOutDetailed.model_fields.keys(),
         where=f"uid = {buyer_id}",
         log_kwargs=dict(
@@ -144,7 +144,7 @@ async def transaction_finilize(
     buyer_uid_uuid4 = db_buyer["uid_uuid4"]
 
     db_transactions = db_update(
-        table=settings.database.tables.transactions.name,
+        table=settings.db_table_transactions,
         data={"finilized": dt.datetime.now(dt.timezone.utc).isoformat()},
         where=f"tid = {req_body.transaction_id} AND buyer_uid_uuid4 = '{buyer_uid_uuid4}' AND finilized IS NULL",
         columns_out=TransactionDBOut.model_fields.keys(),

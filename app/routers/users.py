@@ -44,7 +44,7 @@ async def get_user(
 ):
     settings: Settings = get_settings()
     db_user = db_search_user_by_id(
-        table=settings.database.tables.users.name,
+        table=settings.db_table_users,
         user_id=user_id,
         columns=UserDBOut.model_fields.keys(),
         log_kwargs=dict(
@@ -72,12 +72,12 @@ async def get_user_me(
     settings: Settings = get_settings()
     user_id = validate_access_token(
         token=token,
-        secret_key=settings.auth.secret_key,
-        algorithms=[settings.auth.algorithm],
+        secret_key=settings.auth_secret_key,
+        algorithms=[settings.auth_algorithm],
     )
 
     db_user = db_search_user_by_id(
-        table=settings.database.tables.users.name,
+        table=settings.db_table_users,
         user_id=user_id,
         columns=UserDBOutDetailed.model_fields.keys(),
         log_kwargs=dict(
@@ -103,7 +103,7 @@ async def user_create(
 ):
     settings: Settings = get_settings()
     db_users = db_search_simple(
-        settings.database.tables.users.name,
+        settings.db_table_users,
         ["email", "phone"],
         f"email = '{user.email}' OR phone = '{user.phone}'",
         "LIMIT 1",
@@ -128,7 +128,7 @@ async def user_create(
     ).model_dump(exclude_none=True, mode="json")
 
     db_users: dict = db_insert(
-        settings.database.tables.users.name,
+        settings.db_table_users,
         user,
         UserDBOutDetailed.model_fields.keys(),
         log_kwargs=dict(
@@ -159,11 +159,11 @@ async def user_update(
     settings: Settings = get_settings()
     user_id = validate_access_token(
         token=token,
-        secret_key=settings.auth.secret_key,
-        algorithms=[settings.auth.algorithm],
+        secret_key=settings.auth_secret_key,
+        algorithms=[settings.auth_algorithm],
     )
     db_users = db_search_simple(
-        settings.database.tables.users.name,
+        settings.db_table_users,
         ["uid"],
         f"uid = {user_id}",
         "LIMIT 1",
@@ -182,7 +182,7 @@ async def user_update(
     ).model_dump(exclude_none=True, mode="json")
 
     db_users = db_update(
-        table=settings.database.tables.users.name,
+        table=settings.db_table_users,
         data=user,
         where=f"uid = {user_id}",
         columns_out=UserDBOutDetailed.model_fields.keys(),
@@ -210,12 +210,12 @@ async def user_remove(
     settings: Settings = get_settings()
     user_id = validate_access_token(
         token=token,
-        secret_key=settings.auth.secret_key,
-        algorithms=[settings.auth.algorithm],
+        secret_key=settings.auth_secret_key,
+        algorithms=[settings.auth_algorithm],
     )
 
     db_users = db_search_simple(
-        settings.database.tables.users.name,
+        settings.db_table_users,
         ["uid_uuid4"],
         f"uid = {user_id}",
         "LIMIT 1",
@@ -229,7 +229,7 @@ async def user_remove(
 
     uid_uuid4 = db_users[0]["uid_uuid4"]
     transaction_ids = db_search_simple(
-        settings.database.tables.transactions.name,
+        settings.db_table_transactions,
         ["tid"],
         f"finilized IS NULL AND (buyer_uid_uuid4 = '{uid_uuid4}' OR seller_uid_uuid4 = '{uid_uuid4}')",
         log_kwargs=dict(
@@ -244,7 +244,7 @@ async def user_remove(
         )
 
     db_remove(
-        settings.database.tables.items.name,
+        settings.db_table_items,
         f"seller_id = {user_id}",
         columns_out=["iid"],
         log_kwargs=dict(
@@ -253,7 +253,7 @@ async def user_remove(
         ),
     )
     db_users = db_remove(
-        table=settings.database.tables.users.name,
+        table=settings.db_table_users,
         where=f"uid = {user_id}",
         columns_out=["email"],
         log_kwargs=dict(

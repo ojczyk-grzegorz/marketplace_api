@@ -40,11 +40,11 @@ def db_query(query: str, log_kwargs: dict = {}) -> list[tuple]:
     start = time.perf_counter_ns()
 
     with psycopg2.connect(
-        host=settings.database.host,
-        port=settings.database.port,
-        user=settings.database.user,
-        password=settings.database.password,
-        database=settings.database.database,
+        host=settings.db_host,
+        port=settings.db_port,
+        user=settings.db_user,
+        password=settings.db_password,
+        database=settings.db_schema,
     ) as connection:
         cursor = connection.cursor()
         cursor.execute(query)

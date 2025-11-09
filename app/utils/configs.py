@@ -1,45 +1,29 @@
-import json
 from functools import lru_cache
-
-from pydantic_settings import BaseSettings
-
-
-class SettingsDBTable(BaseSettings):
-    name: str
-
-
-class SettingsDBTables(BaseSettings):
-    users: SettingsDBTable
-    items: SettingsDBTable
-    transactions: SettingsDBTable
-    logs_request: SettingsDBTable
-    logs_query: SettingsDBTable
-
-
-class SettingsAuth(BaseSettings):
-    secret_key: str
-    algorithm: str
-    access_token_expire_minutes: int
-
-
-class SettingsDB(BaseSettings):
-    host: str
-    port: int
-    user: str
-    password: str
-    database: str
-    tables: SettingsDBTables
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env")
+
     app_name: str
-    database: SettingsDB
-    auth: SettingsAuth
+
+    db_host: str
+    db_port: int
+    db_user: str
+    db_password: str
+
+    db_schema: str
+    db_table_users: str
+    db_table_items: str
+    db_table_transactions: str
+    db_table_logs_request: str
+    db_table_logs_query: str
+    
+    auth_secret_key: str
+    auth_algorithm: str
+    auth_access_token_expire_minutes: int
 
 
 @lru_cache()
-def get_settings(filepath: str = "secrets/configs.json") -> Settings:
-    with open(filepath, "r") as f:
-        settings_data = json.load(f)
-        settings = Settings.model_validate(settings_data)
-    return settings
+def get_settings() -> Settings:
+    return Settings()

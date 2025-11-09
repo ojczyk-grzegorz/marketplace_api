@@ -1,0 +1,37 @@
+[project]
+name = "marketplace"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiohttp>=3.13.2",
+    "apscheduler>=3.11.1",
+    "fastapi>=0.121.1",
+    "fastapi-utilities>=0.3.1",
+    "httpx>=0.28.1",
+    "passlib>=1.7.4",
+    "psycopg2-binary>=2.9.11",
+    "pydantic-settings>=2.11.0",
+    "pydantic[email]>=2.12.4",
+    "pyjwt>=2.10.1",
+    "python-multipart>=0.0.20",
+    "pytz>=2025.2",
+    "ruff>=0.14.4",
+    "uvicorn>=0.38.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "pytest-mock>=3.15.1",
+]
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+pythonpath = [
+  "."
+]

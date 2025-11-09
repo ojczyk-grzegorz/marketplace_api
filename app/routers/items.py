@@ -51,7 +51,7 @@ async def get_items(
         filters.append(flt)
 
     db_items = db_search_simple(
-        table=settings.database.tables.items.name,
+        table=settings.db_table_items,
         columns=ItemDBToList.model_fields.keys(),
         where=" AND ".join(filters),
         other=f"LIMIT {query_items.limit}",
@@ -79,7 +79,7 @@ async def get_item(
 ):
     settings: Settings = get_settings()
     db_items = db_search_simple(
-        table=settings.database.tables.items.name,
+        table=settings.db_table_items,
         columns=ItemDB.model_fields.keys(),
         where=f"iid = {iid}",
         log_kwargs=dict(
@@ -105,7 +105,7 @@ async def get_user_items(
 ):
     settings: Settings = get_settings()
     users = db_search_simple(
-        table=settings.database.tables.users.name,
+        table=settings.db_table_users,
         columns=UserDBOut.model_fields.keys(),
         where=f"uid = {uid}",
         log_kwargs=dict(
@@ -117,7 +117,7 @@ async def get_user_items(
         raise ExcUserNotFound(user_id=uid)
 
     db_items = db_search_simple(
-        table=settings.database.tables.items.name,
+        table=settings.db_table_items,
         columns=ItemDBToList.model_fields.keys(),
         where=f"seller_id = {uid}",
         log_kwargs=dict(
@@ -146,8 +146,8 @@ async def item_create(
     settings: Settings = get_settings()
     user_id: int = validate_access_token(
         token=token,
-        secret_key=settings.auth.secret_key,
-        algorithms=[settings.auth.algorithm],
+        secret_key=settings.auth_secret_key,
+        algorithms=[settings.auth_algorithm],
     )
 
     created_at = dt.datetime.now(dt.timezone.utc)
@@ -162,7 +162,7 @@ async def item_create(
     ).model_dump(exclude_none=True, mode="json")
 
     db_items: dict = db_insert(
-        table=settings.database.tables.items.name,
+        table=settings.db_table_items,
         data=item,
         columns_out=ItemDB.model_fields.keys(),
         log_kwargs=dict(
@@ -195,8 +195,8 @@ async def item_update(
     settings: Settings = get_settings()
     user_id: int = validate_access_token(
         token=token,
-        secret_key=settings.auth.secret_key,
-        algorithms=[settings.auth.algorithm],
+        secret_key=settings.auth_secret_key,
+        algorithms=[settings.auth_algorithm],
     )
 
     updated_at = dt.datetime.now(dt.timezone.utc)
@@ -210,7 +210,7 @@ async def item_update(
 
     item_id = item.iid
     db_items = db_update(
-        table=settings.database.tables.items.name,
+        table=settings.db_table_items,
         data=item.model_dump(exclude_none=True, mode="json"),
         where=f"iid = '{item_id}' AND seller_id = {user_id}",
         columns_out=ItemDB.model_fields.keys(),
@@ -243,12 +243,12 @@ async def item_remove(
     settings: Settings = get_settings()
     user_id: int = validate_access_token(
         token=token,
-        secret_key=settings.auth.secret_key,
-        algorithms=[settings.auth.algorithm],
+        secret_key=settings.auth_secret_key,
+        algorithms=[settings.auth_algorithm],
     )
 
     db_items = db_remove(
-        table=settings.database.tables.items.name,
+        table=settings.db_table_items,
         where=f"seller_id = {user_id} AND iid = {req_body.item_id}",
         columns_out=["iid", "name"],
         log_kwargs=dict(

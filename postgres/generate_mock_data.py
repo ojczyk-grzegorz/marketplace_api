@@ -58,12 +58,12 @@ def main():
         item.pop("iid")
     for transaction in transactions:
         transaction.pop("tid")
-    db_insert(settings.database.tables.users.name, users, columns_out=[], log_kwargs={})
+    db_insert(settings.db_table_users, users, columns_out=[], log_kwargs={})
 
-    db_insert(settings.database.tables.items.name, items, columns_out=[], log_kwargs={})
+    db_insert(settings.db_table_items, items, columns_out=[], log_kwargs={})
 
     db_insert(
-        settings.database.tables.transactions.name,
+        settings.db_table_transactions,
         transactions,
         columns_out=[],
         log_kwargs={},
