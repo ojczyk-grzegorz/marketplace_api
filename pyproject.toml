@@ -7,7 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "aiohttp>=3.13.2",
     "apscheduler>=3.11.1",
-    "fastapi>=0.121.1",
+    "fastapi[standard]>=0.121.1",
     "fastapi-utilities>=0.3.1",
     "httpx>=0.28.1",
     "passlib>=1.7.4",

@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
 
     app_name: str
+    logger_name: str
+    logger_level: str
 
     db_host: str
     db_port: int
