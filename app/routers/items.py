@@ -26,6 +26,8 @@ from tests.openapi.items import ITEM_CREATE, ITEM_PATCH, ITEM_DELETE
 
 router = APIRouter(prefix="/items", tags=["Items"], route_class=APIRouteLogging)
 
+# QUERY ITEMS
+# GET ITEM BY ID
 
 @router.get(
     "/query",

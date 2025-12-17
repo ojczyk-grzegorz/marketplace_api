@@ -36,7 +36,27 @@ logger.setLevel(settings.logger_level)
 handler_file = TimedRotatingFileHandler(
     FILENAME_LOGS, when="M", interval=5, utc=True, encoding="utf-8"
 )
-formatter_file = logging.Formatter(
+
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, dt.datetime):
+            return obj.isoformat()
+        return super().default(obj)
+
+class LogFormatter(logging.Formatter):
+    def format(self, record):
+        if not isinstance(record.msg, (str, dict)):
+            record.msg = str(record.msg)
+        log_record = {
+            "timestamp": self.formatTime(record, self.datefmt),
+            "level": record.levelname,
+            "log_type": "struct" if isinstance(record.msg, dict) else "string",
+            "log": record.msg,
+        }
+        return json.dumps(log_record, cls=CustomJSONEncoder)
+    
+    
+formatter_file = LogFormatter(
     fmt='{"timestamp": "%(asctime)s", "level": "%(levelname)s", "log": %(message)s}',
     datefmt="%Y-%m-%d %H:%M:%S",
 )
@@ -49,7 +69,6 @@ def custom_middleware_factory(app: FastAPI):
         async def dispatch(self, request, call_next):
             request.state.req_id = "1"
             response = await call_next(request)
-            response.headers["X-Custom-Header"] = "CustomValue"
             return response
 
     return CustomMiddleware(app)
@@ -62,24 +81,14 @@ def get_req_id(request: Request) -> str:
     return request.state.req_id
 
 
-class CustomJSONEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, dt.datetime):
-            return obj.isoformat()
-        return super().default(obj)
-
-
-def write_log(logger_method: Callable, message: dict):
-    message = json.dumps(message, cls=CustomJSONEncoder)
-    logger_method(message)
-
-
 @app.get("/", description="API home page.", response_class=JSONResponse)
 async def home(
     req_id: Annotated[str, Depends(get_req_id)],
     settings: Annotated[Settings, Depends(get_settings)],
 ):
-    write_log(logger.info, {"message": "Home endpoint accessed", "req_id": req_id})
+    logger.info("Test log message")
+    logger.info({"message": "Home endpoint accessed", "req_id": req_id})
+
     return JSONResponse(
         status_code=200, content={"message": f"Hello from {settings.app_name}!"}
     )

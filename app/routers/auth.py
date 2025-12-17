@@ -14,6 +14,8 @@ from app.exceptions.exceptions import ExcInvalidCredentials
 router = APIRouter(prefix="/auth", tags=["Authentication"], route_class=APIRouteLogging)
 
 
+# TOKEN GENERATION
+
 @router.post(
     "/token",
     status_code=status.HTTP_200_OK,
