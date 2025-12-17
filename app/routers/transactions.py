@@ -27,6 +27,11 @@ router = APIRouter(
     prefix="/transactions", tags=["Transactions"], route_class=APIRouteLogging
 )
 
+# CREATE TRANSACTION
+# SEE CURRENT TRANSACTIONS
+# CHECK TRANSACTION STATUS
+# SEE HISTORICAL TRANSACTIONS
+
 
 @router.post(
     "/create",
@@ -107,61 +112,5 @@ async def transaction_create(
             "item_id": db_item["iid"],
             "seller_id": seller["uid"],
             "buyer_id": buyer["uid"],
-        },
-    )
-
-
-@router.post(
-    "/finilize",
-    status_code=status.HTTP_200_OK,
-    response_model=ResponseSuccess,
-    description="Route for deleting an item",
-)
-async def transaction_finilize(
-    req: Request,
-    token: str = Depends(oauth2_scheme),
-    req_body: TransactionFinilize = Body(..., openapi_examples=TRANSACTION_FINILIZE),
-):
-    settings: Settings = get_settings()
-    buyer_id: int = validate_access_token(
-        token=token,
-        secret_key=settings.auth_secret_key,
-        algorithms=[settings.auth_algorithm],
-    )
-    db_buyers = db_search_simple(
-        table=settings.db_table_users,
-        columns=UserDBOutDetailed.model_fields.keys(),
-        where=f"uid = {buyer_id}",
-        log_kwargs=dict(
-            request_id=req.uuid4,
-            query_tags=["users", "get"],
-        ),
-    )
-    if not db_buyers:
-        raise ExcUserNotFound(user_id=buyer_id)
-
-    db_buyer = db_buyers[0]
-    buyer_uid_uuid4 = db_buyer["uid_uuid4"]
-
-    db_transactions = db_update(
-        table=settings.db_table_transactions,
-        data={"finilized": dt.datetime.now(dt.timezone.utc).isoformat()},
-        where=f"tid = {req_body.transaction_id} AND buyer_uid_uuid4 = '{buyer_uid_uuid4}' AND finilized IS NULL",
-        columns_out=TransactionDBOut.model_fields.keys(),
-        log_kwargs=dict(
-            request_id=req.uuid4,
-            query_tags=["transactions", "finilize"],
-        ),
-    )
-    if not db_transactions:
-        raise ExcTransactionActiveNotFound(
-            transaction_id=req_body.transaction_id, user_id_uuid4=buyer_uid_uuid4
-        )
-
-    return ResponseSuccess(
-        message="Transaction finilized successfully.",
-        details={
-            "transaction_id": req_body.transaction_id,
-            "item": db_transactions[0]["item"],
         },
     )

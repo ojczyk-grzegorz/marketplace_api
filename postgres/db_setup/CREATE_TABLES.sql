@@ -8,16 +8,6 @@ CREATE TABLE users (
     email VARCHAR(256) UNIQUE NOT NULL,
     phone VARCHAR(16) UNIQUE NOT NULL,
     password_hash VARCHAR(64) NOT NULL,
-    first_name VARCHAR(128) NOT NULL,
-    last_name VARCHAR(256) NOT NULL,
-    birth_date DATE NOT NULL,
-    country VARCHAR(4) NOT NULL,
-    city VARCHAR(128) NOT NULL,
-    street VARCHAR(128) NOT NULL,
-    street_number VARCHAR(16) NOT NULL,
-    postal_code VARCHAR(16) NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL,
-    updated_at TIMESTAMPTZ NOT NULL
 );
 
 

@@ -5,10 +5,9 @@ from logging.handlers import TimedRotatingFileHandler
 import json
 import datetime as dt
 
-from fastapi import FastAPI, Depends, Header, Request
+from fastapi import FastAPI, Depends, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.routers import users, items, auth, transactions
@@ -16,7 +15,6 @@ from app.utils.scheduler import lifespan
 from app.utils.configs import get_settings, Settings
 from app.constants.constants import FILENAME_LOGS
 
-# app = FastAPI(lifespan=lifespan, tags=["Main"])
 app = FastAPI(tags=["Main"])
 app.add_middleware(
     CORSMiddleware,
@@ -39,7 +37,7 @@ handler_file = TimedRotatingFileHandler(
     FILENAME_LOGS, when="M", interval=5, utc=True, encoding="utf-8"
 )
 formatter_file = logging.Formatter(
-    fmt='{"timestamp": "%(asctime)s", "level": "%(levelname)s", %(message)s}',
+    fmt='{"timestamp": "%(asctime)s", "level": "%(levelname)s", "log": %(message)s}',
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 handler_file.setFormatter(formatter_file)
@@ -73,7 +71,7 @@ class CustomJSONEncoder(json.JSONEncoder):
 
 def write_log(logger_method: Callable, message: dict):
     message = json.dumps(message, cls=CustomJSONEncoder)
-    logger_method(message[1:-1])
+    logger_method(message)
 
 
 @app.get("/", description="API home page.", response_class=JSONResponse)

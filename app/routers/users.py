@@ -32,64 +32,9 @@ from tests.openapi.users import USER_PATCH, USER_CREATE
 router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRouteLogging)
 
 
-@router.get(
-    "/user/{user_id}",
-    status_code=status.HTTP_200_OK,
-    response_model=UserDBOut,
-    description="Route for getting user by ID",
-)
-async def get_user(
-    req: Request,
-    user_id: int = Path(...),
-):
-    settings: Settings = get_settings()
-    db_user = db_search_user_by_id(
-        table=settings.db_table_users,
-        user_id=user_id,
-        columns=UserDBOut.model_fields.keys(),
-        log_kwargs=dict(
-            request_id=req.uuid4,
-            query_tags=["users", "get"],
-        ),
-    )
-
-    if not db_user:
-        raise ExcUserNotFound(user_id=user_id)
-
-    return db_user
-
-
-@router.post(
-    "/me",
-    status_code=status.HTTP_200_OK,
-    response_model=UserDBOutDetailed,
-    description="Route for getting user by ID",
-)
-async def get_user_me(
-    req: Request,
-    token: str = Depends(oauth2_scheme),
-):
-    settings: Settings = get_settings()
-    user_id = validate_access_token(
-        token=token,
-        secret_key=settings.auth_secret_key,
-        algorithms=[settings.auth_algorithm],
-    )
-
-    db_user = db_search_user_by_id(
-        table=settings.db_table_users,
-        user_id=user_id,
-        columns=UserDBOutDetailed.model_fields.keys(),
-        log_kwargs=dict(
-            request_id=req.uuid4,
-            query_tags=["users", "get_me"],
-        ),
-    )
-
-    if not db_user:
-        raise ExcUserNotFound(user_id=user_id)
-    return db_user
-
+# CREATE USER
+# UPDATE EMAIL/PHONE/PASSWORD
+# REMOVE USER
 
 @router.post(
     "/create",
@@ -138,61 +83,6 @@ async def user_create(
     )
     return ResponseSuccess(
         message="User created successfully",
-        details=dict(user=db_users[0]),
-    )
-
-
-@router.patch(
-    "/update",
-    status_code=status.HTTP_200_OK,
-    response_model=ResponseSuccess,
-    description="Route for creating user",
-)
-async def user_update(
-    req: Request,
-    token: str = Depends(oauth2_scheme),
-    user: UserUpdate = Body(
-        ...,
-        openapi_examples=USER_PATCH,
-    ),
-):
-    settings: Settings = get_settings()
-    user_id = validate_access_token(
-        token=token,
-        secret_key=settings.auth_secret_key,
-        algorithms=[settings.auth_algorithm],
-    )
-    db_users = db_search_simple(
-        settings.db_table_users,
-        ["uid"],
-        f"uid = {user_id}",
-        "LIMIT 1",
-        log_kwargs=dict(
-            request_id=req.uuid4,
-            query_tags=["users", "update"],
-        ),
-    )
-    if not db_users:
-        raise ExcUserNotFound(user_id=user_id)
-
-    user = UserDBIn(
-        **user.model_dump(exclude_none=True, exclude=["password"]),
-        password_hash=get_password_hash(user.password) if user.password else None,
-        updated_at=dt.datetime.now(dt.timezone.utc),
-    ).model_dump(exclude_none=True, mode="json")
-
-    db_users = db_update(
-        table=settings.db_table_users,
-        data=user,
-        where=f"uid = {user_id}",
-        columns_out=UserDBOutDetailed.model_fields.keys(),
-        log_kwargs=dict(
-            request_id=req.uuid4,
-            query_tags=["users", "update"],
-        ),
-    )
-    return ResponseSuccess(
-        message="User updated successfully",
         details=dict(user=db_users[0]),
     )
 
