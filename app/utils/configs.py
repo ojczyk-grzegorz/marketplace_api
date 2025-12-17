@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     db_table_transactions: str
     db_table_logs_request: str
     db_table_logs_query: str
-    
+
     auth_secret_key: str
     auth_algorithm: str
     auth_access_token_expire_minutes: int

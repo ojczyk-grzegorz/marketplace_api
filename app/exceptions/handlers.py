@@ -135,8 +135,7 @@ def handle_invalid_expires_at(
 def handle_http_exception(request: Request, excepion: HTTPException) -> JSONResponse:
     response = JSONResponse(
         status_code=excepion.status_code,
-        content={
-            "request_id": request.uuid4,"code": excepion.detail},
+        content={"request_id": request.uuid4, "code": excepion.detail},
     )
     return response
 
