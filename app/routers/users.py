@@ -1,22 +1,18 @@
 import datetime as dt
 
-from fastapi import APIRouter, Path, Body, status, Depends, Request
+from fastapi import APIRouter, Body, status, Depends, Request
 
 from app.utils.db import (
     db_search_simple,
     db_insert,
-    db_update,
     db_remove,
-    db_search_user_by_id,
 )
 from app.utils.routers import APIRouteLogging
 from app.utils.configs import get_settings, Settings
 from app.utils.auth import get_password_hash
 from app.datamodels.user import (
-    UserDBOut,
     UserDBOutDetailed,
     UserCreate,
-    UserUpdate,
     UserDBIn,
 )
 from app.datamodels.response import ResponseSuccess
@@ -26,7 +22,7 @@ from app.exceptions.exceptions import (
     ExcTransactionsFound,
 )
 from app.utils.auth import validate_access_token, oauth2_scheme
-from tests.openapi.users import USER_PATCH, USER_CREATE
+from tests.openapi.users import USER_CREATE
 
 
 router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRouteLogging)
@@ -35,6 +31,7 @@ router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRouteLogging)
 # CREATE USER
 # UPDATE EMAIL/PHONE/PASSWORD
 # REMOVE USER
+
 
 @router.post(
     "/create",

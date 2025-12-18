@@ -16,6 +16,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"], route_class=APIRoute
 
 # TOKEN GENERATION
 
+
 @router.post(
     "/token",
     status_code=status.HTTP_200_OK,

@@ -6,9 +6,8 @@ from app.datamodels.response import ResponseSuccess
 from app.exceptions.exceptions import (
     ExcUserNotFound,
     ExcItemNotFound,
-    ExcTransactionActiveNotFound,
 )
-from app.utils.db import db_search_simple, db_insert, db_update, db_remove
+from app.utils.db import db_search_simple, db_insert, db_remove
 from app.utils.routers import APIRouteLogging
 from app.utils.configs import get_settings, Settings
 
@@ -16,11 +15,10 @@ from app.datamodels.transaction import (
     TransactionCreate,
     TransactionDBIn,
     TransactionDBOut,
-    TransactionFinilize,
 )
 from app.datamodels.item import ItemDB
 from app.datamodels.user import UserDBOutDetailed
-from tests.openapi.transactions import TRANSACTION_CREATE, TRANSACTION_FINILIZE
+from tests.openapi.transactions import TRANSACTION_CREATE
 
 
 router = APIRouter(
