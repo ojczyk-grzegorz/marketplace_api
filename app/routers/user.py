@@ -1,8 +1,12 @@
 import datetime as dt
 
+from typing import Annotated
 from fastapi import APIRouter, Body, status, Depends, Request
-
+from fastapi.routing import APIRoute
+from sqlalchemy.orm import Session
+from sqlalchemy.sql import text
 from app.utils.db import (
+    get_db_session,
     db_search_simple,
     db_insert,
     db_remove,
@@ -22,10 +26,9 @@ from app.exceptions.exceptions import (
     ExcTransactionsFound,
 )
 from app.utils.auth import validate_access_token, oauth2_scheme
-from tests.openapi.users import USER_CREATE
 
 
-router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRouteLogging)
+router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRoute)
 
 
 # CREATE USER
@@ -40,47 +43,63 @@ router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRouteLogging)
     description="Route for creating user",
 )
 async def user_create(
-    req: Request,
-    user: UserCreate = Body(..., openapi_examples=USER_CREATE),
+    settings: Annotated[Settings, Depends(get_settings)],
+    db: Annotated[Session, Depends(get_db_session)],
+    user: UserCreate = Body(
+        ...,
+        openapi_examples={
+            "example1": {
+                "summary": "Example user creation payload",
+                "value": {
+                    "email": "user@example.com",
+                    "phone": "+48123456789",
+                    "password": "strongpassword123",
+                },
+            }
+        },
+    ),
 ):
-    settings: Settings = get_settings()
-    db_users = db_search_simple(
-        settings.db_table_users,
-        ["email", "phone"],
-        f"email = '{user.email}' OR phone = '{user.phone}'",
-        "LIMIT 1",
-        log_kwargs=dict(
-            request_id=req.uuid4,
-            query_tags=["users", "create"],
+    db_users_matching = db.execute(
+        text(
+            "SELECT email, phone FROM "
+            + settings.db_table_users
+            + " WHERE email = :email OR phone = :phone LIMIT 1"
         ),
-    )
-    if db_users:
+        params={"email": user.email, "phone": user.phone},
+    ).fetchone()
+    if db_users_matching:
         raise ExcUserExists(
-            email=user.email if db_users[0]["email"] == user.email else None,
-            phone=user.phone if db_users[0]["phone"] == user.phone else None,
+            email=user.email
+            if db_users_matching._mapping["email"] == user.email
+            else None,
+            phone=user.phone
+            if db_users_matching._mapping["phone"] == user.phone
+            else None,
         )
 
     created_at = dt.datetime.now(dt.timezone.utc)
 
     user = UserDBIn(
-        **user.model_dump(exclude_none=True, exclude=["password"]),
+        **user.model_dump(),
         password_hash=get_password_hash(user.password),
         created_at=created_at,
         updated_at=created_at,
-    ).model_dump(exclude_none=True, mode="json")
-
-    db_users: dict = db_insert(
-        settings.db_table_users,
-        user,
-        UserDBOutDetailed.model_fields.keys(),
-        log_kwargs=dict(
-            request_id=req.uuid4,
-            query_tags=["users", "create"],
-        ),
     )
+
+    db_user_new: dict = db.execute(
+        text(
+            "INSERT INTO "
+            + settings.db_table_users
+            + " (user_id, email, phone, password_hash, created_at, updated_at) "
+            "VALUES (:user_id, :email, :phone, :password_hash, :created_at, :updated_at) "
+            "RETURNING email, phone, created_at"
+        ),
+        params=user.model_dump(exclude_none=True, mode="json"),
+    ).fetchone()
+    db.commit()
     return ResponseSuccess(
         message="User created successfully",
-        details=dict(user=db_users[0]),
+        details=dict(user=dict(db_user_new._mapping)),
     )
 
 

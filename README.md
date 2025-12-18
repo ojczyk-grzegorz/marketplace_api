@@ -1,8 +1,10 @@
 fastapi
+uv
+ruff
 pydantic
-custom exceptions
-sql model
-pytest
-httpx
+sqlmodel
 sqlalchemy
+starlette exceptions
+pytest
 duckdb
+httpx

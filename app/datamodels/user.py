@@ -1,19 +1,12 @@
+from uuid import uuid4
 import datetime as dt
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 
 
 class UserCreate(BaseModel):
     email: EmailStr
-    password: str
     phone: str
-    first_name: str
-    last_name: str
-    birth_date: dt.date
-    country: str
-    city: str
-    street: str
-    street_number: str
-    postal_code: str
+    password: str = Field(..., exclude=True)
 
 
 class UserUpdate(BaseModel):
@@ -31,20 +24,14 @@ class UserUpdate(BaseModel):
 
 
 class UserDBIn(BaseModel):
-    email: EmailStr | None = None
-    phone: str | None = None
-    first_name: str | None = None
-    last_name: str | None = None
-    birth_date: dt.date | None = None
-    country: str | None = None
-    city: str | None = None
-    street: str | None = None
-    street_number: str | None = None
-    postal_code: str | None = None
+    model_config = ConfigDict(extra="ignore")
 
-    created_at: dt.datetime | None = None
-    updated_at: dt.datetime | None = None
-    password_hash: str | None = None
+    user_id: str = Field(default_factory=lambda: uuid4().hex)
+    email: EmailStr
+    phone: str
+    created_at: dt.datetime
+    updated_at: dt.datetime
+    password_hash: str
 
 
 class UserDBOut(BaseModel):

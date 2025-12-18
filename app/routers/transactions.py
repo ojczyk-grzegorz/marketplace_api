@@ -18,7 +18,6 @@ from app.datamodels.transaction import (
 )
 from app.datamodels.item import ItemDB
 from app.datamodels.user import UserDBOutDetailed
-from tests.openapi.transactions import TRANSACTION_CREATE
 
 
 router = APIRouter(
@@ -39,7 +38,7 @@ router = APIRouter(
 async def transaction_create(
     req: Request,
     token: str = Depends(oauth2_scheme),
-    req_body: TransactionCreate = Body(..., openapi_examples=TRANSACTION_CREATE),
+    req_body: TransactionCreate = Body(..., openapi_examples={}),
 ):
     settings: Settings = get_settings()
     buyer_id: int = validate_access_token(

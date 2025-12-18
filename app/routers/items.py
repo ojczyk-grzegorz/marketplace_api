@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, status, Query, Path, Request
 
 from app.utils.routers import APIRouteLogging

@@ -4,11 +4,14 @@ from fastapi import FastAPI, Depends
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import users, items, auth, transactions
+from app.routers import user, items, auth, transactions
 from app.utils.logger import get_logger
 from app.utils.configs import get_settings
 from app.utils.middleware import custom_middleware_factory
-from app.utils.request import get_req_id
+from app.utils.db import get_db_session
+
+from sqlalchemy.orm import Session
+from sqlalchemy.sql import text
 
 
 app = FastAPI(tags=["Main"])
@@ -22,7 +25,7 @@ app.add_middleware(
 )
 app.add_middleware(custom_middleware_factory)
 app.include_router(auth.router)
-app.include_router(users.router)
+app.include_router(user.router)
 app.include_router(items.router)
 app.include_router(transactions.router)
 
@@ -31,12 +34,7 @@ logger = get_logger()
 
 
 @app.get("/", description="API home page.", response_class=JSONResponse)
-async def home(
-    req_id: Annotated[str, Depends(get_req_id)],
-):
-    logger.info("Test log message")
-    logger.info({"message": "Home endpoint accessed", "req_id": req_id})
-
+async def home():
     return JSONResponse(
         status_code=200, content={"message": f"Hello from {settings.app_name}!"}
     )
@@ -45,7 +43,8 @@ async def home(
 @app.get(
     "/healthcheck", description="API healthcheck endpoint.", response_class=JSONResponse
 )
-async def home():
+async def home(db: Annotated[Session, Depends(get_db_session)]):
+    db.execute(text("SELECT 1 as test")).fetchone()
     return JSONResponse(
         status_code=200, content={"message": f"{settings.app_name} is healthy!"}
     )
