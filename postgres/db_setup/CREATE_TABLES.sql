@@ -3,92 +3,103 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
-    uid SERIAL PRIMARY KEY,
-    uid_uuid4 UUID DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
+    user_id UUID PRIMARY KEY,
     email VARCHAR(256) UNIQUE NOT NULL,
     phone VARCHAR(16) UNIQUE NOT NULL,
     password_hash VARCHAR(64) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL
 );
 
 
 DROP TABLE IF EXISTS items CASCADE;
 CREATE TABLE items (
-	iid SERIAL PRIMARY KEY,
-	iid_uuid4 UUID DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
-    name VARCHAR(256) NOT NULL,
-    seller_id INT NOT NULL,
-    price NUMERIC NOT NULL,
-    
+	item_id UUID PRIMARY KEY,
+    name VARCHAR(256) NOT NULL,    
     category VARCHAR(32),
-    type VARCHAR(32),
-    style VARCHAR(32),
+    subcategories VARCHAR(32),
+    price NUMERIC NOT NULL,
     brand VARCHAR(64),
-    condition VARCHAR(16),
-    material VARCHAR(32),
-    color VARCHAR(16),
-    pattern VARCHAR(32),
-    size NUMERIC,
-    
-    width VARCHAR(32),
-    fastener VARCHAR(32),
-    heel VARCHAR(32),
-    toe VARCHAR(32),
-    
-    country VARCHAR(4) NOT NULL,
-    city VARCHAR(128) NOT NULL,
-    
+    description TEXT,
+    features JSONB,
+    created_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL
+);
+
+
+DROP TABLE IF EXISTS items_snapshots CASCADE;
+CREATE TABLE items_snapshots (
+	item_id UUID NOT NULL,
+    name VARCHAR(256) NOT NULL,    
+    category VARCHAR(32),
+    subcategories VARCHAR(32),
+    price NUMERIC NOT NULL,
+    brand VARCHAR(64),
+    description TEXT,
+    features JSONB,
     created_at TIMESTAMPTZ NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL,
-    expires_at TIMESTAMPTZ NOT NULL,
+    
+    PRIMARY KEY (item_id, updated_at) 
+);
 
-    description TEXT,
 
-    FOREIGN KEY (seller_id) REFERENCES users(uid)
+DROP TABLE IF EXISTS ground_staff CASCADE;
+CREATE TABLE ground_staff (
+    staff_id UUID PRIMARY KEY,
+    name VARCHAR(128) NOT NULL,
+    role VARCHAR(64) NOT NULL
 );
 
 
 DROP TABLE IF EXISTS transactions CASCADE;
 CREATE TABLE transactions (
-	tid SERIAL PRIMARY KEY,
-	tid_uuid4 UUID DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
-    sold_at TIMESTAMPTZ NOT NULL,
-    item JSONB,
-    seller_uid_uuid4 UUID NOT NULL,
-    buyer_uid_uuid4 UUID NOT NULL,
-    seller_snapshot JSONB,
-    buyer_snapshot JSONB,
-    finilized TIMESTAMPTZ DEFAULT NULL
+	transaction_id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL,
+    delivery_option VARCHAR(32) NOT NULL,
+    delivery_price NUMERIC NOT NULL,
+    transaction_details JSONB NOT NULL,
+    
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+DROP TABLE IF EXISTS transaction_items CASCADE;
+CREATE TABLE transaction_items (
+	transaction_id UUID NOT NULL,
+    item_id UUID NOT NULL,
+    item_updated_at TIMESTAMPTZ NOT NULL,
+    discount_amount NUMERIC,
+    discount_code VARCHAR(64),
+
+    FOREIGN KEY (transaction_id) REFERENCES transactions(transaction_id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id, item_updated_at)  REFERENCES items_snapshots(item_id, updated_at)
 );
 
 
-DROP TABLE IF EXISTS logs_request CASCADE;
-CREATE TABLE logs_request (
-	rid_uuid4 UUID UNIQUE NOT NULL PRIMARY KEY,
-    timestamp TIMESTAMPTZ NOT NULL,
-    url TEXT NOT NULL,
-    method VARCHAR(8) NOT NULL,
-    status_code INT NOT NULL,
-    duration_ms NUMERIC NOT NULL,
-    type VARCHAR(16) NOT NULL,
-    http_version VARCHAR(8) NOT NULL,
-    server JSONB,
-    client JSONB,
-    path TEXT NOT NULL,
-    path_params JSONB,
-    asgi_version VARCHAR(16) NOT NULL,
-    asgi_spec_version VARCHAR(16) NOT NULL,
-    request_headers JSONB,
-    request_body JSONB,
-    response_headers JSONB,
-    response_body JSONB,
-    exception JSONB
+DROP TABLE IF EXISTS transaction_actions CASCADE;
+CREATE TABLE transaction_actions (
+	action_id UUID PRIMARY KEY,
+    transaction_id UUID NOT NULL,
+    action VARCHAR(64) NOT NULL,
+    description TEXT,
+    performed_by UUID NOT NULL,
+    performed_at TIMESTAMPTZ NOT NULL,
+
+    FOREIGN KEY (transaction_id) REFERENCES transactions(transaction_id) ON DELETE CASCADE,
+    FOREIGN KEY (performed_by) REFERENCES ground_staff(staff_id)
 );
 
 
-DROP TABLE IF EXISTS logs_query CASCADE;
-CREATE TABLE logs_query (
-	lid SERIAL PRIMARY KEY,
-    timestamp TIMESTAMPTZ NOT NULL,
-    duration_ms NUMERIC NOT NULL,
-    query_details JSONB
+DROP TABLE IF EXISTS transactions_finalized CASCADE;
+CREATE TABLE transactions_finalized (
+	transaction_id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL,
+    finalized_at TIMESTAMPTZ NOT NULL,
+    delivery_option VARCHAR(32) NOT NULL,
+    delivery_price NUMERIC NOT NULL,
+    transaction_details JSONB NOT NULL,
+    items JSONB NOT NULL,
+    action_history JSONB NOT NULL
 );
