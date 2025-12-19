@@ -1,6 +1,8 @@
 import datetime as dt
 
 from fastapi import APIRouter, status, Body, Depends, Request
+from fastapi.routing import APIRoute
+
 from app.utils.auth import oauth2_scheme, validate_access_token
 from app.datamodels.response import ResponseSuccess
 from app.exceptions.exceptions import (
@@ -8,7 +10,6 @@ from app.exceptions.exceptions import (
     ExcItemNotFound,
 )
 from app.utils.db import db_search_simple, db_insert, db_remove
-from app.utils.routers import APIRouteLogging
 from app.utils.configs import get_settings, Settings
 
 from app.datamodels.transaction import (
@@ -21,7 +22,7 @@ from app.datamodels.user import UserDBOutDetailed
 
 
 router = APIRouter(
-    prefix="/transactions", tags=["Transactions"], route_class=APIRouteLogging
+    prefix="/transactions", tags=["Transactions"], route_class=APIRoute
 )
 
 # CREATE TRANSACTION

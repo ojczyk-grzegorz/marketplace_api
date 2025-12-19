@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, Query, Path, Request
+from fastapi.routing import APIRoute
 
-from app.utils.routers import APIRouteLogging
 from app.utils.configs import get_settings, Settings
 from app.utils.db import get_filter
 from app.exceptions.exceptions import (
@@ -15,7 +15,7 @@ from app.datamodels.item import (
 )
 
 
-router = APIRouter(prefix="/items", tags=["Items"], route_class=APIRouteLogging)
+router = APIRouter(prefix="/items", tags=["Items"], route_class=APIRoute)
 
 # QUERY ITEMS
 # GET ITEM BY ID
