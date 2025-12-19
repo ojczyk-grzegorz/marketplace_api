@@ -18,7 +18,7 @@ class UserUpdate(BaseModel):
 class UserDBIn(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
-    user_id:  UUID = Field(default_factory=lambda: uuid4())
+    user_id: UUID = Field(default_factory=lambda: uuid4())
     email: EmailStr
     phone: str
     created_at: dt.datetime

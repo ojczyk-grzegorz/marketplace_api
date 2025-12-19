@@ -7,9 +7,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
-from app.utils.routers import APIRouteLogging
 from app.utils.configs import get_settings, Settings
-from app.utils.db import get_db_session, db_search_simple
+from app.utils.db import get_db_session
 from app.utils.auth import get_access_token, verify_password
 from app.datamodels.auth import Token
 from app.exceptions.exceptions import ExcInvalidCredentials

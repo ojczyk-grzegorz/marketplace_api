@@ -7,11 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 from app.utils.db import (
     get_db_session,
-    db_search_simple,
-    db_insert,
-    db_remove,
 )
-from app.utils.routers import APIRouteLogging
 from app.utils.configs import get_settings, Settings
 from app.utils.auth import get_password_hash
 from app.datamodels.user import (
@@ -29,9 +25,6 @@ from app.utils.auth import validate_access_token, oauth2_scheme
 
 
 router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRoute)
-
-
-# UPDATE EMAIL/PHONE/PASSWORD
 
 
 @router.post(
@@ -142,10 +135,12 @@ async def user_update(
         raise ExcUserNotFound(
             user_id=user_id,
         )
-    user_db_in = UserDBIn.model_validate({
-        **db_user_matching._mapping,
-        **user.model_dump(exclude_none=True),
-    })
+    user_db_in = UserDBIn.model_validate(
+        {
+            **db_user_matching._mapping,
+            **user.model_dump(exclude_none=True),
+        }
+    )
     user_db_in.updated_at = dt.datetime.now(dt.timezone.utc)
     if user.password:
         user_db_in.password_hash = get_password_hash(user.password)
@@ -153,13 +148,17 @@ async def user_update(
     db_user_updated: dict = db.execute(
         text(
             "UPDATE"
-            + " " + settings.db_table_users
+            + " "
+            + settings.db_table_users
             + " SET"
             + " user_id = :user_id, email = :email, phone = :phone, password_hash = :password_hash, created_at = :created_at, updated_at = :updated_at"
             + " WHERE user_id = :user_id"
             + " RETURNING email, phone, updated_at"
         ),
-        params={"user_id": user_id, **user_db_in.model_dump(exclude_none=True, mode="json")},
+        params={
+            "user_id": user_id,
+            **user_db_in.model_dump(exclude_none=True, mode="json"),
+        },
     ).fetchone()
     db.commit()
     return ResponseSuccess(
