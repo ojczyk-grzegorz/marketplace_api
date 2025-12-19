@@ -1,7 +1,7 @@
 import datetime as dt
 
 from typing import Annotated
-from fastapi import APIRouter, Body, status, Depends, Request
+from fastapi import APIRouter, Body, status, Depends
 from fastapi.routing import APIRoute
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
@@ -15,8 +15,8 @@ from app.utils.routers import APIRouteLogging
 from app.utils.configs import get_settings, Settings
 from app.utils.auth import get_password_hash
 from app.datamodels.user import (
-    UserDBOutDetailed,
     UserCreate,
+    UserUpdate,
     UserDBIn,
 )
 from app.datamodels.response import ResponseSuccess
@@ -31,9 +31,7 @@ from app.utils.auth import validate_access_token, oauth2_scheme
 router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRoute)
 
 
-# CREATE USER
 # UPDATE EMAIL/PHONE/PASSWORD
-# REMOVE USER
 
 
 @router.post(
@@ -59,7 +57,7 @@ async def user_create(
         },
     ),
 ):
-    db_users_matching = db.execute(
+    db_user_matching = db.execute(
         text(
             "SELECT email, phone FROM "
             + settings.db_table_users
@@ -67,13 +65,13 @@ async def user_create(
         ),
         params={"email": user.email, "phone": user.phone},
     ).fetchone()
-    if db_users_matching:
+    if db_user_matching:
         raise ExcUserExists(
             email=user.email
-            if db_users_matching._mapping["email"] == user.email
+            if db_user_matching._mapping["email"] == user.email
             else None,
             phone=user.phone
-            if db_users_matching._mapping["phone"] == user.phone
+            if db_user_matching._mapping["phone"] == user.phone
             else None,
         )
 
@@ -103,6 +101,73 @@ async def user_create(
     )
 
 
+@router.patch(
+    "/update",
+    status_code=status.HTTP_201_CREATED,
+    response_model=ResponseSuccess,
+    description="Route for creating user",
+)
+async def user_update(
+    settings: Annotated[Settings, Depends(get_settings)],
+    db: Annotated[Session, Depends(get_db_session)],
+    token: Annotated[str, Depends(oauth2_scheme)],
+    user: UserUpdate = Body(
+        ...,
+        openapi_examples={
+            "example1": {
+                "summary": "Example user creation payload",
+                "value": {
+                    "email": "user2@example.com",
+                    "phone": "+48234567891",
+                    "password": "strongpassword456",
+                },
+            }
+        },
+    ),
+):
+    user_id = validate_access_token(
+        token=token,
+        secret_key=settings.auth_secret_key,
+        algorithms=[settings.auth_algorithm],
+    )
+    db_user_matching = db.execute(
+        text(
+            "SELECT * FROM "
+            + settings.db_table_users
+            + " WHERE user_id = :user_id LIMIT 1"
+        ),
+        params={"user_id": user_id},
+    ).fetchone()
+    if not db_user_matching:
+        raise ExcUserNotFound(
+            user_id=user_id,
+        )
+    user_db_in = UserDBIn.model_validate({
+        **db_user_matching._mapping,
+        **user.model_dump(exclude_none=True),
+    })
+    user_db_in.updated_at = dt.datetime.now(dt.timezone.utc)
+    if user.password:
+        user_db_in.password_hash = get_password_hash(user.password)
+
+    db_user_updated: dict = db.execute(
+        text(
+            "UPDATE"
+            + " " + settings.db_table_users
+            + " SET"
+            + " user_id = :user_id, email = :email, phone = :phone, password_hash = :password_hash, created_at = :created_at, updated_at = :updated_at"
+            + " WHERE user_id = :user_id"
+            + " RETURNING email, phone, updated_at"
+        ),
+        params={"user_id": user_id, **user_db_in.model_dump(exclude_none=True, mode="json")},
+    ).fetchone()
+    db.commit()
+    return ResponseSuccess(
+        message="User updated successfully",
+        details=dict(user=dict(db_user_updated._mapping)),
+    )
+
+
 @router.delete(
     "/remove",
     status_code=status.HTTP_202_ACCEPTED,
@@ -110,69 +175,60 @@ async def user_create(
     description="Route for creating user",
 )
 async def user_remove(
-    req: Request,
+    settings: Annotated[Settings, Depends(get_settings)],
+    db: Annotated[Session, Depends(get_db_session)],
     token: str = Depends(oauth2_scheme),
 ):
-    settings: Settings = get_settings()
     user_id = validate_access_token(
         token=token,
         secret_key=settings.auth_secret_key,
         algorithms=[settings.auth_algorithm],
     )
 
-    db_users = db_search_simple(
-        settings.db_table_users,
-        ["uid_uuid4"],
-        f"uid = {user_id}",
-        "LIMIT 1",
-        log_kwargs=dict(
-            request_id=req.uuid4,
-            query_tags=["users", "remove"],
+    db_user_matching = db.execute(
+        text(
+            "SELECT user_id FROM "
+            + settings.db_table_users
+            + " WHERE user_id = :user_id LIMIT 1"
         ),
-    )
-    if not db_users:
+        params={"user_id": user_id},
+    ).fetchone()
+
+    if not db_user_matching:
         raise ExcUserNotFound(user_id=user_id)
 
-    uid_uuid4 = db_users[0]["uid_uuid4"]
-    transaction_ids = db_search_simple(
-        settings.db_table_transactions,
-        ["tid"],
-        f"finilized IS NULL AND (buyer_uid_uuid4 = '{uid_uuid4}' OR seller_uid_uuid4 = '{uid_uuid4}')",
-        log_kwargs=dict(
-            request_id=req.uuid4,
-            query_tags=["users", "remove"],
+    db_user_tranasactions = db.execute(
+        text(
+            "SELECT transaction_id FROM "
+            + settings.db_table_transactions
+            + " WHERE user_id = :user_id"
         ),
-    )
-    if transaction_ids:
+        params={"user_id": user_id},
+    ).fetchall()
+    if db_user_tranasactions:
         raise ExcTransactionsFound(
             user_id=user_id,
-            details=dict(transaction_ids=[t["tid"] for t in transaction_ids]),
+            details=dict(
+                transaction_ids=[
+                    t._mapping["transaction_id"] for t in db_user_tranasactions
+                ]
+            ),
         )
 
-    db_remove(
-        settings.db_table_items,
-        f"seller_id = {user_id}",
-        columns_out=["iid"],
-        log_kwargs=dict(
-            request_id=req.uuid4,
-            query_tags=["items", "remove"],
+    db_user_removed = db.execute(
+        text(
+            "DELETE FROM "
+            + settings.db_table_users
+            + " WHERE user_id = :user_id RETURNING email"
         ),
-    )
-    db_users = db_remove(
-        table=settings.db_table_users,
-        where=f"uid = {user_id}",
-        columns_out=["email"],
-        log_kwargs=dict(
-            request_id=req.uuid4,
-            query_tags=["users", "remove"],
-        ),
-    )
+        params={"user_id": user_id},
+    ).fetchone()
+    db.commit()
 
     return ResponseSuccess(
         message="User removed successfully",
         details={
-            "email": db_users[0]["email"],
-            "uid": user_id,
-            "uid_uuid4": uid_uuid4,
+            "user_id": user_id,
+            "email": db_user_removed._mapping["email"],
         },
     )

@@ -1,6 +1,7 @@
 from typing import Annotated
 
-from fastapi import APIRouter, status, Depends, Request
+from fastapi import APIRouter, status, Depends
+from fastapi.routing import APIRoute
 from fastapi.security import OAuth2PasswordRequestForm
 
 from sqlalchemy.orm import Session
@@ -14,7 +15,7 @@ from app.datamodels.auth import Token
 from app.exceptions.exceptions import ExcInvalidCredentials
 
 
-router = APIRouter(prefix="/auth", tags=["Authentication"], route_class=APIRouteLogging)
+router = APIRouter(prefix="/auth", tags=["Authentication"], route_class=APIRoute)
 
 
 # TOKEN GENERATION
@@ -31,32 +32,28 @@ async def get_token(
     settings: Annotated[Settings, Depends(get_settings)],
     db: Annotated[Session, Depends(get_db_session)],
 ):
-    # users = db_search_simple(
-    #     settings.db_table_users,
-    #     ["uid", "email", "password_hash"],
-    #     f"email = '{form.username}'",
-    #     "LIMIT 1",
-    #     log_kwargs=dict(
-    #         request_id=req.uuid4,
-    #         query_tags=["token", "get"],
-    #     ),
-    # )
-    # user = users[0] if users else None
-    # if not user or not verify_password(form.password, user["password_hash"]):
-    #     raise ExcInvalidCredentials()
+    db_user_matching = db.execute(
+        text(
+            "SELECT user_id, password_hash FROM "
+            + settings.db_table_users
+            + " WHERE email = :email"
+        ),
+        params={"email": form.username},
+    ).fetchone()
 
-    # token = get_access_token(
-    #     data={"user_id": user["uid"]},
-    #     secret_key=settings.auth_secret_key,
-    #     algorithm=settings.auth_algorithm,
-    #     expire_minutes=settings.auth_access_token_expire_minutes,
-    # )
+    if not db_user_matching or not verify_password(
+        form.password, db_user_matching._mapping["password_hash"]
+    ):
+        raise ExcInvalidCredentials()
 
-    # return Token(
-    #     access_token=token,
-    #     token_type="bearer",
-    # )
+    token = get_access_token(
+        data={"user_id": db_user_matching._mapping["user_id"].hex},
+        secret_key=settings.auth_secret_key,
+        algorithm=settings.auth_algorithm,
+        expire_minutes=settings.auth_access_token_expire_minutes,
+    )
+
     return Token(
-        access_token="mocked_access_token",
+        access_token=token,
         token_type="bearer",
     )
