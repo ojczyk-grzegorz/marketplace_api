@@ -21,9 +21,7 @@ from app.datamodels.item import ItemDB
 from app.datamodels.user import UserDBOutDetailed
 
 
-router = APIRouter(
-    prefix="/transactions", tags=["Transactions"], route_class=APIRoute
-)
+router = APIRouter(prefix="/transactions", tags=["Transactions"], route_class=APIRoute)
 
 # CREATE TRANSACTION
 # SEE CURRENT TRANSACTIONS

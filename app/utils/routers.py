@@ -120,4 +120,3 @@ def save_log_request(log_request: LogRequest) -> None:
     timestamp = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M")
     with open(os.path.join(DIR_LOGS_REQUEST, timestamp + ".log"), "a") as log_file:
         log_file.write("\n" + log_request.model_dump_json())
-

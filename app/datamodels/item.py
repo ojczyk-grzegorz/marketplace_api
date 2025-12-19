@@ -1,7 +1,22 @@
 import datetime as dt
+from uuid import UUID
+
 from pydantic import BaseModel, Field
 
 from app.datamodels.user import UserDBOut
+
+
+class Item(BaseModel):
+    item_id: UUID | None = None
+    name: str | None = None
+    category: str | None = None
+    subcategories: str | None = None
+    price: float | None = None
+    brand: str | None = None
+    description: str | None = None
+    features: dict | None = None
+    created_at: dt.datetime | None = None
+    updated_at: dt.datetime | None = None
 
 
 class ItemDBToList(BaseModel):

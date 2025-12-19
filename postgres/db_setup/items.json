@@ -1,0 +1,422 @@
+[
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440001",
+    "name": "iPhone 14 Pro Max 256GB",
+    "category": "Electronics",
+    "subcategories": "Smartphones",
+    "price": 1199.99,
+    "brand": "Apple",
+    "description": "Latest iPhone with ProRAW photography, A16 Bionic chip, and Dynamic Island. Unlocked and brand new in original packaging.",
+    "features": {
+      "storage": "256GB",
+      "color": "Deep Purple",
+      "condition": "New",
+      "warranty": "1 Year Apple Warranty",
+      "unlocked": true,
+      "camera": "48MP Main + 12MP Ultra Wide + 12MP Telephoto",
+      "battery_life": "Up to 29 hours video playback"
+    },
+    "created_at": "2024-12-19T10:00:00Z",
+    "updated_at": "2024-12-19T10:00:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440002",
+    "name": "Nike Air Jordan 1 Retro High OG",
+    "category": "Fashion",
+    "subcategories": "Footwear",
+    "price": 179.99,
+    "brand": "Nike",
+    "description": "Classic Air Jordan 1 in Chicago colorway. Size 10.5 US, excellent condition with original box.",
+    "features": {
+      "size": "10.5 US",
+      "colorway": "Chicago",
+      "condition": "Excellent",
+      "original_box": true,
+      "year": "2022",
+      "material": "Leather",
+      "style_code": "555088-101"
+    },
+    "created_at": "2024-12-19T10:15:00Z",
+    "updated_at": "2024-12-19T10:15:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440003",
+    "name": "MacBook Pro 14-inch M2 Pro",
+    "category": "Electronics",
+    "subcategories": "Laptops",
+    "price": 2499.00,
+    "brand": "Apple",
+    "description": "Professional laptop with M2 Pro chip, 16GB RAM, 1TB SSD. Perfect for developers and creative professionals.",
+    "features": {
+      "processor": "M2 Pro",
+      "ram": "16GB",
+      "storage": "1TB SSD",
+      "screen_size": "14-inch",
+      "color": "Space Gray",
+      "ports": ["3x Thunderbolt 4", "HDMI", "SDXC", "MagSafe 3"],
+      "battery_life": "Up to 18 hours"
+    },
+    "created_at": "2024-12-19T10:30:00Z",
+    "updated_at": "2024-12-19T10:30:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440004",
+    "name": "Vintage Fender Stratocaster 1982",
+    "category": "Music",
+    "subcategories": "Guitars",
+    "price": 3200.00,
+    "brand": "Fender",
+    "description": "Authentic 1982 Fender Stratocaster in Sunburst finish. Well-maintained with original hardcase. Some minor wear consistent with age.",
+    "features": {
+      "year": "1982",
+      "finish": "3-Color Sunburst",
+      "neck": "Maple",
+      "pickups": "Single-coil",
+      "condition": "Very Good",
+      "case_included": true,
+      "serial_number": "S961234",
+      "made_in": "USA"
+    },
+    "created_at": "2024-12-19T11:00:00Z",
+    "updated_at": "2024-12-19T11:00:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440005",
+    "name": "PlayStation 5 Console",
+    "category": "Electronics",
+    "subcategories": "Gaming",
+    "price": 499.99,
+    "brand": "Sony",
+    "description": "Brand new PlayStation 5 console with DualSense controller. Includes all original accessories and packaging.",
+    "features": {
+      "model": "Standard Edition",
+      "storage": "825GB SSD",
+      "controller": "DualSense Wireless",
+      "condition": "New",
+      "warranty": "1 Year Sony Warranty",
+      "ray_tracing": true,
+      "4k_gaming": true,
+      "backward_compatible": true
+    },
+    "created_at": "2024-12-19T11:30:00Z",
+    "updated_at": "2024-12-19T11:30:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440006",
+    "name": "Rolex Submariner Date",
+    "category": "Fashion",
+    "subcategories": "Watches",
+    "price": 12500.00,
+    "brand": "Rolex",
+    "description": "Authentic Rolex Submariner Date 116610LN. Black dial and bezel, excellent condition with box and papers.",
+    "features": {
+      "model": "116610LN",
+      "movement": "Automatic",
+      "case_size": "40mm",
+      "material": "Stainless Steel",
+      "water_resistance": "300m",
+      "box_papers": true,
+      "condition": "Excellent",
+      "year": "2019"
+    },
+    "created_at": "2024-12-19T12:00:00Z",
+    "updated_at": "2024-12-19T12:00:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440007",
+    "name": "Herman Miller Aeron Chair Size B",
+    "category": "Furniture",
+    "subcategories": "Office",
+    "price": 895.00,
+    "brand": "Herman Miller",
+    "description": "Ergonomic office chair in excellent condition. Size B (medium), graphite frame with classic carbon pellicle.",
+    "features": {
+      "size": "B (Medium)",
+      "color": "Graphite/Carbon",
+      "adjustable_arms": true,
+      "lumbar_support": true,
+      "tilt_limiter": true,
+      "condition": "Excellent",
+      "warranty_remaining": "8 years",
+      "manufacture_year": "2023"
+    },
+    "created_at": "2024-12-19T12:30:00Z",
+    "updated_at": "2024-12-19T12:30:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440008",
+    "name": "Canon EOS R5 Mirrorless Camera",
+    "category": "Electronics",
+    "subcategories": "Cameras",
+    "price": 3899.00,
+    "brand": "Canon",
+    "description": "Professional full-frame mirrorless camera with 45MP sensor. Includes original accessories and one extra battery.",
+    "features": {
+      "sensor": "45MP Full-Frame CMOS",
+      "video": "8K RAW, 4K 120p",
+      "image_stabilization": "In-body 8-stop",
+      "autofocus": "1053-point Dual Pixel CMOS AF II",
+      "condition": "Like New",
+      "shutter_count": "1,247",
+      "extra_battery": true,
+      "memory_card": "CFexpress Type B + SD"
+    },
+    "created_at": "2024-12-19T13:00:00Z",
+    "updated_at": "2024-12-19T13:00:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440009",
+    "name": "Patagonia Better Sweater Jacket",
+    "category": "Fashion",
+    "subcategories": "Outerwear",
+    "price": 119.00,
+    "brand": "Patagonia",
+    "description": "Cozy fleece jacket in Navy Blue, size Large. Great for layering, minimal wear. Made from recycled polyester.",
+    "features": {
+      "size": "Large",
+      "color": "Navy Blue",
+      "material": "100% Recycled Polyester Fleece",
+      "pockets": "2 hand-warmer pockets",
+      "full_zip": true,
+      "condition": "Very Good",
+      "care": "Machine washable",
+      "season": "Fall/Winter"
+    },
+    "created_at": "2024-12-19T13:30:00Z",
+    "updated_at": "2024-12-19T13:30:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440010",
+    "name": "KitchenAid Artisan Stand Mixer",
+    "category": "Home",
+    "subcategories": "Appliances",
+    "price": 379.99,
+    "brand": "KitchenAid",
+    "description": "5-quart tilt-head stand mixer in Empire Red. Includes dough hook, flat beater, and wire whip attachments.",
+    "features": {
+      "capacity": "5 Quart",
+      "type": "Tilt-Head",
+      "color": "Empire Red",
+      "motor": "325 Watts",
+      "attachments": ["Dough Hook", "Flat Beater", "Wire Whip"],
+      "condition": "Excellent",
+      "model": "KSM150PSER",
+      "warranty": "1 Year"
+    },
+    "created_at": "2024-12-19T14:00:00Z",
+    "updated_at": "2024-12-19T14:00:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440011",
+    "name": "Trek Domane AL 2 Road Bike",
+    "category": "Sports",
+    "subcategories": "Bicycles",
+    "price": 829.99,
+    "brand": "Trek",
+    "description": "Lightweight aluminum road bike, size 56cm. Great for commuting and weekend rides. Recently serviced with new tires.",
+    "features": {
+      "frame_size": "56cm",
+      "material": "Alpha Aluminum",
+      "gears": "16-speed",
+      "brakes": "Rim brakes",
+      "wheels": "Bontrager Affinity",
+      "condition": "Very Good",
+      "recent_service": true,
+      "new_tires": true
+    },
+    "created_at": "2024-12-19T14:30:00Z",
+    "updated_at": "2024-12-19T14:30:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440012",
+    "name": "Nintendo Switch OLED Model",
+    "category": "Electronics",
+    "subcategories": "Gaming",
+    "price": 349.99,
+    "brand": "Nintendo",
+    "description": "7-inch OLED screen Nintendo Switch with enhanced audio and 64GB internal storage. Includes dock and Joy-Con controllers.",
+    "features": {
+      "screen": "7-inch OLED",
+      "storage": "64GB Internal",
+      "controllers": "Joy-Con (L/R)",
+      "dock_included": true,
+      "kickstand": "Wide adjustable",
+      "condition": "Like New",
+      "color": "White",
+      "ethernet_port": true
+    },
+    "created_at": "2024-12-19T15:00:00Z",
+    "updated_at": "2024-12-19T15:00:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440013",
+    "name": "Levi's 501 Original Jeans",
+    "category": "Fashion",
+    "subcategories": "Denim",
+    "price": 59.50,
+    "brand": "Levi's",
+    "description": "Classic straight-leg jeans in medium wash. Size 32x32, excellent condition with minimal fading.",
+    "features": {
+      "size": "32x32",
+      "fit": "Original Straight",
+      "wash": "Medium Blue",
+      "material": "100% Cotton Denim",
+      "button_fly": true,
+      "condition": "Excellent",
+      "shrink_to_fit": false,
+      "made_in": "Mexico"
+    },
+    "created_at": "2024-12-19T15:30:00Z",
+    "updated_at": "2024-12-19T15:30:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440014",
+    "name": "Dyson V15 Detect Cordless Vacuum",
+    "category": "Home",
+    "subcategories": "Appliances",
+    "price": 749.99,
+    "brand": "Dyson",
+    "description": "Advanced cordless vacuum with laser dust detection and LCD screen. Includes multiple attachments for different surfaces.",
+    "features": {
+      "battery_life": "60 minutes",
+      "laser_detection": true,
+      "lcd_screen": true,
+      "filtration": "HEPA",
+      "attachments": ["Laser Slim Fluffy", "Digital Motorbar", "Hair screw tool", "Combination tool", "Crevice tool"],
+      "condition": "Like New",
+      "warranty": "2 Years",
+      "bin_capacity": "0.77L"
+    },
+    "created_at": "2024-12-19T16:00:00Z",
+    "updated_at": "2024-12-19T16:00:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440015",
+    "name": "Adidas Ultraboost 22 Running Shoes",
+    "category": "Fashion",
+    "subcategories": "Footwear",
+    "price": 129.99,
+    "brand": "Adidas",
+    "description": "High-performance running shoes with Boost midsole technology. Size 9.5 US, Core Black colorway, lightly used.",
+    "features": {
+      "size": "9.5 US",
+      "color": "Core Black/Solar Red",
+      "technology": "Boost Midsole",
+      "upper": "Primeknit+",
+      "outsole": "Continental Rubber",
+      "condition": "Very Good",
+      "usage": "Light running, ~50 miles",
+      "original_box": true
+    },
+    "created_at": "2024-12-19T16:30:00Z",
+    "updated_at": "2024-12-19T16:30:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440016",
+    "name": "iPad Pro 12.9-inch M2 Wi-Fi 256GB",
+    "category": "Electronics",
+    "subcategories": "Tablets",
+    "price": 1099.00,
+    "brand": "Apple",
+    "description": "Latest iPad Pro with M2 chip and Liquid Retina XDR display. Space Gray, 256GB storage. Includes USB-C cable and adapter.",
+    "features": {
+      "storage": "256GB",
+      "connectivity": "Wi-Fi",
+      "color": "Space Gray",
+      "display": "12.9-inch Liquid Retina XDR",
+      "chip": "M2",
+      "cameras": "12MP Wide, 10MP Ultra Wide",
+      "condition": "New",
+      "apple_pencil_support": "2nd Generation",
+      "thunderbolt": true
+    },
+    "created_at": "2024-12-19T17:00:00Z",
+    "updated_at": "2024-12-19T17:00:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440017",
+    "name": "Yeti Rambler 30oz Tumbler",
+    "category": "Home",
+    "subcategories": "Drinkware",
+    "price": 39.99,
+    "brand": "Yeti",
+    "description": "Double-wall vacuum insulated tumbler with MagSlider lid. Keeps drinks cold for hours, dishwasher safe.",
+    "features": {
+      "capacity": "30oz",
+      "material": "18/8 Stainless Steel",
+      "insulation": "Double-wall vacuum",
+      "lid": "MagSlider",
+      "color": "Navy",
+      "dishwasher_safe": true,
+      "condition": "Like New",
+      "no_sweat_design": true
+    },
+    "created_at": "2024-12-19T17:30:00Z",
+    "updated_at": "2024-12-19T17:30:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440018",
+    "name": "Bose QuietComfort 45 Headphones",
+    "category": "Electronics",
+    "subcategories": "Audio",
+    "price": 279.00,
+    "brand": "Bose",
+    "description": "Wireless noise-cancelling headphones with 24-hour battery life. Midnight Blue color, excellent sound quality.",
+    "features": {
+      "noise_cancellation": "Active",
+      "battery_life": "24 hours",
+      "connectivity": ["Bluetooth 5.1", "3.5mm aux"],
+      "color": "Midnight Blue",
+      "microphone": "Built-in for calls",
+      "condition": "Excellent",
+      "case_included": true,
+      "quick_charge": "15 min = 3 hours playback"
+    },
+    "created_at": "2024-12-19T18:00:00Z",
+    "updated_at": "2024-12-19T18:00:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440019",
+    "name": "Ray-Ban Aviator Classic Sunglasses",
+    "category": "Fashion",
+    "subcategories": "Accessories",
+    "price": 154.00,
+    "brand": "Ray-Ban",
+    "description": "Iconic aviator sunglasses with gold frame and green classic G-15 lenses. Size 58mm, comes with original case.",
+    "features": {
+      "frame_color": "Gold",
+      "lens_color": "Green Classic G-15",
+      "size": "58mm",
+      "bridge": "14mm",
+      "temple": "135mm",
+      "uv_protection": "100%",
+      "condition": "Excellent",
+      "case_included": true,
+      "model": "RB3025"
+    },
+    "created_at": "2024-12-19T18:30:00Z",
+    "updated_at": "2024-12-19T18:30:00Z"
+  },
+  {
+    "item_id": "550e8400-e29b-41d4-a716-446655440020",
+    "name": "Samsung 32-inch Odyssey G7 Gaming Monitor",
+    "category": "Electronics",
+    "subcategories": "Monitors",
+    "price": 599.99,
+    "brand": "Samsung",
+    "description": "1440p curved gaming monitor with 240Hz refresh rate and 1ms response time. Perfect for competitive gaming.",
+    "features": {
+      "screen_size": "32 inches",
+      "resolution": "2560 x 1440 (QHD)",
+      "refresh_rate": "240Hz",
+      "response_time": "1ms",
+      "curvature": "1000R",
+      "panel_type": "VA",
+      "hdr": "HDR600",
+      "condition": "Like New",
+      "ports": ["2x HDMI 2.1", "1x DisplayPort 1.4", "2x USB 3.0"]
+    },
+    "created_at": "2024-12-19T19:00:00Z",
+    "updated_at": "2024-12-19T19:00:00Z"
+  }
+]

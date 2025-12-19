@@ -1,5 +1,9 @@
-from fastapi import APIRouter, status, Query, Path, Request
+from typing import Annotated
+
+from fastapi import APIRouter, status, Query, Path, Request, Depends
 from fastapi.routing import APIRoute
+
+from sqlalchemy.orm import Session
 
 from app.utils.configs import get_settings, Settings
 from app.utils.db import get_filter
@@ -8,6 +12,7 @@ from app.exceptions.exceptions import (
 )
 from app.utils.db import db_search_simple
 from app.datamodels.item import (
+    Item,
     ItemDB,
     ItemDBToList,
     QueryItems,
@@ -29,10 +34,10 @@ router = APIRouter(prefix="/items", tags=["Items"], route_class=APIRoute)
     response_model_exclude_none=True,
 )
 async def get_items(
-    req: Request,
-    query_items: QueryItems = Query(QueryItems()),
+    query_items: Annotated[Item, Query(QueryItems())],
+    settings: Annotated[Settings, Depends(get_settings)],
+    db: Annotated[Session, Depends(get_settings)],
 ):
-    settings: Settings = get_settings()
 
     filters = []
     for column, value in query_items.model_dump(
