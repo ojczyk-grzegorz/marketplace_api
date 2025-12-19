@@ -22,6 +22,7 @@ dependencies = [
     "psycopg2>=2.9.11",
     "sqlalchemy>=2.0.44",
     "bcrypt>=5.0.0",
+    "sqlmodel>=0.0.27",
 ]
 
 [dependency-groups]

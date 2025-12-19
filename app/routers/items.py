@@ -1,84 +1,72 @@
 from typing import Annotated
 
-from fastapi import APIRouter, status, Query, Path, Request, Depends
+from fastapi import APIRouter, status, Query, Path, Depends
 from fastapi.routing import APIRoute
 
-from sqlalchemy.orm import Session
-from sqlalchemy.sql import text
+from sqlmodel import Session, select
+import uuid
 
-from app.utils.configs import get_settings, Settings
-from app.utils.db import get_filter, get_db_session
-from app.exceptions.exceptions import (
-    ExcItemNotFound,
-)
-from app.utils.db import db_search_simple
+from app.utils.db import get_db_session_sql_model
 from app.datamodels.item import (
     Item,
-    ItemDB,
-    ItemDBToList,
-    QueryItems,
-    ItemsQuery,
+    QueryItemMultiple,
+    QueryItemSingle,
 )
+
+from app.dbmodels.dbmodels import ItemSQL
 
 
 router = APIRouter(prefix="/items", tags=["Items"], route_class=APIRoute)
-
-# QUERY ITEMS
-# GET ITEM BY ID
 
 
 @router.get(
     "/query",
     status_code=status.HTTP_200_OK,
-    response_model=ItemsQuery,
+    response_model=QueryItemMultiple,
     description="Query items based on various filters",
     response_model_exclude_none=True,
 )
 async def get_items(
     query_items: Annotated[Item, Query()],
-    settings: Annotated[Settings, Depends(get_settings)],
-    db: Annotated[Session, Depends(get_db_session)],
+    db: Annotated[Session, Depends(get_db_session_sql_model)],
 ):
-    q = query_items.model_dump(exclude_none=True, mode="json")
-    db_items_matching = db.execute(
-        text(
-            "SELECT "
-            + ", ".join(q.keys())
-            + " FROM " + settings.db_table_items
-            + " WHERE "
-            + " AND".join([f" {key} = :{key}" for key in q.keys()])
-        ),
-        params=q,
-    ).fetchall()
+    query = select(ItemSQL)
+    if query_items.search:
+        query = query.where(
+            ItemSQL.name.ilike(f"%{query_items.search}%")
+            | ItemSQL.description.ilike(f"%{query_items.search}%")
+        )
+    if query_items.category:
+        query = query.where(ItemSQL.category == query_items.category)
+    if query_items.subcategory:
+        query = query.where(ItemSQL.subcategories.contains(query_items.subcategory))
+    if query_items.price:
+        if query_items.price[0]:
+            query = query.where(ItemSQL.price >= query_items.price[0])
+        if query_items.price[1]:
+            query = query.where(ItemSQL.price <= query_items.price[1])
+    if query_items.brand:
+        query = query.where(ItemSQL.brand == query_items.brand)
 
-
-    return ItemsQuery(
+    return QueryItemMultiple(
         q=query_items,
-        items=[x._mapping for x in db_items_matching],
+        items=[x.model_dump() for x in db.exec(query)],
     )
 
 
 @router.get(
-    "/item/{iid}",
+    "/item/{item_id}",
     status_code=status.HTTP_200_OK,
-    response_model=ItemDB,
+    response_model=QueryItemSingle,
     description="Get item by its ID",
 )
 async def get_item(
-    req: Request,
-    iid: int = Path(...),
+    db: Annotated[Session, Depends(get_db_session_sql_model)],
+    item_id: uuid.UUID = Path(...),
 ):
-    settings: Settings = get_settings()
-    db_items = db_search_simple(
-        table=settings.db_table_items,
-        columns=ItemDB.model_fields.keys(),
-        where=f"iid = {iid}",
-        log_kwargs=dict(
-            request_id=req.uuid4,
-            query_tags=["items", "get"],
-        ),
+    query = select(ItemSQL).where(ItemSQL.item_id == item_id)
+    item = db.exec(query).first()
+    return QueryItemSingle(
+        item_id=item_id,
+        item=item.model_dump() if item else None,
     )
-
-    if not db_items:
-        raise ExcItemNotFound(item_id=iid)
-    return db_items[0]

@@ -3,10 +3,11 @@ import datetime as dt
 from typing import Annotated
 from fastapi import APIRouter, Body, status, Depends
 from fastapi.routing import APIRoute
-from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
+from sqlmodel import Session, select
 from app.utils.db import (
     get_db_session,
+    get_db_session_sql_model,
 )
 from app.utils.configs import get_settings, Settings
 from app.utils.auth import get_password_hash
@@ -16,6 +17,7 @@ from app.datamodels.user import (
     UserDBIn,
 )
 from app.datamodels.response import ResponseSuccess
+from app.dbmodels.dbmodels import UserSQL
 from app.exceptions.exceptions import (
     ExcUserNotFound,
     ExcUserExists,
@@ -35,7 +37,7 @@ router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRoute)
 )
 async def user_create(
     settings: Annotated[Settings, Depends(get_settings)],
-    db: Annotated[Session, Depends(get_db_session)],
+    db: Annotated[Session, Depends(get_db_session_sql_model)],
     user: UserCreate = Body(
         ...,
         openapi_examples={
@@ -50,18 +52,15 @@ async def user_create(
         },
     ),
 ):
-    db_user_matching = db.execute(
-        text(
-            "SELECT email, phone FROM "
-            + settings.db_table_users
-            + " WHERE email = :email OR phone = :phone LIMIT 1"
-        ),
-        params={"email": user.email, "phone": user.phone},
-    ).fetchone()
+    query = select(UserSQL).where(
+        (UserSQL.email == user.email)
+        | (UserSQL.phone == user.phone)
+    )
+    db_user_matching: UserSQL | None = db.exec(query).first(),
     if db_user_matching:
         raise ExcUserExists(
             email=user.email
-            if db_user_matching._mapping["email"] == user.email
+            if db_user_matching.email == user.email
             else None,
             phone=user.phone
             if db_user_matching._mapping["phone"] == user.phone

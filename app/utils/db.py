@@ -10,6 +10,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import QueuePool
 
+from sqlmodel import Session
+
 from app.utils.configs import Settings, get_settings
 from app.constants.constants import DIR_LOGS_QUERY
 
@@ -37,6 +39,14 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def get_db_session():
     db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+def get_db_session_sql_model():
+    db = Session(engine)
     try:
         yield db
     finally:

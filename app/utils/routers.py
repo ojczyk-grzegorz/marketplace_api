@@ -1,18 +1,13 @@
-from uuid import uuid4
-import time
 import os
 import datetime as dt
-from typing import Callable
 import json
 import traceback
 
 from fastapi import Request, Response
-from fastapi.routing import APIRoute
 
 from app.datamodels.log import LogRequest
 from app.constants.constants import DIR_LOGS_REQUEST
 
-from app.exceptions.handlers import EXCEPTION_HANDLERS, handle_exception
 
 
 def custom_serializer(obj):

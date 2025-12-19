@@ -16,8 +16,8 @@ DROP TABLE IF EXISTS items CASCADE;
 CREATE TABLE items (
 	item_id UUID PRIMARY KEY,
     name VARCHAR(256) NOT NULL,    
-    category VARCHAR(32),
-    subcategories VARCHAR(32),
+    category VARCHAR(32) NOT NULL,
+    subcategories VARCHAR(32)[],
     price NUMERIC NOT NULL,
     brand VARCHAR(64),
     description TEXT,

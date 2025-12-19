@@ -1,5 +1,6 @@
 import datetime as dt
-from uuid import UUID
+from decimal import Decimal
+import uuid
 
 from pydantic import BaseModel, Field
 
@@ -7,43 +8,34 @@ from app.datamodels.user import UserDBOut
 
 
 class Item(BaseModel):
-    item_id: UUID | None = None
-    name: str | None = None
+    search: str | None = None
     category: str | None = None
-    subcategories: str | None = None
-    price: float | None = None
+    subcategory: list[str] | None = None
+    price: tuple[Decimal, Decimal] = Field(
+        default=(Decimal("0.01"), Decimal("100_000_000.0")), min_items=2, max_items=2
+    )
     brand: str | None = None
-    description: str | None = None
     features: dict | None = None
-    created_at: dt.datetime | None = None
-    updated_at: dt.datetime | None = None
 
 
 class ItemDBToList(BaseModel):
-    iid: int | None = None
-    iid_uuid4: str | None = None
-
+    item_id: uuid.UUID | None = None
     name: str | None = None
-    seller_id: int | None = None
-    price: float | None = None
-
     category: str | None = None
-    type: str | None = None
-    style: str | None = None
+    price: float | None = None
     brand: str | None = None
-    condition: str | None = None
-    material: str | None = None
-    color: str | None = None
-    pattern: str | None = None
-    size: float | None = None
+    features: dict | None = None
 
-    width: str | None = None
-    fastener: str | None = None
-    heel: str | None = None
-    toe: str | None = None
 
-    country: str | None = None
-    city: str | None = None
+class ItemDBSingle(BaseModel):
+    item_id: uuid.UUID | None = None
+    name: str | None = None
+    category: str | None = None
+    subcategories: list[str] | None = None
+    price: float | None = None
+    brand: str | None = None
+    features: dict | None = None
+    description: str
 
 
 class ItemDB(ItemDBToList):
@@ -87,6 +79,11 @@ class ItemsUser(BaseModel):
     items: list[ItemDBToList]
 
 
-class ItemsQuery(BaseModel):
+class QueryItemMultiple(BaseModel):
     q: Item
     items: list[ItemDBToList]
+
+
+class QueryItemSingle(BaseModel):
+    item_id: uuid.UUID
+    item: ItemDBSingle
