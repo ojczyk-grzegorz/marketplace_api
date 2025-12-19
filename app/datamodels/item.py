@@ -88,5 +88,5 @@ class ItemsUser(BaseModel):
 
 
 class ItemsQuery(BaseModel):
-    q: QueryItems
+    q: Item
     items: list[ItemDBToList]

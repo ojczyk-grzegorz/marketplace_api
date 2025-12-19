@@ -4,9 +4,10 @@ from fastapi import APIRouter, status, Query, Path, Request, Depends
 from fastapi.routing import APIRoute
 
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import text
 
 from app.utils.configs import get_settings, Settings
-from app.utils.db import get_filter
+from app.utils.db import get_filter, get_db_session
 from app.exceptions.exceptions import (
     ExcItemNotFound,
 )
@@ -34,32 +35,26 @@ router = APIRouter(prefix="/items", tags=["Items"], route_class=APIRoute)
     response_model_exclude_none=True,
 )
 async def get_items(
-    query_items: Annotated[Item, Query(QueryItems())],
+    query_items: Annotated[Item, Query()],
     settings: Annotated[Settings, Depends(get_settings)],
-    db: Annotated[Session, Depends(get_settings)],
+    db: Annotated[Session, Depends(get_db_session)],
 ):
-
-    filters = []
-    for column, value in query_items.model_dump(
-        exclude_none=True, exclude=["limit", "features_specific"]
-    ).items():
-        flt = get_filter(column, value)
-        filters.append(flt)
-
-    db_items = db_search_simple(
-        table=settings.db_table_items,
-        columns=ItemDBToList.model_fields.keys(),
-        where=" AND ".join(filters),
-        other=f"LIMIT {query_items.limit}",
-        log_kwargs=dict(
-            request_id=req.uuid4,
-            query_tags=["items", "get"],
+    q = query_items.model_dump(exclude_none=True, mode="json")
+    db_items_matching = db.execute(
+        text(
+            "SELECT "
+            + ", ".join(q.keys())
+            + " FROM " + settings.db_table_items
+            + " WHERE "
+            + " AND".join([f" {key} = :{key}" for key in q.keys()])
         ),
-    )
+        params=q,
+    ).fetchall()
+
 
     return ItemsQuery(
         q=query_items,
-        items=db_items,
+        items=[x._mapping for x in db_items_matching],
     )
 
 
