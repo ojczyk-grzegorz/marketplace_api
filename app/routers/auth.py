@@ -10,7 +10,7 @@ from app.dbmodels.dbmodels import DBUser
 from app.exceptions.exceptions import ExcInvalidCredentials
 from app.utils.auth import get_access_token, verify_password
 from app.utils.configs import Settings, get_settings
-from app.utils.db import get_db_session_sql_model
+from app.utils.db import get_db_session
 
 router = APIRouter(prefix="/auth", tags=["Authentication"], route_class=APIRoute)
 
@@ -27,7 +27,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"], route_class=APIRoute
 async def get_token(
     form: Annotated[OAuth2PasswordRequestForm, Depends()],
     settings: Annotated[Settings, Depends(get_settings)],
-    db: Annotated[Session, Depends(get_db_session_sql_model)],
+    db: Annotated[Session, Depends(get_db_session)],
 ):
     query = select(DBUser).where(DBUser.email == form.username)
     db_user_matching = db.exec(query).first()

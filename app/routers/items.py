@@ -11,7 +11,7 @@ from app.datamodels.item import (
     QueryItemSingle,
 )
 from app.dbmodels.dbmodels import DBItem
-from app.utils.db import get_db_session_sql_model
+from app.utils.db import get_db_session
 
 router = APIRouter(prefix="/items", tags=["Items"], route_class=APIRoute)
 
@@ -25,7 +25,7 @@ router = APIRouter(prefix="/items", tags=["Items"], route_class=APIRoute)
 )
 async def get_items(
     query_items: Annotated[Item, Query()],
-    db: Annotated[Session, Depends(get_db_session_sql_model)],
+    db: Annotated[Session, Depends(get_db_session)],
 ):
     query = select(DBItem)
     if query_items.search:
@@ -58,8 +58,8 @@ async def get_items(
     description="Get item by its ID",
 )
 async def get_item(
-    db: Annotated[Session, Depends(get_db_session_sql_model)],
-    item_id: uuid.UUID = Path(...),
+    db: Annotated[Session, Depends(get_db_session)],
+    item_id: Annotated[uuid.UUID, Path(...)],
 ):
     query = select(DBItem).where(DBItem.item_id == item_id)
     item = db.exec(query).first()

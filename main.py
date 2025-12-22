@@ -3,8 +3,7 @@ from typing import Annotated
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session
-from sqlalchemy.sql import text
+from sqlmodel import Session, text
 
 from app.routers import auth, items, transactions, user
 from app.utils.configs import get_settings
@@ -41,8 +40,8 @@ async def home():
 @app.get(
     "/healthcheck", description="API healthcheck endpoint.", response_class=JSONResponse
 )
-async def home(db: Annotated[Session, Depends(get_db_session)]):
-    db.execute(text("SELECT 1 as test")).fetchone()
+async def healthcheck(db: Annotated[Session, Depends(get_db_session)]):
+    db.exec(text("SELECT 1 as test")).fetchone()
     return JSONResponse(
         status_code=200, content={"message": f"{settings.app_name} is healthy!"}
     )

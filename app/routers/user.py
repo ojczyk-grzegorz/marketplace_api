@@ -19,7 +19,7 @@ from app.exceptions.exceptions import (
 from app.utils.auth import get_password_hash, oauth2_scheme, validate_access_token
 from app.utils.configs import Settings, get_settings
 from app.utils.db import (
-    get_db_session_sql_model,
+    get_db_session,
 )
 
 router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRoute)
@@ -33,20 +33,23 @@ router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRoute)
 )
 async def user_create(
     settings: Annotated[Settings, Depends(get_settings)],
-    db: Annotated[Session, Depends(get_db_session_sql_model)],
-    user_req: UserCreate = Body(
-        ...,
-        openapi_examples={
-            "example1": {
-                "summary": "Example user creation payload",
-                "value": {
-                    "email": "user2@example.com",
-                    "phone": "+48234567891",
-                    "password": "p2",
-                },
-            }
-        },
-    ),
+    db: Annotated[Session, Depends(get_db_session)],
+    user_req: Annotated[
+        UserCreate,
+        Body(
+            ...,
+            openapi_examples={
+                "example1": {
+                    "summary": "Example user creation payload",
+                    "value": {
+                        "email": "user2@example.com",
+                        "phone": "+48234567891",
+                        "password": "p2",
+                    },
+                }
+            },
+        ),
+    ],
 ):
     query = select(DBUser).where(
         (DBUser.email == user_req.email) | (DBUser.phone == user_req.phone)
@@ -85,21 +88,24 @@ async def user_create(
 )
 async def user_update(
     settings: Annotated[Settings, Depends(get_settings)],
-    db: Annotated[Session, Depends(get_db_session_sql_model)],
+    db: Annotated[Session, Depends(get_db_session)],
     token: Annotated[str, Depends(oauth2_scheme)],
-    user: UserUpdate = Body(
-        ...,
-        openapi_examples={
-            "example1": {
-                "summary": "Example user creation payload",
-                "value": {
-                    "email": "user3@example.com",
-                    "phone": "+48345678912",
-                    "password": "p3",
-                },
-            }
-        },
-    ),
+    user: Annotated[
+        UserUpdate,
+        Body(
+            ...,
+            openapi_examples={
+                "example1": {
+                    "summary": "Example user creation payload",
+                    "value": {
+                        "email": "user3@example.com",
+                        "phone": "+48345678912",
+                        "password": "p3",
+                    },
+                }
+            },
+        ),
+    ],
 ):
     user_id = validate_access_token(
         token=token,
@@ -142,7 +148,7 @@ async def user_update(
 )
 async def user_remove(
     settings: Annotated[Settings, Depends(get_settings)],
-    db: Annotated[Session, Depends(get_db_session_sql_model)],
+    db: Annotated[Session, Depends(get_db_session)],
     token: str = Depends(oauth2_scheme),
 ):
     user_id = validate_access_token(

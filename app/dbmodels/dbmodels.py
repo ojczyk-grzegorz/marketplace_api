@@ -2,7 +2,7 @@ import datetime as dt
 from decimal import Decimal
 import uuid
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, Numeric, String, Text
+from sqlalchemy import Column, DateTime, Integer, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlmodel import Field, SQLModel
 
@@ -131,7 +131,11 @@ class DBTransaction(SQLModel, table=True):
     )
     user_id: uuid.UUID = Field(sa_column=Column(UUID(as_uuid=True), nullable=False))
     created_at: dt.datetime = Field(
-        sa_column=Column(DateTime(timezone=True), nullable=False, default=lambda: dt.datetime.now(dt.timezone.utc))
+        sa_column=Column(
+            DateTime(timezone=True),
+            nullable=False,
+            default=lambda: dt.datetime.now(dt.timezone.utc),
+        )
     )
     delivery_option_id: uuid.UUID = Field(
         sa_column=Column(UUID(as_uuid=True), nullable=False)
@@ -161,6 +165,8 @@ class DBTransactionItem(SQLModel, table=True):
     item_updated_at: dt.datetime = Field(
         sa_column=Column(DateTime(timezone=True), nullable=False)
     )
+    count: int = Field(sa_column=Column(Integer, nullable=False))
+    price_after_discounts: Decimal = Field(sa_column=Column(Numeric, nullable=False))
 
 
 class DBTransactionAction(SQLModel, table=True):

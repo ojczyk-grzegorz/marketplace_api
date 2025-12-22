@@ -1,20 +1,19 @@
 import json
 
-from sqlmodel import text, delete, insert
+from sqlmodel import insert, text
 
-from app.utils.configs import get_settings
-from app.utils.db import get_db_session_sql_model
 from app.dbmodels.dbmodels import (
-    DBUser,
-    DBItem,
+    DBDeliveryOptions,
     DBDiscount,
     DBGroundStaff,
-    DBDeliveryOptions,
+    DBItem,
+    DBUser,
 )
+from app.utils.db import get_db_session
 
 
 def main():
-    db = next(get_db_session_sql_model())
+    db = next(get_db_session())
 
     with open("postgres/db_setup/CREATE_TABLES.sql") as f:
         db.exec(text(f.read()))
