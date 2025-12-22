@@ -1,5 +1,6 @@
-from pydantic import BaseModel, field_validator
 import datetime as dt
+
+from pydantic import BaseModel, field_validator
 
 
 class LogRequest(BaseModel):

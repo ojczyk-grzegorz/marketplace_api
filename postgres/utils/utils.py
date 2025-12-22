@@ -1,26 +1,26 @@
-import random
 from datetime import datetime, timedelta, timezone
+import random
 from uuid import uuid4
 
 from app.utils.auth import get_password_hash
 from postgres.utils.mock_values import (
-    CITIES,
-    STREETS,
-    FIRST_NAMES,
-    LAST_NAMES,
-    CATEGORIES,
-    TYPES,
-    STYLES,
     BRANDS,
-    CONDITIONS,
-    MATERIALS,
+    CATEGORIES,
+    CITIES,
     COLORS,
-    PATTERNS,
-    WIDTHS,
-    FASTENERS,
-    HEELS,
-    TOES,
+    CONDITIONS,
     DESCRIPTIONS,
+    FASTENERS,
+    FIRST_NAMES,
+    HEELS,
+    LAST_NAMES,
+    MATERIALS,
+    PATTERNS,
+    STREETS,
+    STYLES,
+    TOES,
+    TYPES,
+    WIDTHS,
 )
 
 

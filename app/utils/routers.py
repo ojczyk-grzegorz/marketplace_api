@@ -1,12 +1,12 @@
-import os
 import datetime as dt
 import json
+import os
 import traceback
 
 from fastapi import Request, Response
 
-from app.datamodels.log import LogRequest
 from app.constants.constants import DIR_LOGS_REQUEST
+from app.datamodels.log import LogRequest
 
 
 def custom_serializer(obj):

@@ -1,6 +1,7 @@
-from uuid import uuid4, UUID
 import datetime as dt
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from uuid import UUID, uuid4
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class UserCreate(BaseModel):
@@ -12,7 +13,7 @@ class UserCreate(BaseModel):
 class UserUpdate(BaseModel):
     email: EmailStr | None = None
     phone: str | None = None
-    password: str | None = None
+    password: str | None = Field(None, exclude=True)
 
 
 class UserDBIn(BaseModel):

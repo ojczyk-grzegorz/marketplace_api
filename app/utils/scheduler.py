@@ -1,14 +1,13 @@
-import os
-import json
-import datetime as dt
-
-from fastapi import FastAPI
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from contextlib import asynccontextmanager
+import datetime as dt
+import json
+import os
 
-from app.utils.db import db_insert
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from fastapi import FastAPI
+
 from app.constants.constants import DIR_LOGS
-
+from app.utils.db import db_insert
 
 scheduler = AsyncIOScheduler(timezone=dt.timezone.utc)
 

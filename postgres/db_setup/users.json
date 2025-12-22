@@ -1,0 +1,10 @@
+[
+    {
+        "user_id": "8f581062-3ca0-4b57-a037-7c88291882ba",
+        "email": "user@example.com",
+        "phone": "+48123456789",
+        "password_hash": "$2b$12$ekgRkqQes6xlQpCEt4K4X.ogzRInRY3e0lBMMBsLY1bN1U5mGNHdG",
+        "created_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z"
+    }
+]

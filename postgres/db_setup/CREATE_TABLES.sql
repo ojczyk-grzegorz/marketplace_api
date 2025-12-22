@@ -19,11 +19,12 @@ CREATE TABLE items (
     category VARCHAR(32) NOT NULL,
     subcategories VARCHAR(32)[],
     price NUMERIC NOT NULL,
-    brand VARCHAR(64),
+    brand VARCHAR(128),
     description TEXT,
     features JSONB,
     created_at TIMESTAMPTZ NOT NULL,
-    updated_at TIMESTAMPTZ NOT NULL
+    updated_at TIMESTAMPTZ NOT NULL,
+    stock INT NOT NULL
 );
 
 
@@ -32,9 +33,9 @@ CREATE TABLE items_snapshots (
 	item_id UUID NOT NULL,
     name VARCHAR(256) NOT NULL,    
     category VARCHAR(32),
-    subcategories VARCHAR(32),
+    subcategories VARCHAR(32)[],
     price NUMERIC NOT NULL,
-    brand VARCHAR(64),
+    brand VARCHAR(128),
     description TEXT,
     features JSONB,
     created_at TIMESTAMPTZ NOT NULL,
@@ -52,25 +53,58 @@ CREATE TABLE ground_staff (
 );
 
 
+DROP TABLE IF EXISTS delivery_options CASCADE;
+CREATE TABLE delivery_options (
+    option_id UUID PRIMARY KEY,
+    name VARCHAR(64) NOT NULL,
+    contractor_id UUID NOT NULL,
+    price NUMERIC NOT NULL,
+
+    FOREIGN KEY (contractor_id) REFERENCES ground_staff(staff_id)
+);
+
+DROP TABLE IF EXISTS discounts CASCADE;
+CREATE TABLE discounts (
+    discount_code VARCHAR(128) PRIMARY KEY,
+    description TEXT,
+    valid_from TIMESTAMPTZ NOT NULL,
+    valid_to TIMESTAMPTZ NOT NULL,
+    discount_percentage NUMERIC NOT NULL,
+    item_ids UUID[],
+    brands VARCHAR(128)[],
+    categories JSONB 
+);
+
+
 DROP TABLE IF EXISTS transactions CASCADE;
 CREATE TABLE transactions (
 	transaction_id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
-    delivery_option VARCHAR(32) NOT NULL,
-    delivery_price NUMERIC NOT NULL,
+    delivery_option_id UUID NOT NULL,
     transaction_details JSONB NOT NULL,
+    total_price NUMERIC NOT NULL,
     
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (delivery_option_id) REFERENCES delivery_options(option_id)
+);
+
+DROP TABLE IF EXISTS transaction_discounts CASCADE;
+CREATE TABLE transaction_discounts (
+    row_id SERIAL PRIMARY KEY,
+	transaction_id UUID NOT NULL,
+    discount_code VARCHAR(128) NOT NULL,
+    
+    FOREIGN KEY (transaction_id) REFERENCES transactions(transaction_id),
+    FOREIGN KEY (discount_code) REFERENCES discounts(discount_code)
 );
 
 DROP TABLE IF EXISTS transaction_items CASCADE;
 CREATE TABLE transaction_items (
+    row_id SERIAL PRIMARY KEY,
 	transaction_id UUID NOT NULL,
     item_id UUID NOT NULL,
     item_updated_at TIMESTAMPTZ NOT NULL,
-    discount_amount NUMERIC,
-    discount_code VARCHAR(64),
 
     FOREIGN KEY (transaction_id) REFERENCES transactions(transaction_id) ON DELETE CASCADE,
     FOREIGN KEY (item_id, item_updated_at)  REFERENCES items_snapshots(item_id, updated_at)

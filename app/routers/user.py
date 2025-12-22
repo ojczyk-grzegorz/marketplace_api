@@ -1,30 +1,26 @@
 import datetime as dt
-
 from typing import Annotated
-from fastapi import APIRouter, Body, status, Depends
+
+from fastapi import APIRouter, Body, Depends, status
 from fastapi.routing import APIRoute
-from sqlalchemy.sql import text
-from sqlmodel import Session, select
-from app.utils.db import (
-    get_db_session,
-    get_db_session_sql_model,
-)
-from app.utils.configs import get_settings, Settings
-from app.utils.auth import get_password_hash
+from sqlmodel import Session, delete, insert, select, update
+
+from app.datamodels.response import ResponseSuccess
 from app.datamodels.user import (
     UserCreate,
     UserUpdate,
-    UserDBIn,
 )
-from app.datamodels.response import ResponseSuccess
-from app.dbmodels.dbmodels import UserSQL
+from app.dbmodels.dbmodels import DBTransaction, DBUser
 from app.exceptions.exceptions import (
-    ExcUserNotFound,
-    ExcUserExists,
     ExcTransactionsFound,
+    ExcUserExists,
+    ExcUserNotFound,
 )
-from app.utils.auth import validate_access_token, oauth2_scheme
-
+from app.utils.auth import get_password_hash, oauth2_scheme, validate_access_token
+from app.utils.configs import Settings, get_settings
+from app.utils.db import (
+    get_db_session_sql_model,
+)
 
 router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRoute)
 
@@ -38,55 +34,46 @@ router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRoute)
 async def user_create(
     settings: Annotated[Settings, Depends(get_settings)],
     db: Annotated[Session, Depends(get_db_session_sql_model)],
-    user: UserCreate = Body(
+    user_req: UserCreate = Body(
         ...,
         openapi_examples={
             "example1": {
                 "summary": "Example user creation payload",
                 "value": {
-                    "email": "user@example.com",
-                    "phone": "+48123456789",
-                    "password": "strongpassword123",
+                    "email": "user2@example.com",
+                    "phone": "+48234567891",
+                    "password": "p2",
                 },
             }
         },
     ),
 ):
-    query = select(UserSQL).where(
-        (UserSQL.email == user.email) | (UserSQL.phone == user.phone)
+    query = select(DBUser).where(
+        (DBUser.email == user_req.email) | (DBUser.phone == user_req.phone)
     )
-    db_user_matching: UserSQL | None = (db.exec(query).first(),)
-    if db_user_matching:
+    user_db: DBUser | None = db.exec(query).first()
+    if user_db:
         raise ExcUserExists(
-            email=user.email if db_user_matching.email == user.email else None,
-            phone=user.phone
-            if db_user_matching._mapping["phone"] == user.phone
-            else None,
+            email=(user_req.email if user_db.email == user_req.email else None),
+            phone=(user_req.phone if user_db.phone == user_req.phone else None),
         )
 
     created_at = dt.datetime.now(dt.timezone.utc)
-
-    user = UserDBIn(
-        **user.model_dump(),
-        password_hash=get_password_hash(user.password),
+    user_db = DBUser(
+        email=user_req.email,
+        phone=user_req.phone,
+        password_hash=get_password_hash(user_req.password).decode("utf-8"),
         created_at=created_at,
         updated_at=created_at,
     )
-
-    db_user_new: dict = db.execute(
-        text(
-            "INSERT INTO "
-            + settings.db_table_users
-            + " (user_id, email, phone, password_hash, created_at, updated_at) "
-            "VALUES (:user_id, :email, :phone, :password_hash, :created_at, :updated_at) "
-            "RETURNING email, phone, created_at"
-        ),
-        params=user.model_dump(exclude_none=True, mode="json"),
-    ).fetchone()
+    query = insert(DBUser).values(
+        {**user_db.model_dump(), "password_hash": user_db.password_hash}
+    )
+    db.exec(query)
     db.commit()
     return ResponseSuccess(
         message="User created successfully",
-        details=dict(user=dict(db_user_new._mapping)),
+        details=dict(user=user_db.model_dump(exclude_none=True)),
     )
 
 
@@ -98,7 +85,7 @@ async def user_create(
 )
 async def user_update(
     settings: Annotated[Settings, Depends(get_settings)],
-    db: Annotated[Session, Depends(get_db_session)],
+    db: Annotated[Session, Depends(get_db_session_sql_model)],
     token: Annotated[str, Depends(oauth2_scheme)],
     user: UserUpdate = Body(
         ...,
@@ -106,9 +93,9 @@ async def user_update(
             "example1": {
                 "summary": "Example user creation payload",
                 "value": {
-                    "email": "user2@example.com",
-                    "phone": "+48234567891",
-                    "password": "strongpassword456",
+                    "email": "user3@example.com",
+                    "phone": "+48345678912",
+                    "password": "p3",
                 },
             }
         },
@@ -119,47 +106,31 @@ async def user_update(
         secret_key=settings.auth_secret_key,
         algorithms=[settings.auth_algorithm],
     )
-    db_user_matching = db.execute(
-        text(
-            "SELECT * FROM "
-            + settings.db_table_users
-            + " WHERE user_id = :user_id LIMIT 1"
-        ),
-        params={"user_id": user_id},
-    ).fetchone()
-    if not db_user_matching:
+    query = select(DBUser).where(DBUser.user_id == user_id)
+    user_db = db.exec(query).first()
+    if not user_db:
         raise ExcUserNotFound(
             user_id=user_id,
         )
-    user_db_in = UserDBIn.model_validate(
-        {
-            **db_user_matching._mapping,
-            **user.model_dump(exclude_none=True),
-        }
-    )
-    user_db_in.updated_at = dt.datetime.now(dt.timezone.utc)
-    if user.password:
-        user_db_in.password_hash = get_password_hash(user.password)
 
-    db_user_updated: dict = db.execute(
-        text(
-            "UPDATE"
-            + " "
-            + settings.db_table_users
-            + " SET"
-            + " user_id = :user_id, email = :email, phone = :phone, password_hash = :password_hash, created_at = :created_at, updated_at = :updated_at"
-            + " WHERE user_id = :user_id"
-            + " RETURNING email, phone, updated_at"
-        ),
-        params={
-            "user_id": user_id,
-            **user_db_in.model_dump(exclude_none=True, mode="json"),
-        },
-    ).fetchone()
+    user_db_update = dict(
+        updated_at=dt.datetime.now(dt.timezone.utc),
+        **user.model_dump(exclude_none=True),
+    )
+    if user.password:
+        user_db_update["password_hash"] = get_password_hash(user.password).decode(
+            "utf-8"
+        )
+
+    db_user = DBUser.model_validate(user_db)
+
+    query = update(DBUser).where(DBUser.user_id == user_id).values(user_db_update)
+    db.exec(query)
     db.commit()
+
     return ResponseSuccess(
         message="User updated successfully",
-        details=dict(user=dict(db_user_updated._mapping)),
+        details=db_user.model_dump(exclude_none=True),
     )
 
 
@@ -171,7 +142,7 @@ async def user_update(
 )
 async def user_remove(
     settings: Annotated[Settings, Depends(get_settings)],
-    db: Annotated[Session, Depends(get_db_session)],
+    db: Annotated[Session, Depends(get_db_session_sql_model)],
     token: str = Depends(oauth2_scheme),
 ):
     user_id = validate_access_token(
@@ -180,50 +151,31 @@ async def user_remove(
         algorithms=[settings.auth_algorithm],
     )
 
-    db_user_matching = db.execute(
-        text(
-            "SELECT user_id FROM "
-            + settings.db_table_users
-            + " WHERE user_id = :user_id LIMIT 1"
-        ),
-        params={"user_id": user_id},
-    ).fetchone()
-
-    if not db_user_matching:
+    query = select(DBUser).where(DBUser.user_id == user_id)
+    user_db = db.exec(query).first()
+    if not user_db:
         raise ExcUserNotFound(user_id=user_id)
 
-    db_user_tranasactions = db.execute(
-        text(
-            "SELECT transaction_id FROM "
-            + settings.db_table_transactions
-            + " WHERE user_id = :user_id"
-        ),
-        params={"user_id": user_id},
-    ).fetchall()
+    email = user_db.email
+
+    query = select(DBTransaction).where(DBTransaction.user_id == user_id)
+    db_user_tranasactions = db.exec(query).all()
     if db_user_tranasactions:
         raise ExcTransactionsFound(
             user_id=user_id,
             details=dict(
-                transaction_ids=[
-                    t._mapping["transaction_id"] for t in db_user_tranasactions
-                ]
+                transaction_ids=[t.transaction_id for t in db_user_tranasactions]
             ),
         )
 
-    db_user_removed = db.execute(
-        text(
-            "DELETE FROM "
-            + settings.db_table_users
-            + " WHERE user_id = :user_id RETURNING email"
-        ),
-        params={"user_id": user_id},
-    ).fetchone()
+    query = delete(DBUser).where(DBUser.user_id == user_id)
+    db.exec(query)
     db.commit()
 
     return ResponseSuccess(
         message="User removed successfully",
         details={
             "user_id": user_id,
-            "email": db_user_removed._mapping["email"],
+            "email": email,
         },
     )

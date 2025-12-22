@@ -1,36 +1,48 @@
 import json
 
-from sqlalchemy import text
+from sqlmodel import text, delete, insert
 
 from app.utils.configs import get_settings
-from app.utils.db import get_db_session
+from app.utils.db import get_db_session_sql_model
+from app.dbmodels.dbmodels import (
+    DBUser,
+    DBItem,
+    DBDiscount,
+    DBGroundStaff,
+    DBDeliveryOptions,
+)
 
 
 def main():
-    settings = get_settings()
-    db = next(get_db_session())
+    db = next(get_db_session_sql_model())
 
     with open("postgres/db_setup/CREATE_TABLES.sql") as f:
-        db.execute(text(f.read()))
-        db.commit()
+        db.exec(text(f.read()))
+
+    with open("postgres/db_setup/users.json") as f:
+        users = json.load(f)
+        query = insert(DBUser).values(users)
+        db.exec(query)
 
     with open("postgres/db_setup/items.json") as f:
         items = json.load(f)
-        items = [{**item, "features": json.dumps(item["features"])} for item in items]
+        query = insert(DBItem).values(items)
+        db.exec(query)
 
-    db.execute(
-        text("TRUNCATE " + settings.db_table_items + " RESTART IDENTITY CASCADE;")
-    )
-    db.execute(
-        text(
-            "INSERT INTO"
-            + " "
-            + settings.db_table_items
-            + " (item_id, name, category, subcategories, price, brand, description, created_at, updated_at, features)"
-            " VALUES (:item_id, :name, :category, :subcategories, :price, :brand, :description, :created_at, :updated_at, :features);"
-        ),
-        params=items,
-    )
+    with open("postgres/db_setup/discounts.json") as f:
+        discounts = json.load(f)
+        query = insert(DBDiscount).values(discounts)
+        db.exec(query)
+
+    with open("postgres/db_setup/ground_staff.json") as f:
+        ground_staff = json.load(f)
+        query = insert(DBGroundStaff).values(ground_staff)
+        db.exec(query)
+
+    with open("postgres/db_setup/delivery_options.json") as f:
+        delivery_options = json.load(f)
+        query = insert(DBDeliveryOptions).values(delivery_options)
+        db.exec(query)
     db.commit()
 
 

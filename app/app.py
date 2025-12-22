@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
-from app.routers import user, items, auth, transactions
+from app.routers import auth, items, transactions, user
+from app.utils.configs import Settings, get_settings
 from app.utils.scheduler import lifespan
-from app.utils.configs import get_settings, Settings
 
 app = FastAPI(lifespan=lifespan, tags=["Main"])
 

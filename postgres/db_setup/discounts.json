@@ -1,0 +1,23 @@
+[
+    {
+        "discount_code": "APPLE_SALE",
+        "description": "10% off on all Apple products",
+        "valid_from": "1900-01-01 00:00:00Z",
+        "valid_to": "2100-01-01 00:00:00Z",
+        "discount_percentage": 10.00,
+        "item_ids": null,
+        "brands": ["APPLE"],
+        "categories": null
+    },
+    {
+        
+        "discount_code": "ELECTRONICS_LAPTOPS_SALE",
+        "description": "10% off on all Apple products",
+        "valid_from": "1900-01-01 00:00:00Z",
+        "valid_to": "2100-01-01 00:00:00Z",
+        "discount_percentage": 15.00,
+        "item_ids": null,
+        "brands": ["APPLE"],
+        "categories": {"Electronics": ["Laptops"]}
+    }
+]

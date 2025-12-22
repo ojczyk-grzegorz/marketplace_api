@@ -1,13 +1,13 @@
 import datetime as dt
 from decimal import Decimal
-
-from sqlmodel import Field, SQLModel
-from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
-from sqlalchemy import Column, String, Text, Numeric, DateTime
 import uuid
 
+from sqlalchemy import Boolean, Column, DateTime, Integer, Numeric, String, Text
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
+from sqlmodel import Field, SQLModel
 
-class ItemSQL(SQLModel, table=True):
+
+class DBItem(SQLModel, table=True):
     __tablename__ = "items"
 
     item_id: uuid.UUID = Field(
@@ -19,14 +19,21 @@ class ItemSQL(SQLModel, table=True):
         sa_column=Column(ARRAY(String(32)), nullable=True), default=None
     )
     price: Decimal = Field(sa_column=Column(Numeric, nullable=False))
-    brand: str | None = Field(sa_column=Column(String(64), nullable=True), default=None)
+    brand: str | None = Field(
+        sa_column=Column(String(128), nullable=True), default=None
+    )
     description: str | None = Field(sa_column=Column(Text, nullable=True), default=None)
     features: dict | None = Field(sa_column=Column(JSONB, nullable=True), default=None)
-    created_at: dt.datetime = Field(sa_column=Column(DateTime(timezone=True)))
-    updated_at: dt.datetime = Field(sa_column=Column(DateTime(timezone=True)))
+    created_at: dt.datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False)
+    )
+    updated_at: dt.datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False)
+    )
+    stock: int = Field(sa_column=Column(Integer, nullable=False))
 
 
-class UserSQL(SQLModel, table=True):
+class DBUser(SQLModel, table=True):
     __tablename__ = "users"
 
     user_id: uuid.UUID = Field(
@@ -34,7 +41,9 @@ class UserSQL(SQLModel, table=True):
     )
     email: str = Field(sa_column=Column(String(256), unique=True, nullable=False))
     phone: str = Field(sa_column=Column(String(16), unique=True, nullable=False))
-    password_hash: str = Field(sa_column=Column(String(64), nullable=False))
+    password_hash: str = Field(
+        sa_column=Column(String(64), nullable=False), exclude=True
+    )
     created_at: dt.datetime = Field(
         sa_column=Column(DateTime(timezone=True), nullable=False)
     )
@@ -43,7 +52,7 @@ class UserSQL(SQLModel, table=True):
     )
 
 
-class ItemSnapshotSQL(SQLModel, table=True):
+class DBItemSnapshot(SQLModel, table=True):
     __tablename__ = "items_snapshots"
 
     item_id: uuid.UUID = Field(sa_column=Column(UUID(as_uuid=True), primary_key=True))
@@ -55,7 +64,9 @@ class ItemSnapshotSQL(SQLModel, table=True):
         sa_column=Column(String(32), nullable=True), default=None
     )  # Note: single string in snapshots
     price: Decimal = Field(sa_column=Column(Numeric, nullable=False))
-    brand: str | None = Field(sa_column=Column(String(64), nullable=True), default=None)
+    brand: str | None = Field(
+        sa_column=Column(String(128), nullable=True), default=None
+    )
     description: str | None = Field(sa_column=Column(Text, nullable=True), default=None)
     features: dict | None = Field(sa_column=Column(JSONB, nullable=True), default=None)
     created_at: dt.datetime = Field(
@@ -66,7 +77,7 @@ class ItemSnapshotSQL(SQLModel, table=True):
     )
 
 
-class GroundStaffSQL(SQLModel, table=True):
+class DBGroundStaff(SQLModel, table=True):
     __tablename__ = "ground_staff"
 
     staff_id: uuid.UUID = Field(
@@ -76,7 +87,43 @@ class GroundStaffSQL(SQLModel, table=True):
     role: str = Field(sa_column=Column(String(64), nullable=False))
 
 
-class TransactionSQL(SQLModel, table=True):
+class DBDeliveryOptions(SQLModel, table=True):
+    __tablename__ = "delivery_options"
+
+    option_id: uuid.UUID = Field(
+        sa_column=Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    )
+    name: str = Field(sa_column=Column(String(64), nullable=False))
+    contractor_id: uuid.UUID = Field(
+        sa_column=Column(UUID(as_uuid=True), nullable=False)
+    )
+    price: Decimal = Field(sa_column=Column(Numeric, nullable=False))
+
+
+class DBDiscount(SQLModel, table=True):
+    __tablename__ = "discounts"
+
+    discount_code: str = Field(sa_column=Column(String(128), primary_key=True))
+    description: str | None = Field(sa_column=Column(Text, nullable=True), default=None)
+    valid_from: dt.datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False)
+    )
+    valid_to: dt.datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False)
+    )
+    discount_percentage: Decimal = Field(sa_column=Column(Numeric, nullable=False))
+    item_ids: list[uuid.UUID] | None = Field(
+        sa_column=Column(ARRAY(UUID(as_uuid=True)), nullable=True), default=None
+    )
+    brands: list[str] | None = Field(
+        sa_column=Column(ARRAY(String(128)), nullable=True), default=None
+    )
+    categories: dict | None = Field(
+        sa_column=Column(JSONB, nullable=True), default=None
+    )
+
+
+class DBTransaction(SQLModel, table=True):
     __tablename__ = "transactions"
 
     transaction_id: uuid.UUID = Field(
@@ -84,32 +131,39 @@ class TransactionSQL(SQLModel, table=True):
     )
     user_id: uuid.UUID = Field(sa_column=Column(UUID(as_uuid=True), nullable=False))
     created_at: dt.datetime = Field(
-        sa_column=Column(DateTime(timezone=True), nullable=False)
+        sa_column=Column(DateTime(timezone=True), nullable=False, default=lambda: dt.datetime.now(dt.timezone.utc))
     )
-    delivery_option: str = Field(sa_column=Column(String(32), nullable=False))
-    delivery_price: Decimal = Field(sa_column=Column(Numeric, nullable=False))
+    delivery_option_id: uuid.UUID = Field(
+        sa_column=Column(UUID(as_uuid=True), nullable=False)
+    )
     transaction_details: dict = Field(sa_column=Column(JSONB, nullable=False))
+    total_price: Decimal = Field(sa_column=Column(Numeric, nullable=False))
 
 
-class TransactionItemSQL(SQLModel, table=True):
+class DBTransactionDiscount(SQLModel, table=True):
+    __tablename__ = "transaction_discounts"
+
+    row_id: int = Field(sa_column=Column(Integer, primary_key=True, autoincrement=True))
+    transaction_id: uuid.UUID = Field(
+        sa_column=Column(UUID(as_uuid=True), nullable=False)
+    )
+    discount_code: str = Field(sa_column=Column(String(128), nullable=False))
+
+
+class DBTransactionItem(SQLModel, table=True):
     __tablename__ = "transaction_items"
 
+    row_id: int = Field(sa_column=Column(Integer, primary_key=True, autoincrement=True))
     transaction_id: uuid.UUID = Field(
-        sa_column=Column(UUID(as_uuid=True), primary_key=True)
+        sa_column=Column(UUID(as_uuid=True), nullable=False)
     )
-    item_id: uuid.UUID = Field(sa_column=Column(UUID(as_uuid=True), primary_key=True))
+    item_id: uuid.UUID = Field(sa_column=Column(UUID(as_uuid=True), nullable=False))
     item_updated_at: dt.datetime = Field(
-        sa_column=Column(DateTime(timezone=True), primary_key=True)
-    )
-    discount_amount: Decimal | None = Field(
-        sa_column=Column(Numeric, nullable=True), default=None
-    )
-    discount_code: str | None = Field(
-        sa_column=Column(String(64), nullable=True), default=None
+        sa_column=Column(DateTime(timezone=True), nullable=False)
     )
 
 
-class TransactionActionSQL(SQLModel, table=True):
+class DBTransactionAction(SQLModel, table=True):
     __tablename__ = "transaction_actions"
 
     action_id: uuid.UUID = Field(
@@ -128,7 +182,7 @@ class TransactionActionSQL(SQLModel, table=True):
     )
 
 
-class TransactionFinalizedSQL(SQLModel, table=True):
+class DBTransactionFinalized(SQLModel, table=True):
     __tablename__ = "transactions_finalized"
 
     transaction_id: uuid.UUID = Field(

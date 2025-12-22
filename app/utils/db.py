@@ -1,19 +1,18 @@
-from typing import Any
-import os
-import psycopg2
+import datetime as dt
 import json
 from numbers import Number
+import os
 import time
-import datetime as dt
+from typing import Any
 
+import psycopg2
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import QueuePool
-
 from sqlmodel import Session
 
-from app.utils.configs import Settings, get_settings
 from app.constants.constants import DIR_LOGS_QUERY
+from app.utils.configs import Settings, get_settings
 
 settings = get_settings()
 

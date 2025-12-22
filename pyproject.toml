@@ -40,3 +40,27 @@ addopts = [
 pythonpath = [
   "."
 ]
+
+[tool.ruff.lint]
+# 1. Enable flake8-bugbear (`B`) rules, in addition to the defaults.
+select = ["E4", "E7", "E9", "F", "B", "I"]
+
+# 2. Avoid enforcing line-length violations (`E501`)
+ignore = ["E501"]
+
+# 3. Avoid trying to fix flake8-bugbear (`B`) violations.
+unfixable = ["B"]
+
+# 4. Ignore `E402` (import violations) in all `__init__.py` files, and in selected subdirectories.
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402"]
+"**/{tests,docs,tools}/*" = ["E402"]
+
+
+[tool.ruff.lint.isort]
+# Configure import ordering
+force-single-line = false
+force-sort-within-sections = true
+known-first-party = ["app"]  # Your app module
+known-third-party = ["fastapi", "sqlmodel", "pydantic"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]

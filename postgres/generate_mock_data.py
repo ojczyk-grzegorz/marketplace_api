@@ -1,14 +1,14 @@
-import random
 import json
 import os
+import random
 import sys
 
 base_dir = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(base_dir)
 
 from app.utils.configs import get_settings
-from app.utils.db import db_query, db_insert
-from postgres.utils.utils import get_mock_users, get_mock_items, get_mock_transactions
+from app.utils.db import db_insert, db_query
+from postgres.utils.utils import get_mock_items, get_mock_transactions, get_mock_users
 
 DIR = "postgres"
 
