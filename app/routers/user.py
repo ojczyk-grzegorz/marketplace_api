@@ -53,15 +53,12 @@ async def user_create(
     ),
 ):
     query = select(UserSQL).where(
-        (UserSQL.email == user.email)
-        | (UserSQL.phone == user.phone)
+        (UserSQL.email == user.email) | (UserSQL.phone == user.phone)
     )
-    db_user_matching: UserSQL | None = db.exec(query).first(),
+    db_user_matching: UserSQL | None = (db.exec(query).first(),)
     if db_user_matching:
         raise ExcUserExists(
-            email=user.email
-            if db_user_matching.email == user.email
-            else None,
+            email=user.email if db_user_matching.email == user.email else None,
             phone=user.phone
             if db_user_matching._mapping["phone"] == user.phone
             else None,

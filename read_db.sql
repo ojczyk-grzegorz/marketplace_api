@@ -1,0 +1,2 @@
+INSTALL postgres;
+LOAD postgres;

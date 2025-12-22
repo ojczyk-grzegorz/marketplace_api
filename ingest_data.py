@@ -10,6 +10,10 @@ def main():
     settings = get_settings()
     db = next(get_db_session())
 
+    with open("postgres/db_setup/CREATE_TABLES.sql") as f:
+        db.execute(text(f.read()))
+        db.commit()
+
     with open("postgres/db_setup/items.json") as f:
         items = json.load(f)
         items = [{**item, "features": json.dumps(item["features"])} for item in items]

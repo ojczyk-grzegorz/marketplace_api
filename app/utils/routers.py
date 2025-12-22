@@ -9,7 +9,6 @@ from app.datamodels.log import LogRequest
 from app.constants.constants import DIR_LOGS_REQUEST
 
 
-
 def custom_serializer(obj):
     if isinstance(obj, bytes):
         obj = obj.decode("utf-8")
