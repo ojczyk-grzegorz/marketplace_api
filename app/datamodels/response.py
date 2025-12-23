@@ -1,67 +1,8 @@
+import datetime as dt
 from decimal import Decimal
 import uuid
-import datetime as dt
 
 from pydantic import BaseModel
-
-
-class DetailsUserCreate(BaseModel):
-    email: str | None = None
-    phone: str | None = None
-
-
-class ResponseUserCreate(BaseModel):
-    message: str = "User created successfully"
-    details: DetailsUserCreate
-
-
-class DetailsUserUpdate(DetailsUserCreate):
-    password_changed: bool = False
-
-
-class ResponseUserUpdate(BaseModel):
-    message: str = "User updated successfully"
-    details: DetailsUserUpdate
-
-
-class DetailsUserRemove(DetailsUserCreate):
-    pass
-
-
-class ResponseUserRemove(BaseModel):
-    message: str = "User removed successfully"
-    details: DetailsUserRemove
-
-
-class ResponseSingleItem(BaseModel):
-    item_id: uuid.UUID
-    name: str
-    category: str
-    subcategories: list[str] | None = None
-    price: Decimal
-    brand: str | None = None
-    description: str | None = None
-    features: dict | None = None
-    stock: int
-
-
-class ResponseGetSingleItem(BaseModel):
-    item: ResponseSingleItem
-
-
-class ResponseQueryItem(BaseModel):
-    item_id: uuid.UUID
-    name: str
-    category: str
-    subcategories: list[str] | None = None
-    price: Decimal
-    brand: str | None = None
-    features: dict | None = None
-    stock: int
-
-
-class ResponseGetMultipleItems(BaseModel):
-    items: list[ResponseQueryItem]
 
 
 class ResponseTransactionDetails(BaseModel):
@@ -83,6 +24,17 @@ class ResponseTransactionItem(BaseModel):
     appied_discounts: list[dict] = []
 
 
+class ResponseTransactionAction(BaseModel):
+    action: str
+    performed_at: dt.datetime
+    description: str | None = None
+
+
 class ResponseTransaction(BaseModel):
     transaction: ResponseTransactionDetails
     items: list[ResponseTransactionItem]
+    actions: list[ResponseTransactionAction] = []
+
+
+class ResponseTransactionsCurrent(BaseModel):
+    transactions: list[ResponseTransaction]

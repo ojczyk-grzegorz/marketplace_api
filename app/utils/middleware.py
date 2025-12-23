@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.utils.logger import get_logger
@@ -21,7 +22,19 @@ def custom_middleware_factory(app: FastAPI):
             logger.info(log)
 
             request.state.req_id = req_id
-            response = await call_next(request)
+            try:
+                response = await call_next(request)
+            except Exception as e:
+                log = {
+                    "type": "error",
+                    "message": str(e),
+                    "req_id": req_id,
+                }
+                logger.error(log)
+                response = JSONResponse(
+                    status_code=500,
+                    content={"error": "Internal Server Error"},
+                )
             response.headers["X-Request-ID"] = req_id
             return response
 

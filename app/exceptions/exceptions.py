@@ -47,14 +47,6 @@ class ExcTransactionsActiveFound(HTTPException):
         self.user_id = user_id
 
 
-class ExcDiscountNotFound(HTTPException):
-    def __init__(self, discount_code: str):
-        super().__init__(
-            status_code=404, detail=f"Discount with code {discount_code} not found."
-        )
-        self.discount_code = discount_code
-
-
 class ExcDiscountActiveNotFound(HTTPException):
     def __init__(self, discount_code: str):
         super().__init__(

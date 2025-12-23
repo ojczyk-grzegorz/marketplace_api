@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
+from app.datamodels.configs import Settings, get_settings
 from app.routers import auth, items, transactions, user
-from app.utils.configs import Settings, get_settings
 from app.utils.scheduler import lifespan
 
 app = FastAPI(lifespan=lifespan, tags=["Main"])

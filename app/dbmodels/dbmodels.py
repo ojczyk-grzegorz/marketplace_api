@@ -135,7 +135,8 @@ class DBTransaction(SQLModel, table=True):
         sa_column=Column(
             DateTime(timezone=True),
             nullable=False,
-        ), default_factory=lambda: dt.datetime.now(dt.timezone.utc),
+        ),
+        default_factory=lambda: dt.datetime.now(dt.timezone.utc),
     )
     delivery_option_id: uuid.UUID = Field(
         sa_column=Column(UUID(as_uuid=True), nullable=False)

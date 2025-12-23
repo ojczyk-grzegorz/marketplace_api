@@ -5,8 +5,9 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 from uuid import UUID
 
-from app.constants.constants import FILENAME_LOGS
 from app.utils.configs import get_settings
+
+FILENAME_LOGS = "logs/app.log"
 
 
 class CustomJSONEncoder(json.JSONEncoder):

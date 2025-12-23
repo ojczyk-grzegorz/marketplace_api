@@ -3,15 +3,23 @@ import uuid
 
 from sqlmodel import Session, insert, select, update
 
+from app.datamodels.response import (
+    ResponseTransaction,
+    ResponseTransactionAction,
+    ResponseTransactionDetails,
+    ResponseTransactionItem,
+)
 from app.dbmodels.dbmodels import (
     DBDeliveryOptions,
     DBDiscount,
     DBItem,
     DBItemSnapshot,
+    DBTransaction,
+    DBTransactionAction,
+    DBTransactionItem,
 )
 from app.exceptions.exceptions import (
     ExcDiscountActiveNotFound,
-    ExcDiscountNotFound,
     ExcInsufficientStock,
     ExcItemNotFound,
 )
@@ -28,7 +36,7 @@ def get_discount_db(
         query = select(DBDiscount).where(DBDiscount.discount_code == discount_code)
         discount_db = db.exec(query).first()
         if not discount_db:
-            raise ExcDiscountNotFound(discount_code=discount_code)
+            raise ExcDiscountActiveNotFound(discount_code=discount_code)
         discounts_db.append(discount_db)
     return discounts_db
 
@@ -120,3 +128,64 @@ def apply_discounts(
         item_price *= 1 - (discount.discount_percentage / 100)
     price_after_discounts = item_price.quantize(Decimal("0.01"), rounding=ROUND_CEILING)
     return price_after_discounts, applied_discounts
+
+
+def get_response_transaction(
+    db: Session,
+    transaction_db: DBTransaction,
+    delivery_options: dict[uuid.UUID, DBDeliveryOptions],
+):
+    delivery_option = delivery_options.get(transaction_db.delivery_option_id)
+    if not delivery_option:
+        query = select(DBDeliveryOptions).where(
+            DBDeliveryOptions.option_id == transaction_db.delivery_option_id
+        )
+    delivery_option_db = db.exec(query).first()
+    query = select(DBTransactionItem).where(
+        DBTransactionItem.transaction_id == transaction_db.transaction_id
+    )
+    transaction_items_db = db.exec(query)
+
+    response_transaction_items = []
+    for transaction_item_db in transaction_items_db:
+        query = select(DBItemSnapshot).where(
+            DBItemSnapshot.item_id == transaction_item_db.item_id
+        )
+        item_db = db.exec(query).first()
+        response_transaction_item = ResponseTransactionItem(
+            item_id=item_db.item_id,
+            name=item_db.name,
+            item_updated_at=item_db.updated_at,
+            count=transaction_item_db.count,
+            price_unit=item_db.price,
+            price_after_discounts=item_db.price,
+        )
+        response_transaction_items.append(response_transaction_item)
+
+    response_transaction_actions = []
+    query = select(DBTransactionAction).where(
+        DBTransactionAction.transaction_id == transaction_db.transaction_id
+    )
+    transaction_actions_db = db.exec(query)
+    for transaction_action_db in transaction_actions_db:
+        response_transaction_action = ResponseTransactionAction(
+            action=transaction_action_db.action,
+            description=transaction_action_db.description,
+            performed_at=transaction_action_db.performed_at,
+        )
+        response_transaction_actions.append(response_transaction_action)
+
+    response_transaction_details = ResponseTransactionDetails(
+        transaction_id=transaction_db.transaction_id,
+        user_id=transaction_db.user_id,
+        created_at=transaction_db.created_at,
+        delivery_option=delivery_option_db.name,
+        delivery_price=delivery_option_db.price,
+        delivery_details=transaction_db.transaction_details,
+        total_price=transaction_db.total_price,
+    )
+    return ResponseTransaction(
+        transaction=response_transaction_details,
+        items=response_transaction_items,
+        actions=response_transaction_actions,
+    )

@@ -5,9 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlmodel import Session, text
 
+from app.datamodels.configs import Settings
 from app.exceptions.handlers import EXCEPTION_HANDLERS
 from app.routers import auth, items, transactions, user
-from app.utils.configs import Settings, get_settings
+from app.utils.configs import get_settings
 from app.utils.db import get_db_session
 from app.utils.logger import get_logger
 from app.utils.middleware import custom_middleware_factory

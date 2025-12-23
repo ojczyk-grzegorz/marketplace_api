@@ -1,9 +1,10 @@
 from decimal import Decimal
+import uuid
 
 from pydantic import BaseModel, Field
 
 
-class Item(BaseModel):
+class ItemQuery(BaseModel):
     search: str | None = None
     category: str | None = None
     subcategory: list[str] | None = None
@@ -12,3 +13,34 @@ class Item(BaseModel):
     )
     brand: str | None = None
     features: dict | None = None
+
+
+class ItemFiltered(BaseModel):
+    item_id: uuid.UUID
+    name: str
+    category: str
+    subcategories: list[str] | None = None
+    price: Decimal
+    brand: str | None = None
+    features: dict | None = None
+    stock: int
+
+
+class ResponseFilterItems(BaseModel):
+    items: list[ItemFiltered]
+
+
+class ItemRetrieved(BaseModel):
+    item_id: uuid.UUID
+    name: str
+    category: str
+    subcategories: list[str] | None = None
+    price: Decimal
+    brand: str | None = None
+    description: str | None = None
+    features: dict | None = None
+    stock: int
+
+
+class ResponseRetrieveItem(BaseModel):
+    item: ItemRetrieved

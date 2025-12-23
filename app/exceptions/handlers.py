@@ -1,9 +1,12 @@
 from fastapi import HTTPException
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
+from jwt.exceptions import ExpiredSignatureError
 from pydantic import BaseModel
 
 from app.exceptions.exceptions import (
+    ExcDiscountActiveNotFound,
+    ExcInsufficientStock,
     ExcInvalidCredentials,
     ExcItemNotFound,
     ExcTransactionActiveNotFound,
@@ -132,6 +135,56 @@ async def exception_handler_user_not_found(request, exc: ExcUserNotFound):
     )
 
 
+async def exception_handler_token_expired(request, exc: ExpiredSignatureError):
+    logger.error(
+        {
+            "type": "token_expired_exception",
+            "detail": str(exc),
+            "req_id": getattr(request.state, "req_id", None),
+        }
+    )
+    return JSONResponse(
+        status_code=401,
+        content=dict(
+            error_code="TOKEN_EXPIRED",
+            message="The provided token has expired.",
+        ),
+    )
+
+
+
+async def exception_handler_discount_active_not_found(
+    request, exc: ExcDiscountActiveNotFound
+):
+    log_error(request, exc)
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=dict(
+            error_code="DISCOUNT_ACTIVE_NOT_FOUND",
+            message=exc.detail,
+            details={
+                "discount_code": str(exc.discount_code),
+            },
+        ),
+    )
+
+
+async def exception_handler_insufficient_stock(request, exc: ExcInsufficientStock):
+    log_error(request, exc)
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=dict(
+            error_code="INSUFFICIENT_STOCK",
+            message=exc.detail,
+            details={
+                "item_id": str(exc.item_id),
+                "requested": exc.requested,
+                "available": exc.available,
+            },
+        ),
+    )
+
+
 EXCEPTION_HANDLERS = {
     HTTPException: exception_handler_http,
     ExcUserExists: exception_handler_user_exists,
@@ -140,4 +193,7 @@ EXCEPTION_HANDLERS = {
     ExcItemNotFound: exception_handler_item_not_found,
     ExcInvalidCredentials: exception_handler_invalid_credentials,
     ExcUserNotFound: exception_handler_user_not_found,
+    ExpiredSignatureError: exception_handler_token_expired,
+    ExcDiscountActiveNotFound: exception_handler_discount_active_not_found,
+    ExcInsufficientStock: exception_handler_insufficient_stock,
 }

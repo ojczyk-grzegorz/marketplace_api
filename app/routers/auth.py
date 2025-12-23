@@ -3,13 +3,12 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status
 from fastapi.routing import APIRoute
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlmodel import Session, select
+from sqlmodel import Session
 
 from app.datamodels.auth import BearerToken
-from app.dbmodels.dbmodels import DBUser
-from app.exceptions.exceptions import ExcInvalidCredentials
-from app.utils.auth import get_access_token, verify_password
-from app.utils.configs import Settings, get_settings
+from app.datamodels.configs import Settings
+from app.services.auth.service import get_token
+from app.utils.configs import get_settings
 from app.utils.db import get_db_session
 
 router = APIRouter(prefix="/auth", tags=["Authentication"], route_class=APIRoute)
@@ -21,26 +20,9 @@ router = APIRouter(prefix="/auth", tags=["Authentication"], route_class=APIRoute
     response_model=BearerToken,
     description="Route for getting user token",
 )
-async def get_token(
+async def req_get_token(
     form: Annotated[OAuth2PasswordRequestForm, Depends()],
     settings: Annotated[Settings, Depends(get_settings)],
     db: Annotated[Session, Depends(get_db_session)],
 ):
-    query = select(DBUser).where(DBUser.email == form.username)
-    db_user_matching = db.exec(query).first()
-
-    if not db_user_matching or not verify_password(
-        form.password, db_user_matching.password_hash
-    ):
-        raise ExcInvalidCredentials()
-
-    token = get_access_token(
-        data={"user_id": db_user_matching.user_id.hex},
-        secret_key=settings.auth_secret_key,
-        algorithm=settings.auth_algorithm,
-        expire_minutes=settings.auth_access_token_expire_minutes,
-    )
-
-    return BearerToken(
-        access_token=token,
-    )
+    return await get_token(settings=settings, db=db, form=form)
