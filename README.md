@@ -30,3 +30,6 @@ Allows you to run multiple PostgreSQL commands without prefixing each one with s
 This is useful when you need to run several postgres commands in succession - you can just type createuser owning_user, createdb marketplace, etc. directly instead of sudo -u postgres createuser owning_user each time.
 
 To exit back to your regular user, just type exit.
+
+
+https://github.com/WhiskyToad/fastapi-starter/blob/main/.pre-commit-config.yaml
