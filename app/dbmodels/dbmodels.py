@@ -4,11 +4,12 @@ import uuid
 
 from sqlalchemy import Column, DateTime, Integer, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
-from sqlmodel import Field, SQLModel
+from sqlmodel import CheckConstraint, Field, SQLModel
 
 
 class DBItem(SQLModel, table=True):
     __tablename__ = "items"
+    __table_args__ = (CheckConstraint("stock >= 0", name="check_stock_non_negative"),)
 
     item_id: uuid.UUID = Field(
         sa_column=Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -134,8 +135,7 @@ class DBTransaction(SQLModel, table=True):
         sa_column=Column(
             DateTime(timezone=True),
             nullable=False,
-            default=lambda: dt.datetime.now(dt.timezone.utc),
-        )
+        ), default_factory=lambda: dt.datetime.now(dt.timezone.utc),
     )
     delivery_option_id: uuid.UUID = Field(
         sa_column=Column(UUID(as_uuid=True), nullable=False)
@@ -204,5 +204,7 @@ class DBTransactionFinalized(SQLModel, table=True):
     delivery_option: str = Field(sa_column=Column(String(32), nullable=False))
     delivery_price: Decimal = Field(sa_column=Column(Numeric, nullable=False))
     transaction_details: dict = Field(sa_column=Column(JSONB, nullable=False))
-    items: dict = Field(sa_column=Column(JSONB, nullable=False))
+    items: dict = Field(
+        sa_column=Column(JSONB, nullable=False),
+    )
     action_history: dict = Field(sa_column=Column(JSONB, nullable=False))

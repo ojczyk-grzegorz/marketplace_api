@@ -5,7 +5,7 @@ from fastapi.routing import APIRoute
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 
-from app.datamodels.auth import Token
+from app.datamodels.auth import BearerToken
 from app.dbmodels.dbmodels import DBUser
 from app.exceptions.exceptions import ExcInvalidCredentials
 from app.utils.auth import get_access_token, verify_password
@@ -15,14 +15,11 @@ from app.utils.db import get_db_session
 router = APIRouter(prefix="/auth", tags=["Authentication"], route_class=APIRoute)
 
 
-# TOKEN GENERATION
-
-
 @router.post(
     "/token",
     status_code=status.HTTP_200_OK,
-    response_model=Token,
-    description="Route for getting user by ID",
+    response_model=BearerToken,
+    description="Route for getting user token",
 )
 async def get_token(
     form: Annotated[OAuth2PasswordRequestForm, Depends()],
@@ -44,7 +41,6 @@ async def get_token(
         expire_minutes=settings.auth_access_token_expire_minutes,
     )
 
-    return Token(
+    return BearerToken(
         access_token=token,
-        token_type="bearer",
     )

@@ -7,10 +7,10 @@ from sqlmodel import Session, select
 
 from app.datamodels.item import (
     Item,
-    QueryItemMultiple,
-    QueryItemSingle,
 )
+from app.datamodels.response import ResponseGetMultipleItems, ResponseGetSingleItem
 from app.dbmodels.dbmodels import DBItem
+from app.exceptions.exceptions import ExcItemNotFound
 from app.utils.db import get_db_session
 
 router = APIRouter(prefix="/items", tags=["Items"], route_class=APIRoute)
@@ -19,7 +19,7 @@ router = APIRouter(prefix="/items", tags=["Items"], route_class=APIRoute)
 @router.get(
     "/query",
     status_code=status.HTTP_200_OK,
-    response_model=QueryItemMultiple,
+    response_model=ResponseGetMultipleItems,
     description="Query items based on various filters",
     response_model_exclude_none=True,
 )
@@ -45,8 +45,7 @@ async def get_items(
     if query_items.brand:
         query = query.where(DBItem.brand == query_items.brand)
 
-    return QueryItemMultiple(
-        q=query_items,
+    return ResponseGetMultipleItems(
         items=[x.model_dump() for x in db.exec(query)],
     )
 
@@ -54,7 +53,8 @@ async def get_items(
 @router.get(
     "/item/{item_id}",
     status_code=status.HTTP_200_OK,
-    response_model=QueryItemSingle,
+    response_model=ResponseGetSingleItem,
+    response_model_exclude_none=True,
     description="Get item by its ID",
 )
 async def get_item(
@@ -63,7 +63,6 @@ async def get_item(
 ):
     query = select(DBItem).where(DBItem.item_id == item_id)
     item = db.exec(query).first()
-    return QueryItemSingle(
-        item_id=item_id,
-        item=item.model_dump() if item else None,
-    )
+    if not item:
+        raise ExcItemNotFound(item_id=item_id)
+    return ResponseGetSingleItem(item=item.model_dump())

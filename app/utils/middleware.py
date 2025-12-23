@@ -22,6 +22,7 @@ def custom_middleware_factory(app: FastAPI):
 
             request.state.req_id = req_id
             response = await call_next(request)
+            response.headers["X-Request-ID"] = req_id
             return response
 
     return CustomMiddleware(app)

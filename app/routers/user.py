@@ -5,14 +5,21 @@ from fastapi import APIRouter, Body, Depends, status
 from fastapi.routing import APIRoute
 from sqlmodel import Session, delete, insert, select, update
 
-from app.datamodels.response import ResponseSuccess
+from app.datamodels.response import (
+    DetailsUserCreate,
+    DetailsUserRemove,
+    DetailsUserUpdate,
+    ResponseUserCreate,
+    ResponseUserRemove,
+    ResponseUserUpdate,
+)
 from app.datamodels.user import (
     UserCreate,
     UserUpdate,
 )
 from app.dbmodels.dbmodels import DBTransaction, DBUser
 from app.exceptions.exceptions import (
-    ExcTransactionsFound,
+    ExcTransactionsActiveFound,
     ExcUserExists,
     ExcUserNotFound,
 )
@@ -21,6 +28,10 @@ from app.utils.configs import Settings, get_settings
 from app.utils.db import (
     get_db_session,
 )
+from development.openapi_examples import (
+    get_user_create_examples,
+    get_user_update_examples,
+)
 
 router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRoute)
 
@@ -28,27 +39,15 @@ router = APIRouter(prefix="/users", tags=["Users"], route_class=APIRoute)
 @router.post(
     "/create",
     status_code=status.HTTP_201_CREATED,
-    response_model=ResponseSuccess,
+    response_model=ResponseUserCreate,
+    response_model_exclude_none=True,
     description="Route for creating user",
 )
 async def user_create(
-    settings: Annotated[Settings, Depends(get_settings)],
     db: Annotated[Session, Depends(get_db_session)],
     user_req: Annotated[
         UserCreate,
-        Body(
-            ...,
-            openapi_examples={
-                "example1": {
-                    "summary": "Example user creation payload",
-                    "value": {
-                        "email": "user2@example.com",
-                        "phone": "+48234567891",
-                        "password": "p2",
-                    },
-                }
-            },
-        ),
+        Body(..., openapi_examples=get_user_create_examples()),
     ],
 ):
     query = select(DBUser).where(
@@ -74,17 +73,18 @@ async def user_create(
     )
     db.exec(query)
     db.commit()
-    return ResponseSuccess(
-        message="User created successfully",
-        details=dict(user=user_db.model_dump(exclude_none=True)),
+
+    return ResponseUserCreate(
+        details=DetailsUserCreate(email=user_req.email, phone=user_req.phone),
     )
 
 
 @router.patch(
     "/update",
     status_code=status.HTTP_201_CREATED,
-    response_model=ResponseSuccess,
-    description="Route for creating user",
+    response_model=ResponseUserUpdate,
+    response_model_exclude_none=True,
+    description="Route for updating user",
 )
 async def user_update(
     settings: Annotated[Settings, Depends(get_settings)],
@@ -92,19 +92,7 @@ async def user_update(
     token: Annotated[str, Depends(oauth2_scheme)],
     user: Annotated[
         UserUpdate,
-        Body(
-            ...,
-            openapi_examples={
-                "example1": {
-                    "summary": "Example user creation payload",
-                    "value": {
-                        "email": "user3@example.com",
-                        "phone": "+48345678912",
-                        "password": "p3",
-                    },
-                }
-            },
-        ),
+        Body(..., openapi_examples=get_user_update_examples()),
     ],
 ):
     user_id = validate_access_token(
@@ -134,17 +122,21 @@ async def user_update(
     db.exec(query)
     db.commit()
 
-    return ResponseSuccess(
-        message="User updated successfully",
-        details=db_user.model_dump(exclude_none=True),
+    return ResponseUserUpdate(
+        details=DetailsUserUpdate(
+            email=db_user.email,
+            phone=db_user.phone,
+            password_changed=bool(user.password),
+        ),
     )
 
 
 @router.delete(
     "/remove",
     status_code=status.HTTP_202_ACCEPTED,
-    response_model=ResponseSuccess,
-    description="Route for creating user",
+    response_model=ResponseUserRemove,
+    response_model_exclude_none=True,
+    description="Route for removing user",
 )
 async def user_remove(
     settings: Annotated[Settings, Depends(get_settings)],
@@ -167,21 +159,15 @@ async def user_remove(
     query = select(DBTransaction).where(DBTransaction.user_id == user_id)
     db_user_tranasactions = db.exec(query).all()
     if db_user_tranasactions:
-        raise ExcTransactionsFound(
+        raise ExcTransactionsActiveFound(
             user_id=user_id,
-            details=dict(
-                transaction_ids=[t.transaction_id for t in db_user_tranasactions]
-            ),
+            transaction_ids=[t.transaction_id for t in db_user_tranasactions],
         )
 
     query = delete(DBUser).where(DBUser.user_id == user_id)
     db.exec(query)
     db.commit()
 
-    return ResponseSuccess(
-        message="User removed successfully",
-        details={
-            "user_id": user_id,
-            "email": email,
-        },
+    return ResponseUserRemove(
+        details=DetailsUserRemove(email=email, phone=user_db.phone),
     )

@@ -4,29 +4,34 @@ import uuid
 
 from fastapi import APIRouter, Body, Depends, Path, status
 from fastapi.routing import APIRoute
-from sqlmodel import Session, insert, select, update
+from sqlmodel import Session, select
 
+from app.datamodels.response import ResponseTransaction, ResponseTransactionDetails, ResponseTransactionItem
 from app.datamodels.transaction import (
     TransactionCreate,
 )
 from app.dbmodels.dbmodels import (
     DBDeliveryOptions,
-    DBDiscount,
     DBItem,
-    DBItemSnapshot,
     DBTransaction,
     DBTransactionAction,
     DBTransactionDiscount,
     DBTransactionItem,
-)
-from app.exceptions.exceptions import (
-    ExcItemNotFound,
 )
 from app.utils.auth import oauth2_scheme, validate_access_token
 from app.utils.configs import Settings, get_settings
 from app.utils.db import (
     get_db_session,
 )
+from app.utils.transactions import (
+    apply_discounts,
+    check_for_item_snapshot,
+    get_delivery_option_db,
+    get_discount_db,
+    get_item_db,
+    update_item_stock,
+)
+from development.openapi_examples import get_transaction_create_examples
 
 router = APIRouter(prefix="/transactions", tags=["Transactions"], route_class=APIRoute)
 
@@ -34,7 +39,9 @@ router = APIRouter(prefix="/transactions", tags=["Transactions"], route_class=AP
 @router.post(
     "/create",
     status_code=status.HTTP_200_OK,
-    # response_model=ResponseSuccess,
+    response_model=ResponseTransaction,
+    response_model_exclude_none=True,
+    description="Route for creating new transaction",
 )
 async def transaction_create(
     settings: Annotated[Settings, Depends(get_settings)],
@@ -42,22 +49,7 @@ async def transaction_create(
     token: Annotated[str, Depends(oauth2_scheme)],
     req_body: Annotated[
         TransactionCreate,
-        Body(
-            ...,
-            openapi_examples={
-                "example1": {
-                    "summary": "Example transaction creation payload",
-                    "value": {
-                        "item_ids": {
-                            "550e8400-e29b-41d4-a716-446655440001": 1,
-                            "550e8400-e29b-41d4-a716-446655440003": 1,
-                        },
-                        "delivery_option_id": "13f92f95-5fe7-46b5-8893-5ea1a5eeae5a",
-                        "discount_codes": ["APPLE_SALE", "ELECTRONICS_LAPTOPS_SALE"],
-                    },
-                }
-            },
-        ),
+        Body(..., openapi_examples=get_transaction_create_examples()),
     ],
 ):
     user_id: int = validate_access_token(
@@ -65,99 +57,48 @@ async def transaction_create(
         secret_key=settings.auth_secret_key,
         algorithms=[settings.auth_algorithm],
     )
-    if req_body.discount_codes:
-        query = select(DBDiscount).where(
-            DBDiscount.discount_code.in_(req_body.discount_codes)
-        )
-        discounts_db = db.exec(query).all()
-        if not discounts_db:
-            raise Exception("No valid discounts found")
-    else:
-        discounts_db = []
-
-    query = select(DBDeliveryOptions).where(
-        DBDeliveryOptions.option_id == req_body.delivery_option_id
-    )
-    delivery_option_db = db.exec(query).first()
-    if not delivery_option_db:
-        raise Exception("Invalid delivery option")
+    discounts_db = get_discount_db(db, req_body.discount_codes)
+    delivery_option_db = get_delivery_option_db(db, req_body.delivery_option_id)
 
     transaction_id = uuid.uuid4()
 
     transaction_items_db = []
-    items_response = []
+    response_transaction_items = []
     total_price = delivery_option_db.price
     for item_id, item_count in req_body.item_ids.items():
-        query = select(DBItem).where(DBItem.item_id == item_id)
-        item_db = db.exec(query).first()
-        if not item_db:
-            raise ExcItemNotFound(item_id=item_id)
-        elif item_db.stock < item_count:
-            raise Exception(f"Not enough stock for item {item_id}")
-
-        query = (
-            update(DBItem)
-            .where(DBItem.item_id == item_id)
-            .values(stock=item_db.stock - item_count)
+        item_db = get_item_db(db, item_id, item_count)
+        update_item_stock(
+            db,
+            item_id,
+            item_count,
         )
-        db.exec(query)
-
-        query = select(DBItemSnapshot).where(
-            (DBItemSnapshot.item_id == item_db.item_id)
-            & (DBItemSnapshot.updated_at == item_db.updated_at)
-        )
-        item_snapshot_db = db.exec(query).first()
-        if not item_snapshot_db:
-            query = insert(DBItemSnapshot).values(item_db.model_dump(exclude={"stock"}))
-            db.exec(query)
+        check_for_item_snapshot(db, item_db)
 
         item_price = item_db.price
-        item_response = dict(
+        price_after_discounts, applied_discounts = apply_discounts(
+            item_db, item_price, discounts_db
+        )
+
+        response_transaction_item = ResponseTransactionItem(
             item_id=item_db.item_id,
             name=item_db.name,
             price_unit=item_price,
-            price_after_discounts=item_price,
+            price_after_discounts=price_after_discounts,
             count=item_count,
-            appied_discounts=[],
+            applied_discounts=applied_discounts,
         )
-        items_response.append(item_response)
-        for discount in discounts_db:
-            if discount.item_ids and item_db.item_id not in discount.item_ids:
-                continue
-            elif (
-                (discount.item_ids and item_db.item_id not in discount.item_ids)
-                or (discount.brands and item_db.brand not in discount.brands)
-                or (discount.categories and item_db.category not in discount.categories)
-                or (
-                    discount.categories
-                    and item_db.category in discount.categories
-                    and not set(item_db.subcategories)
-                    & set(discount.categories[item_db.category])
-                )
-            ):
-                continue
-            item_response["appied_discounts"].append(
-                dict(
-                    discount_code=discount.discount_code,
-                    discount_percentage=discount.discount_percentage,
-                )
-            )
+        response_transaction_items.append(response_transaction_item)
 
-            item_price *= 1 - (discount.discount_percentage / 100)
-        price_after_discounts = item_price.quantize(
-            Decimal("0.01"), rounding=ROUND_CEILING
+        db_transaction_item = DBTransactionItem(
+            transaction_id=transaction_id,
+            item_id=item_db.item_id,
+            item_updated_at=item_db.updated_at,
+            count=item_count,
+            price_after_discounts=price_after_discounts,
         )
-        item_response["price_after_discounts"] = price_after_discounts
+        transaction_items_db.append(db_transaction_item)
+
         total_price += price_after_discounts * item_count
-        transaction_items_db.append(
-            DBTransactionItem(
-                transaction_id=transaction_id,
-                item_id=item_db.item_id,
-                item_updated_at=item_db.updated_at,
-                count=item_count,
-                price_after_discounts=price_after_discounts,
-            )
-        )
 
     total_price = total_price.quantize(Decimal("0.01"), rounding=ROUND_CEILING)
     transaction_db = DBTransaction(
@@ -169,7 +110,15 @@ async def transaction_create(
         },
         total_price=total_price,
     )
-    transaction_response = transaction_db.model_dump(exclude_none=True)
+    response_transaction_details = ResponseTransactionDetails(
+            transaction_id=transaction_db.transaction_id,
+            user_id=transaction_db.user_id,
+            created_at=transaction_db.created_at,
+            delivery_option=delivery_option_db.name,
+            delivery_price=delivery_option_db.price,
+            delivery_details=transaction_db.transaction_details,
+            total_price=transaction_db.total_price,
+        )
     db.add(transaction_db)
 
     transaction_discounts_db = [
@@ -181,36 +130,18 @@ async def transaction_create(
     ]
     db.add_all(transaction_discounts_db)
     db.add_all(transaction_items_db)
-
-    transaction_response = dict(
-        transaction_id=transaction_db.transaction_id,
-        user_id=transaction_db.user_id,
-        created_at=transaction_db.created_at,
-        delivery_option=delivery_option_db.name,
-        delivery_price=delivery_option_db.price,
-        delivery_details=transaction_db.transaction_details,
-        total_price=transaction_db.total_price,
-    )
-
     db.commit()
 
-    transaction_response = dict(
-        transaction_id=transaction_db.transaction_id,
-        user_id=transaction_db.user_id,
-        created_at=transaction_db.created_at,
-        delivery_option=delivery_option_db.name,
-        delivery_price=delivery_option_db.price,
-        delivery_details=transaction_db.transaction_details,
-        total_price=transaction_db.total_price,
+    return ResponseTransaction(
+        transaction=response_transaction_details,
+        items=response_transaction_items
     )
-
-    return dict(transaction=transaction_response, transaction_items=items_response)
 
 
 @router.get(
     "/current",
     status_code=status.HTTP_200_OK,
-    # response_model=ResponseSuccess,
+    response_model=ResponseTransactionDetails,
 )
 async def transactions_get_current(
     settings: Annotated[Settings, Depends(get_settings)],
