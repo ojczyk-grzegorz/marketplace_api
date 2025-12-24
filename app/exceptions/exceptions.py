@@ -1,3 +1,4 @@
+import uuid
 from fastapi import HTTPException
 
 
@@ -7,7 +8,7 @@ class ExcInvalidCredentials(HTTPException):
 
 
 class ExcUserNotFound(HTTPException):
-    def __init__(self, user_id: str):
+    def __init__(self, user_id: uuid.UUID):
         super().__init__(status_code=404, detail=f"User with ID {user_id} not found.")
         self.user_id = user_id
 
@@ -20,13 +21,13 @@ class ExcUserExists(HTTPException):
 
 
 class ExcItemNotFound(HTTPException):
-    def __init__(self, item_id: str):
+    def __init__(self, item_id: uuid.UUID):
         super().__init__(status_code=404, detail=f"Item with ID {item_id} not found.")
         self.item_id = item_id
 
 
 class ExcTransactionActiveNotFound(HTTPException):
-    def __init__(self, user_id: str, transaction_id: str):
+    def __init__(self, user_id: uuid.UUID, transaction_id: uuid.UUID):
         super().__init__(
             status_code=404,
             detail=f"Active transaction with ID {transaction_id} of user with ID {user_id} not found.",
@@ -36,7 +37,7 @@ class ExcTransactionActiveNotFound(HTTPException):
 
 
 class ExcTransactionsActiveFound(HTTPException):
-    def __init__(self, transaction_ids: list[str], user_id: str):
+    def __init__(self, transaction_ids: list[str], user_id: uuid.UUID):
         super().__init__(
             status_code=404,
             detail=f"User with ID {user_id} has active transactions with IDs {transaction_ids}.",
@@ -54,8 +55,27 @@ class ExcDiscountActiveNotFound(HTTPException):
         self.discount_code = discount_code
 
 
+class ExcDeliveryOptionNotFound(HTTPException):
+    def __init__(self, delivery_option_id: uuid.UUID):
+        super().__init__(
+            status_code=404,
+            detail=f"Active discount with code {delivery_option_id} not found.",
+        )
+        self.delivery_option_id = delivery_option_id
+
+
+class ExcTransactionFinalizedNotFound(HTTPException):
+    def __init__(self, user_id: uuid.UUID, transaction_id: uuid.UUID):
+        super().__init__(
+            status_code=404,
+            detail=f"Active transaction with ID {transaction_id} of user with ID {user_id} not found.",
+        )
+        self.transaction_id = transaction_id
+        self.user_id = user_id
+
+
 class ExcInsufficientStock(HTTPException):
-    def __init__(self, item_id: str, requested: int, available: int):
+    def __init__(self, item_id: uuid.UUID, requested: int, available: int):
         super().__init__(
             status_code=400,
             detail=f"Insufficient stock for item with ID {item_id}. Requested: {requested}, Available: {available}.",

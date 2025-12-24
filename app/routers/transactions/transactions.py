@@ -17,21 +17,23 @@ from app.routers.transactions.datamodels import (
 from app.routers.transactions.service import (
     create_transaction,
     get_all_current_transactions,
+    get_all_finalized_transactions,
     get_current_transaction,
+    get_finalized_transaction,
 )
-from testing.openapi_examples import get_transaction_create_examples
+from development.openapi_examples import get_transaction_create_examples
 
 router = APIRouter(prefix="/transactions", tags=["Transactions"], route_class=APIRoute)
 
 
 @router.post(
     "/create",
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_201_CREATED,
     response_model=ResponseGetCurrentTransaction,
     response_model_exclude_none=True,
     description="Route for creating new transaction",
 )
-async def transaction_create(
+async def req_create_transaction(
     settings: Annotated[Settings, Depends(get_settings)],
     db: Annotated[Session, Depends(get_db_session)],
     token: Annotated[str, Depends(oauth2_scheme)],
@@ -55,7 +57,7 @@ async def transaction_create(
     response_model_exclude_none=True,
     description="Route for retrieving current user's transactions",
 )
-async def transactions_get_current(
+async def req_get_all_current_transactions(
     settings: Annotated[Settings, Depends(get_settings)],
     db: Annotated[Session, Depends(get_db_session)],
     token: str = Depends(oauth2_scheme),
@@ -74,7 +76,7 @@ async def transactions_get_current(
     response_model_exclude_none=True,
     description="Route for retrieving transaction status",
 )
-async def transaction_get_status(
+async def req_get_current_transaction(
     settings: Annotated[Settings, Depends(get_settings)],
     db: Annotated[Session, Depends(get_db_session)],
     token: Annotated[str, Depends(oauth2_scheme)],
@@ -83,6 +85,48 @@ async def transaction_get_status(
     ],
 ):
     return await get_current_transaction(
+        settings=settings,
+        db=db,
+        token=token,
+        transaction_id=transaction_id,
+    )
+
+
+@router.get(
+    "/finalized",
+    status_code=status.HTTP_200_OK,
+    response_model=ResponseGetAllCurrentTransactions,
+    response_model_exclude_none=True,
+    description="Route for retrieving current user's transactions",
+)
+async def req_get_all_finalized_transactions(
+    settings: Annotated[Settings, Depends(get_settings)],
+    db: Annotated[Session, Depends(get_db_session)],
+    token: str = Depends(oauth2_scheme),
+):
+    return await get_all_finalized_transactions(
+        settings=settings,
+        db=db,
+        token=token,
+    )
+
+
+@router.get(
+    "/finalized/{transaction_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=ResponseGetCurrentTransaction,
+    response_model_exclude_none=True,
+    description="Route for retrieving transaction status",
+)
+async def req_get_finalized_transaction(
+    settings: Annotated[Settings, Depends(get_settings)],
+    db: Annotated[Session, Depends(get_db_session)],
+    token: Annotated[str, Depends(oauth2_scheme)],
+    transaction_id: Annotated[
+        uuid.UUID, Path(..., description="The UUID of the transaction to retrieve")
+    ],
+):
+    return await get_finalized_transaction(
         settings=settings,
         db=db,
         token=token,

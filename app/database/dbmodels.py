@@ -138,7 +138,7 @@ class DBTransactionItem(SQLModel, table=True):
     row_id: int = Field(sa_column=Column(Integer, primary_key=True, autoincrement=True))
     transaction_id: uuid.UUID = Field(sa_column=Column(UUID(as_uuid=True), nullable=False))
     item_id: uuid.UUID = Field(sa_column=Column(UUID(as_uuid=True), nullable=False))
-    item_updated_at: dt.datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=False))
+    updated_at: dt.datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=False))
     count: int = Field(sa_column=Column(Integer, nullable=False))
     price_after_discounts: Decimal = Field(sa_column=Column(Numeric, nullable=False))
 
@@ -161,19 +161,21 @@ class DBTransactionFinalized(SQLModel, table=True):
 
     transaction_id: uuid.UUID = Field(sa_column=Column(UUID(as_uuid=True), primary_key=True))
     user_id: uuid.UUID = Field(sa_column=Column(UUID(as_uuid=True), nullable=False))
-    created_at: dt.datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=False))
-    finalized_at: dt.datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=False))
-    name: str = Field(sa_column=Column(String(256), nullable=False))
-    last_name: str = Field(sa_column=Column(String(256), nullable=False))
-    email: str = Field(sa_column=Column(String(256), nullable=False))
-    phone: str = Field(sa_column=Column(String(16), nullable=False))
-    country: str = Field(sa_column=Column(String(128), nullable=False))
-    city: str = Field(sa_column=Column(String(128), nullable=False))
-    postal_code: str = Field(sa_column=Column(String(16), nullable=False))
-    address_line_1: str = Field(sa_column=Column(String(256), nullable=False))
+    created_at: dt.datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=True))
+    finalized_at: dt.datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=True))
+
+    name: str = Field(sa_column=Column(String(256), nullable=True))
+    last_name: str = Field(sa_column=Column(String(256), nullable=True))
+    email: str = Field(sa_column=Column(String(256), nullable=True))
+    phone: str = Field(sa_column=Column(String(16), nullable=True))
+    country: str = Field(sa_column=Column(String(128), nullable=True))
+    city: str = Field(sa_column=Column(String(128), nullable=True))
+    postal_code: str = Field(sa_column=Column(String(16), nullable=True))
+    address_line_1: str = Field(sa_column=Column(String(256), nullable=True))
     address_line_2: str | None = Field(sa_column=Column(String(256), nullable=True), default=None)
-    delivery_price: Decimal = Field(sa_column=Column(Numeric, nullable=False))
-    items: dict = Field(
-        sa_column=Column(JSONB, nullable=False),
+
+    delivery: dict = Field(sa_column=Column(JSONB, nullable=True))
+    items: list[dict] = Field(
+        sa_column=Column(JSONB, nullable=True),
     )
-    action_history: dict = Field(sa_column=Column(JSONB, nullable=False))
+    action_history: list[dict] = Field(sa_column=Column(JSONB, nullable=True))

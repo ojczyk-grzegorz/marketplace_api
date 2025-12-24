@@ -11,9 +11,11 @@ from app.exceptions.exceptions import (
     ExcInvalidCredentials,
     ExcItemNotFound,
     ExcTransactionActiveNotFound,
+    ExcTransactionFinalizedNotFound,
     ExcTransactionsActiveFound,
     ExcUserExists,
     ExcUserNotFound,
+    ExcDeliveryOptionNotFound
 )
 from app.logger.utils import get_logger
 
@@ -89,6 +91,38 @@ async def exception_handler_transaction_active_not_found(
         status_code=exc.status_code,
         content=dict(
             error_code="TRANSACTION_ACTIVE_NOT_FOUND",
+            message=exc.detail,
+            details={
+                "transaction_id": str(exc.transaction_id),
+                "user_id": str(exc.user_id),
+            },
+        ),
+    )
+
+async def exception_handler_delivery_option_not_found(
+    request, exc: ExcDeliveryOptionNotFound
+):
+    log_error(request, exc)
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=dict(
+            error_code="DELIVERY_OPTION_NOT_FOUND",
+            message=exc.detail,
+            details={
+                "delivery_option_id": str(exc.delivery_option_id),
+            },
+        ),
+    )
+
+
+async def exception_handler_transaction_finalized_not_found(
+    request, exc: ExcTransactionFinalizedNotFound
+):
+    log_error(request, exc)
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=dict(
+            error_code="TRANSACTION_FINALIZED_NOT_FOUND",
             message=exc.detail,
             details={
                 "transaction_id": str(exc.transaction_id),
@@ -204,7 +238,9 @@ EXCEPTION_HANDLERS = {
     RequestValidationError: exception_handler_validation_error,
     ExcUserExists: exception_handler_user_exists,
     ExcTransactionActiveNotFound: exception_handler_transaction_active_not_found,
+    ExcDeliveryOptionNotFound: exception_handler_delivery_option_not_found,
     ExcTransactionsActiveFound: exception_handler_transactions_active_found,
+    ExcTransactionFinalizedNotFound: exception_handler_transaction_finalized_not_found,
     ExcItemNotFound: exception_handler_item_not_found,
     ExcInvalidCredentials: exception_handler_invalid_credentials,
     ExcUserNotFound: exception_handler_user_not_found,

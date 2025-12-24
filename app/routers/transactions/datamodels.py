@@ -40,6 +40,8 @@ class TransactionCreated(BaseModel):
 
 class TransactionItem(BaseModel):
     item_id: uuid.UUID
+    updated_at: dt.datetime
+
     name: str
     price_unit: Decimal
     price_after_discounts: Decimal
@@ -61,3 +63,32 @@ class ResponseGetCurrentTransaction(BaseModel):
 
 class ResponseGetAllCurrentTransactions(BaseModel):
     transactions: list[ResponseGetCurrentTransaction]
+
+
+class TransactionFinalized(BaseModel):
+    transaction_id: uuid.UUID
+    user_id: uuid.UUID
+    created_at: dt.datetime
+    finalized_at: dt.datetime
+
+    name: str
+    last_name: str
+    email: str
+    phone: str
+    country: str
+    city: str
+    postal_code: str
+    address_line_1: str
+    address_line_2: str | None = None
+
+    delivery: dict
+    items: list[dict]
+    action_history: list[dict] | None = None
+
+
+class ResponseGetFinalizedTransaction(BaseModel):
+    transaction: TransactionFinalized
+
+
+class ResponseGetAllFinalizedTransactions(BaseModel):
+    transactions: list[TransactionFinalized]

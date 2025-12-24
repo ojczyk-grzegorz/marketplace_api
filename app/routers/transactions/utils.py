@@ -14,6 +14,7 @@ from app.database.dbmodels import (
 )
 from app.exceptions.exceptions import (
     ExcDiscountActiveNotFound,
+    ExcDeliveryOptionNotFound,
     ExcInsufficientStock,
     ExcItemNotFound,
 )
@@ -25,7 +26,7 @@ from app.routers.transactions.datamodels import (
 )
 
 
-def get_discount_db(
+def get_db_discounts(
     db: Session,
     discount_codes: list[DBDiscount],
 ):
@@ -41,18 +42,18 @@ def get_discount_db(
     return discounts_db
 
 
-def get_delivery_option_db(
+def get_db_delivery_options(
     db: Session,
     delivery_option_id: uuid.UUID,
 ):
     query = select(DBDeliveryOptions).where(DBDeliveryOptions.option_id == delivery_option_id)
     delivery_option_db = db.exec(query).first()
     if not delivery_option_db:
-        raise ExcDiscountActiveNotFound(discount_code=delivery_option_id)
+        raise ExcDeliveryOptionNotFound(delivery_option_id=delivery_option_id)
     return delivery_option_db
 
 
-def get_item_db(
+def get_db_item(
     db: Session,
     item_id: uuid.UUID,
     item_count: int,
@@ -66,7 +67,7 @@ def get_item_db(
     return item_db
 
 
-def update_item_stock(
+def update_db_item_stock(
     db: Session,
     item_id: uuid.UUID,
     item_count: int,
@@ -77,7 +78,7 @@ def update_item_stock(
     db.exec(query)
 
 
-def check_for_item_snapshot(
+def check_for_db_item_snapshot(
     db: Session,
     item_db: DBItem,
 ):
@@ -91,7 +92,7 @@ def check_for_item_snapshot(
         db.exec(query)
 
 
-def apply_discounts(
+def apply_db_discounts(
     item_db: DBItem,
     item_price: Decimal,
     discounts_db: list[DBDiscount],
@@ -123,11 +124,11 @@ def apply_discounts(
     return price_after_discounts, applied_discounts
 
 
-def get_response_transaction(
+def get_response_current_transaction(
     db: Session,
     transaction_db: DBTransaction,
     delivery_options: dict[uuid.UUID, DBDeliveryOptions] = dict(),
-):
+) -> ResponseGetCurrentTransaction:
     delivery_option = delivery_options.get(transaction_db.delivery_option_id)
     if not delivery_option:
         query = select(DBDeliveryOptions).where(
@@ -145,7 +146,7 @@ def get_response_transaction(
         item_db = db.exec(query).first()
         response_transaction_item = TransactionItem(
             **item_db.model_dump(),
-            **transaction_item_db.model_dump(exclude={"item_id"}),
+            **transaction_item_db.model_dump(exclude={"item_id", "updated_at"}),
             price_unit=item_db.price,
         )
         response_transaction_items.append(response_transaction_item)

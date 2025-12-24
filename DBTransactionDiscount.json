@@ -1,0 +1,12 @@
+[
+    {
+        "discount_code": "APPLE_SALE",
+        "row_id": 1,
+        "transaction_id": "3c805482-09bd-40ca-b616-5563109a2961"
+    },
+    {
+        "discount_code": "ELECTRONICS_LAPTOPS_SALE",
+        "row_id": 2,
+        "transaction_id": "3c805482-09bd-40ca-b616-5563109a2961"
+    }
+]

@@ -8,24 +8,27 @@ from app.configs.datamodels import Settings
 from app.database.dbmodels import (
     DBTransaction,
     DBTransactionDiscount,
+    DBTransactionFinalized,
     DBTransactionItem,
 )
-from app.exceptions.exceptions import ExcTransactionActiveNotFound
+from app.exceptions.exceptions import ExcTransactionActiveNotFound, ExcTransactionFinalizedNotFound
 from app.routers.transactions.datamodels import (
     ResponseGetAllCurrentTransactions,
+    ResponseGetAllFinalizedTransactions,
     ResponseGetCurrentTransaction,
+    ResponseGetFinalizedTransaction,
     TransactionCreated,
     TransactionItem,
     TransactionToCreate,
 )
 from app.routers.transactions.utils import (
-    apply_discounts,
-    check_for_item_snapshot,
-    get_delivery_option_db,
-    get_discount_db,
-    get_item_db,
-    get_response_transaction,
-    update_item_stock,
+    apply_db_discounts,
+    check_for_db_item_snapshot,
+    get_db_delivery_options,
+    get_db_discounts,
+    get_db_item,
+    get_response_current_transaction,
+    update_db_item_stock,
 )
 
 
@@ -40,36 +43,36 @@ async def create_transaction(
         secret_key=settings.auth_secret_key,
         algorithms=[settings.auth_algorithm],
     )
-    discounts_db = get_discount_db(db, req_body.discount_codes)
-    delivery_option_db = get_delivery_option_db(db, req_body.delivery_option_id)
+    db_discounts = get_db_discounts(db, req_body.discount_codes)
+    db_delivery_options = get_db_delivery_options(db, req_body.delivery_option_id)
 
     transaction_id = uuid.uuid4()
 
-    transaction_items_db = []
-    response_transaction_items = []
-    total_price = delivery_option_db.price
+    db_transaction_items = []
+    transaction_items = []
+    total_price = db_delivery_options.price
     for item_id, item_count in req_body.item_ids.items():
-        item_db = get_item_db(db, item_id, item_count)
-        update_item_stock(
+        item_db = get_db_item(db, item_id, item_count)
+        update_db_item_stock(
             db,
             item_id,
             item_count,
         )
-        check_for_item_snapshot(db, item_db)
+        check_for_db_item_snapshot(db, item_db)
 
         item_price = item_db.price
-        price_after_discounts, applied_discounts = apply_discounts(
-            item_db, item_price, discounts_db
+        price_after_discounts, applied_discounts = apply_db_discounts(
+            item_db, item_price, db_discounts
         )
 
-        response_transaction_item = TransactionItem(
+        transaction_item = TransactionItem(
             **item_db.model_dump(),
             price_unit=item_price,
             price_after_discounts=price_after_discounts,
             count=item_count,
             applied_discounts=applied_discounts,
         )
-        response_transaction_items.append(response_transaction_item)
+        transaction_items.append(transaction_item)
 
         db_transaction_item = DBTransactionItem(
             **item_db.model_dump(),
@@ -77,37 +80,37 @@ async def create_transaction(
             count=item_count,
             price_after_discounts=price_after_discounts,
         )
-        transaction_items_db.append(db_transaction_item)
+        db_transaction_items.append(db_transaction_item)
 
         total_price += price_after_discounts * item_count
 
     total_price = total_price.quantize(Decimal("0.01"), rounding=ROUND_CEILING)
-    transaction_db = DBTransaction(
+    db_transaction = DBTransaction(
         **req_body.model_dump(),
         transaction_id=transaction_id,
         user_id=user_id,
         total_price=total_price,
     )
     response_transaction_details = TransactionCreated(
-        **transaction_db.model_dump(),
-        delivery_option=delivery_option_db.name,
-        delivery_price=delivery_option_db.price,
+        **db_transaction.model_dump(),
+        delivery_option=db_delivery_options.name,
+        delivery_price=db_delivery_options.price,
     )
-    db.add(transaction_db)
+    db.add(db_transaction)
 
-    transaction_discounts_db = [
+    transaction_db_discounts = [
         DBTransactionDiscount(
             transaction_id=transaction_id,
             discount_code=discount.discount_code,
         )
-        for discount in discounts_db
+        for discount in db_discounts
     ]
-    db.add_all(transaction_discounts_db)
-    db.add_all(transaction_items_db)
+    db.add_all(transaction_db_discounts)
+    db.add_all(db_transaction_items)
     db.commit()
 
     return ResponseGetCurrentTransaction(
-        transaction=response_transaction_details, items=response_transaction_items
+        transaction=response_transaction_details, items=transaction_items
     )
 
 
@@ -122,14 +125,14 @@ async def get_all_current_transactions(
         algorithms=[settings.auth_algorithm],
     )
     query = select(DBTransaction).where(DBTransaction.user_id == user_id)
-    transactions_db = db.exec(query)
+    db_transactions = db.exec(query)
 
     delivery_options = dict()
     response_transactions = []
-    for transaction_db in transactions_db:
-        response_transaction = get_response_transaction(
+    for db_transaction in db_transactions:
+        response_transaction = get_response_current_transaction(
             db,
-            transaction_db,
+            db_transaction,
             delivery_options,
         )
         response_transactions.append(response_transaction)
@@ -150,15 +153,60 @@ async def get_current_transaction(
     query = select(DBTransaction).where(
         (DBTransaction.user_id == user_id) & (DBTransaction.transaction_id == transaction_id)
     )
-    transaction_db = db.exec(query).first()
-    if not transaction_db:
+    db_transaction = db.exec(query).first()
+    if not db_transaction:
         raise ExcTransactionActiveNotFound(
             transaction_id=transaction_id,
             user_id=user_id,
         )
 
-    response_transaction = get_response_transaction(
+    response_transaction = get_response_current_transaction(
         db,
-        transaction_db,
+        db_transaction,
     )
     return response_transaction
+
+
+async def get_all_finalized_transactions(
+    settings: Settings,
+    db: Session,
+    token: str,
+) -> ResponseGetAllFinalizedTransactions:
+    user_id: int = validate_access_token(
+        token=token,
+        secret_key=settings.auth_secret_key,
+        algorithms=[settings.auth_algorithm],
+    )
+    query = select(DBTransactionFinalized).where(DBTransactionFinalized.user_id == user_id)
+    db_transactions = db.exec(query)
+
+    return ResponseGetAllFinalizedTransactions(
+        transactions=[
+            db_transaction.model_dump(exclude_none=True) for db_transaction in db_transactions
+        ]
+    )
+
+
+async def get_finalized_transaction(
+    settings: Settings,
+    db: Session,
+    token: str,
+    transaction_id: uuid.UUID,
+) -> ResponseGetFinalizedTransaction:
+    user_id: int = validate_access_token(
+        token=token,
+        secret_key=settings.auth_secret_key,
+        algorithms=[settings.auth_algorithm],
+    )
+    query = select(DBTransactionFinalized).where(
+        (DBTransactionFinalized.user_id == user_id)
+        & (DBTransactionFinalized.transaction_id == transaction_id)
+    )
+    db_transaction = db.exec(query).first()
+    if not db_transaction:
+        raise ExcTransactionFinalizedNotFound(
+            transaction_id=transaction_id,
+            user_id=user_id,
+        )
+
+    return ResponseGetFinalizedTransaction(transaction=db_transaction.model_dump(exclude_none=True))

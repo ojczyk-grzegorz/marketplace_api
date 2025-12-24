@@ -1,0 +1,18 @@
+[
+    {
+        "count": 1,
+        "transaction_id": "3c805482-09bd-40ca-b616-5563109a2961",
+        "item_id": "550e8400-e29b-41d4-a716-446655440001",
+        "updated_at": "2024-12-19T10:00:00+00:00",
+        "row_id": 1,
+        "price_after_discounts": 1080.0
+    },
+    {
+        "count": 1,
+        "transaction_id": "3c805482-09bd-40ca-b616-5563109a2961",
+        "item_id": "550e8400-e29b-41d4-a716-446655440003",
+        "updated_at": "2024-12-19T10:30:00+00:00",
+        "row_id": 2,
+        "price_after_discounts": 1911.74
+    }
+]

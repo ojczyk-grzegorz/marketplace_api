@@ -112,12 +112,12 @@ CREATE TABLE transaction_items (
     row_id SERIAL PRIMARY KEY,
 	transaction_id UUID NOT NULL,
     item_id UUID NOT NULL,
-    item_updated_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL,
     count INT NOT NULL,
     price_after_discounts NUMERIC NOT NULL,
 
     FOREIGN KEY (transaction_id) REFERENCES transactions(transaction_id) ON DELETE CASCADE,
-    FOREIGN KEY (item_id, item_updated_at)  REFERENCES items_snapshots(item_id, updated_at)    
+    FOREIGN KEY (item_id, updated_at)  REFERENCES items_snapshots(item_id, updated_at)    
 );
 
 
@@ -139,19 +139,21 @@ DROP TABLE IF EXISTS transactions_finalized CASCADE;
 CREATE TABLE transactions_finalized (
 	transaction_id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL,
-    finalized_at TIMESTAMPTZ NOT NULL,
-    delivery_option VARCHAR(32) NOT NULL,
-    delivery_price NUMERIC NOT NULL,
-    name VARCHAR(256) NOT NULL,
-    last_name VARCHAR(256) NOT NULL,
-    email VARCHAR(256) NOT NULL,
-    phone VARCHAR(16) NOT NULL,
-    country VARCHAR(128) NOT NULL,
-    city VARCHAR(128) NOT NULL,
-    postal_code VARCHAR(16) NOT NULL,
-    address_line_1 VARCHAR(256) NOT NULL,
+    created_at TIMESTAMPTZ,
+    finalized_at TIMESTAMPTZ,
+    delivery_option VARCHAR(32),
+    delivery_price NUMERIC,
+    name VARCHAR(256),
+    last_name VARCHAR(256),
+    email VARCHAR(256),
+    phone VARCHAR(16),
+    country VARCHAR(128),
+    city VARCHAR(128),
+    postal_code VARCHAR(16),
+    address_line_1 VARCHAR(256),
     address_line_2 VARCHAR(256),
-    items JSONB NOT NULL,
+    
+    delivery JSONB,
+    items JSONB,
     action_history JSONB NOT NULL
 );

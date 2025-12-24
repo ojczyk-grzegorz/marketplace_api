@@ -34,7 +34,7 @@ To exit back to your regular user, just type exit.
 
 https://github.com/WhiskyToad/fastapi-starter/blob/main/.pre-commit-config.yaml
 
-- Add get transactions finilized
+- Add get transactions finalized
 - Improve logging
 - Add mock data
 - Add tests

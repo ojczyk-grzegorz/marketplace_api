@@ -20,7 +20,7 @@ from app.routers.user.service import (
     remove_user,
     update_user,
 )
-from testing.openapi_examples import (
+from development.openapi_examples import (
     get_user_create_examples,
     get_user_update_examples,
 )
