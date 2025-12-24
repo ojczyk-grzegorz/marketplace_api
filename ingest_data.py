@@ -2,14 +2,14 @@ import json
 
 from sqlmodel import insert, text
 
-from app.dbmodels.dbmodels import (
+from app.database.dbmodels import (
     DBDeliveryOptions,
     DBDiscount,
     DBGroundStaff,
     DBItem,
     DBUser,
 )
-from app.utils.db import get_db_session
+from app.database.utils import get_db_session
 
 
 def main():

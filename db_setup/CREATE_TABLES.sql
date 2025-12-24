@@ -24,7 +24,7 @@ CREATE TABLE items (
     features JSONB,
     created_at TIMESTAMPTZ NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL,
-    stock INT NOT  CONSTRAINT stock_non_negative CHECK (stock >= 0)
+    stock INT NOT NULL CONSTRAINT stock_non_negative CHECK (stock >= 0)
 );
 
 
@@ -50,7 +50,7 @@ CREATE TABLE ground_staff (
     staff_id UUID PRIMARY KEY,
     name VARCHAR(128) NOT NULL,
     role VARCHAR(64) NOT NULL
-);
+); 
 
 
 DROP TABLE IF EXISTS delivery_options CASCADE;
@@ -109,8 +109,7 @@ CREATE TABLE transaction_items (
     price_after_discounts NUMERIC NOT NULL,
 
     FOREIGN KEY (transaction_id) REFERENCES transactions(transaction_id) ON DELETE CASCADE,
-    FOREIGN KEY (item_id, item_updated_at)  REFERENCES items_snapshots(item_id, updated_at),
-    
+    FOREIGN KEY (item_id, item_updated_at)  REFERENCES items_snapshots(item_id, updated_at)    
 );
 
 
