@@ -5,6 +5,11 @@ from sqlmodel import Session, delete, insert, select, update
 from app.auth.utils import get_password_hash, validate_access_token
 from app.configs.datamodels import Settings
 from app.database.dbmodels import DBTransaction, DBUser
+from app.exceptions.exceptions import (
+    ExcTransactionsActiveFound,
+    ExcUserExists,
+    ExcUserNotFound,
+)
 from app.routers.user.datamodels import (
     ResponseCreateUser,
     ResponseRemoveUser,
@@ -14,11 +19,6 @@ from app.routers.user.datamodels import (
     UserToCreate,
     UserToUpdate,
     UserUpdated,
-)
-from app.exceptions.exceptions import (
-    ExcTransactionsActiveFound,
-    ExcUserExists,
-    ExcUserNotFound,
 )
 
 
@@ -42,9 +42,7 @@ async def create_user(db: Session, user_req: UserToCreate):
         updated_at=created_at,
     )
     user_id = user_db.user_id
-    query = insert(DBUser).values(
-        {**user_db.model_dump(), "password_hash": user_db.password_hash}
-    )
+    query = insert(DBUser).values({**user_db.model_dump(), "password_hash": user_db.password_hash})
     db.exec(query)
     db.commit()
 
@@ -76,9 +74,7 @@ async def update_user(
         **user.model_dump(exclude_none=True),
     )
     if user.password:
-        user_db_update["password_hash"] = get_password_hash(user.password).decode(
-            "utf-8"
-        )
+        user_db_update["password_hash"] = get_password_hash(user.password).decode("utf-8")
 
     db_user = DBUser.model_validate(user_db)
 
@@ -88,6 +84,7 @@ async def update_user(
 
     return ResponseUpdateUser(
         user_updated=UserUpdated(
+            user_id=user_id,
             email=db_user.email,
             phone=db_user.phone,
             password_changed=bool(user.password),
@@ -112,6 +109,7 @@ async def remove_user(
         raise ExcUserNotFound(user_id=user_id)
 
     email = user_db.email
+    phone = user_db.phone
 
     query = select(DBTransaction).where(DBTransaction.user_id == user_id)
     db_user_tranasactions = db.exec(query).all()
@@ -126,5 +124,5 @@ async def remove_user(
     db.commit()
 
     return ResponseRemoveUser(
-        user_removed=UserRemoved(email=email, phone=user_db.phone),
+        user_removed=UserRemoved(user_id=user_id, email=email, phone=phone),
     )

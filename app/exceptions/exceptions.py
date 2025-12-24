@@ -8,15 +8,13 @@ class ExcInvalidCredentials(HTTPException):
 
 class ExcUserNotFound(HTTPException):
     def __init__(self, user_id: str):
+        super().__init__(status_code=404, detail=f"User with ID {user_id} not found.")
         self.user_id = user_id
-        super().__init__(f"User with ID {user_id} not found.")
 
 
 class ExcUserExists(HTTPException):
     def __init__(self, email: str | None = None, phone: str | None = None):
-        super().__init__(
-            status_code=409, detail="User with provided values already exists."
-        )
+        super().__init__(status_code=409, detail="User with provided values already exists.")
         self.email = email
         self.phone = phone
 

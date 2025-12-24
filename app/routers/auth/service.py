@@ -4,7 +4,7 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 
-from app.auth.datamodels import BearerToken
+from app.auth.datamodels import ResponseGetToken
 from app.auth.utils import get_access_token, verify_password
 from app.configs.datamodels import Settings
 from app.configs.utils import get_settings
@@ -21,9 +21,7 @@ async def get_token(
     query = select(DBUser).where(DBUser.email == form.username)
     db_user_matching = db.exec(query).first()
 
-    if not db_user_matching or not verify_password(
-        form.password, db_user_matching.password_hash
-    ):
+    if not db_user_matching or not verify_password(form.password, db_user_matching.password_hash):
         raise ExcInvalidCredentials()
 
     token = get_access_token(
@@ -33,6 +31,6 @@ async def get_token(
         expire_minutes=settings.auth_access_token_expire_minutes,
     )
 
-    return BearerToken(
+    return ResponseGetToken(
         access_token=token,
     )

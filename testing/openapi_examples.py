@@ -1,4 +1,4 @@
-def get_user_create_examples():
+def get_user_create_examples() -> dict:
     return {
         "example1": {
             "summary": "Example user creation payload",
@@ -11,7 +11,7 @@ def get_user_create_examples():
     }
 
 
-def get_user_update_examples():
+def get_user_update_examples() -> dict:
     return {
         "example1": {
             "summary": "Example user creation payload",
@@ -24,7 +24,7 @@ def get_user_update_examples():
     }
 
 
-def get_transaction_create_examples():
+def get_transaction_create_examples() -> dict:
     return {
         "example1": {
             "summary": "Example transaction creation payload",
@@ -35,6 +35,14 @@ def get_transaction_create_examples():
                 },
                 "delivery_option_id": "13f92f95-5fe7-46b5-8893-5ea1a5eeae5a",
                 "discount_codes": ["APPLE_SALE", "ELECTRONICS_LAPTOPS_SALE"],
+                "name": "John",
+                "last_name": "Doe",
+                "email": "johndoe@example.com",
+                "phone": "+48123456789",
+                "country": "Poland",
+                "city": "Kraków",
+                "postal_code": "31-001",
+                "address_line_1": "Wawel Cathedral, Wawel",
             },
         }
     }

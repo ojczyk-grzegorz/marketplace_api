@@ -21,9 +21,7 @@ def get_password_hash(password):
     )
 
 
-def get_access_token(
-    data: dict, secret_key: str, algorithm: str, expire_minutes: int
-) -> str:
+def get_access_token(data: dict, secret_key: str, algorithm: str, expire_minutes: int) -> str:
     token = jwt.encode(
         payload=dict(
             **data,

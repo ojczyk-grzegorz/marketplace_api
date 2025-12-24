@@ -10,14 +10,14 @@ from app.database.dbmodels import (
     DBTransactionDiscount,
     DBTransactionItem,
 )
-from app.routers.transactions.datamodels import (
-    TransactionCreate,
-    ResponseTransaction,
-    ResponseTransactionDetails,
-    ResponseTransactionItem,
-    ResponseTransactionsCurrent,
-)
 from app.exceptions.exceptions import ExcTransactionActiveNotFound
+from app.routers.transactions.datamodels import (
+    ResponseGetAllCurrentTransactions,
+    ResponseGetCurrentTransaction,
+    TransactionCreated,
+    TransactionItem,
+    TransactionToCreate,
+)
 from app.routers.transactions.utils import (
     apply_discounts,
     check_for_item_snapshot,
@@ -33,8 +33,8 @@ async def create_transaction(
     settings: Settings,
     db: Session,
     token: str,
-    req_body: TransactionCreate,
-):
+    req_body: TransactionToCreate,
+) -> ResponseGetCurrentTransaction:
     user_id: int = validate_access_token(
         token=token,
         secret_key=settings.auth_secret_key,
@@ -62,9 +62,8 @@ async def create_transaction(
             item_db, item_price, discounts_db
         )
 
-        response_transaction_item = ResponseTransactionItem(
-            item_id=item_db.item_id,
-            name=item_db.name,
+        response_transaction_item = TransactionItem(
+            **item_db.model_dump(),
             price_unit=item_price,
             price_after_discounts=price_after_discounts,
             count=item_count,
@@ -73,9 +72,8 @@ async def create_transaction(
         response_transaction_items.append(response_transaction_item)
 
         db_transaction_item = DBTransactionItem(
+            **item_db.model_dump(),
             transaction_id=transaction_id,
-            item_id=item_db.item_id,
-            item_updated_at=item_db.updated_at,
             count=item_count,
             price_after_discounts=price_after_discounts,
         )
@@ -85,22 +83,15 @@ async def create_transaction(
 
     total_price = total_price.quantize(Decimal("0.01"), rounding=ROUND_CEILING)
     transaction_db = DBTransaction(
+        **req_body.model_dump(),
         transaction_id=transaction_id,
         user_id=user_id,
-        delivery_option_id=req_body.delivery_option_id,
-        transaction_details={
-            "address": "Wawel Cathedral, Wawel, 31-001 Kraków, Poland",
-        },
         total_price=total_price,
     )
-    response_transaction_details = ResponseTransactionDetails(
-        transaction_id=transaction_db.transaction_id,
-        user_id=transaction_db.user_id,
-        created_at=transaction_db.created_at,
+    response_transaction_details = TransactionCreated(
+        **transaction_db.model_dump(),
         delivery_option=delivery_option_db.name,
         delivery_price=delivery_option_db.price,
-        delivery_details=transaction_db.transaction_details,
-        total_price=transaction_db.total_price,
     )
     db.add(transaction_db)
 
@@ -115,7 +106,7 @@ async def create_transaction(
     db.add_all(transaction_items_db)
     db.commit()
 
-    return ResponseTransaction(
+    return ResponseGetCurrentTransaction(
         transaction=response_transaction_details, items=response_transaction_items
     )
 
@@ -142,7 +133,7 @@ async def get_all_current_transactions(
             delivery_options,
         )
         response_transactions.append(response_transaction)
-    return ResponseTransactionsCurrent(transactions=response_transactions)
+    return ResponseGetAllCurrentTransactions(transactions=response_transactions)
 
 
 async def get_current_transaction(
@@ -157,8 +148,7 @@ async def get_current_transaction(
         algorithms=[settings.auth_algorithm],
     )
     query = select(DBTransaction).where(
-        (DBTransaction.user_id == user_id)
-        & (DBTransaction.transaction_id == transaction_id)
+        (DBTransaction.user_id == user_id) & (DBTransaction.transaction_id == transaction_id)
     )
     transaction_db = db.exec(query).first()
     if not transaction_db:
@@ -170,6 +160,5 @@ async def get_current_transaction(
     response_transaction = get_response_transaction(
         db,
         transaction_db,
-        dict(),
     )
     return response_transaction

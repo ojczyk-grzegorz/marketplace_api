@@ -26,10 +26,6 @@ class ItemFiltered(BaseModel):
     stock: int
 
 
-class ResponseFilterItems(BaseModel):
-    items: list[ItemFiltered]
-
-
 class ItemRetrieved(BaseModel):
     item_id: uuid.UUID
     name: str
@@ -40,6 +36,10 @@ class ItemRetrieved(BaseModel):
     description: str | None = None
     features: dict | None = None
     stock: int
+
+
+class ResponseFilterItems(BaseModel):
+    items: list[ItemFiltered]
 
 
 class ResponseRetrieveItem(BaseModel):

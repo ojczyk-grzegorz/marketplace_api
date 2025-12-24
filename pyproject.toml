@@ -41,9 +41,23 @@ pythonpath = [
   "."
 ]
 
+[tool.ruff]
+line-length = 100
+include = ["app/**/*.py"]
 [tool.ruff.lint]
 # 1. Enable flake8-bugbear (`B`) rules, in addition to the defaults.
-select = ["E4", "E7", "E9", "F", "B", "I"]
+select = [
+    "E4", "E7", "E9",  # pycodestyle
+    "F",  # Pyflakes
+    "B",  # flake8-bugbear
+    "I",  # isort
+    "ANN001",  # Missing type annotation for function argument
+    "ANN201",  # Missing return type annotation for public function
+    "ANN202",  # Missing return type annotation for private function
+    "ANN204",  # Missing return type annotation for special method
+    "ANN205",  # Missing return type annotation for staticmethod
+    "ANN206",  # Missing return type annotation for classmethod
+]
 
 # 2. Avoid enforcing line-length violations (`E501`)
 ignore = ["E501"]

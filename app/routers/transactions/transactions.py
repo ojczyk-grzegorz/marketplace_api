@@ -10,9 +10,9 @@ from app.configs.datamodels import Settings
 from app.configs.utils import get_settings
 from app.database.utils import get_db_session
 from app.routers.transactions.datamodels import (
-    ResponseTransaction,
-    ResponseTransactionsCurrent,
-    TransactionCreate,
+    ResponseGetAllCurrentTransactions,
+    ResponseGetCurrentTransaction,
+    TransactionToCreate,
 )
 from app.routers.transactions.service import (
     create_transaction,
@@ -27,7 +27,7 @@ router = APIRouter(prefix="/transactions", tags=["Transactions"], route_class=AP
 @router.post(
     "/create",
     status_code=status.HTTP_200_OK,
-    response_model=ResponseTransaction,
+    response_model=ResponseGetCurrentTransaction,
     response_model_exclude_none=True,
     description="Route for creating new transaction",
 )
@@ -36,11 +36,11 @@ async def transaction_create(
     db: Annotated[Session, Depends(get_db_session)],
     token: Annotated[str, Depends(oauth2_scheme)],
     req_body: Annotated[
-        TransactionCreate,
+        TransactionToCreate,
         Body(..., openapi_examples=get_transaction_create_examples()),
     ],
 ):
-    await create_transaction(
+    return await create_transaction(
         settings=settings,
         db=db,
         token=token,
@@ -51,7 +51,7 @@ async def transaction_create(
 @router.get(
     "/current",
     status_code=status.HTTP_200_OK,
-    response_model=ResponseTransactionsCurrent,
+    response_model=ResponseGetAllCurrentTransactions,
     response_model_exclude_none=True,
     description="Route for retrieving current user's transactions",
 )
@@ -60,7 +60,7 @@ async def transactions_get_current(
     db: Annotated[Session, Depends(get_db_session)],
     token: str = Depends(oauth2_scheme),
 ):
-    await get_all_current_transactions(
+    return await get_all_current_transactions(
         settings=settings,
         db=db,
         token=token,
@@ -70,7 +70,7 @@ async def transactions_get_current(
 @router.get(
     "/current/{transaction_id}",
     status_code=status.HTTP_200_OK,
-    response_model=ResponseTransaction,
+    response_model=ResponseGetCurrentTransaction,
     response_model_exclude_none=True,
     description="Route for retrieving transaction status",
 )
@@ -82,7 +82,7 @@ async def transaction_get_status(
         uuid.UUID, Path(..., description="The UUID of the transaction to retrieve")
     ],
 ):
-    await get_current_transaction(
+    return await get_current_transaction(
         settings=settings,
         db=db,
         token=token,

@@ -1,5 +1,4 @@
 import uuid
-
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -21,25 +20,25 @@ class UserCreated(BaseModel):
     phone: str
 
 
-class ResponseCreateUser(BaseModel):
-    user_created: UserCreated
-
-
 class UserUpdated(UserCreated):
     user_id: uuid.UUID
-    email: str | None = None
+    email: EmailStr | None = None
     phone: str | None = None
     password_changed: bool = False
 
 
-class ResponseUpdateUser(BaseModel):
-    user_updated: UserUpdated
-
-
 class UserRemoved(BaseModel):
     user_id: uuid.UUID
-    email: str
+    email: EmailStr
     phone: str
+
+
+class ResponseCreateUser(BaseModel):
+    user_created: UserCreated
+
+
+class ResponseUpdateUser(BaseModel):
+    user_updated: UserUpdated
 
 
 class ResponseRemoveUser(BaseModel):

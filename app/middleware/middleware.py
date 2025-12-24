@@ -31,6 +31,7 @@ def custom_middleware_factory(app: FastAPI):
                     "req_id": req_id,
                 }
                 logger.error(log)
+                raise e from e
                 response = JSONResponse(
                     status_code=500,
                     content={"error": "Internal Server Error"},

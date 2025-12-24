@@ -5,43 +5,59 @@ import uuid
 from pydantic import BaseModel
 
 
-class TransactionCreate(BaseModel):
+class TransactionToCreate(BaseModel):
     item_ids: dict[str, int]
-    delivery_option_id: uuid.UUID
+    delivery_option_id: str
     discount_codes: list[str] = []
+    name: str
+    last_name: str
+    email: str
+    phone: str
+    country: str
+    city: str
+    postal_code: str
+    address_line_1: str
+    address_line_2: str | None = None
 
 
-
-class ResponseTransactionDetails(BaseModel):
+class TransactionCreated(BaseModel):
     transaction_id: uuid.UUID
     user_id: uuid.UUID
     created_at: dt.datetime
     delivery_option: str
     delivery_price: Decimal
-    delivery_details: dict
     total_price: Decimal
+    name: str
+    last_name: str
+    email: str
+    phone: str
+    country: str
+    city: str
+    postal_code: str
+    address_line_1: str
+    address_line_2: str | None = None
 
 
-class ResponseTransactionItem(BaseModel):
+class TransactionItem(BaseModel):
     item_id: uuid.UUID
     name: str
     price_unit: Decimal
     price_after_discounts: Decimal
     count: int
-    appied_discounts: list[dict] = []
+    applied_discounts: list[dict] = []
 
 
-class ResponseTransactionAction(BaseModel):
+class TransactionAction(BaseModel):
     action: str
     performed_at: dt.datetime
     description: str | None = None
 
 
-class ResponseTransaction(BaseModel):
-    transaction: ResponseTransactionDetails
-    items: list[ResponseTransactionItem]
-    actions: list[ResponseTransactionAction] = []
+class ResponseGetCurrentTransaction(BaseModel):
+    transaction: TransactionCreated
+    items: list[TransactionItem]
+    actions: list[TransactionAction] = []
 
 
-class ResponseTransactionsCurrent(BaseModel):
-    transactions: list[ResponseTransaction]
+class ResponseGetAllCurrentTransactions(BaseModel):
+    transactions: list[ResponseGetCurrentTransaction]

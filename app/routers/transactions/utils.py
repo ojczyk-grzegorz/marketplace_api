@@ -12,16 +12,16 @@ from app.database.dbmodels import (
     DBTransactionAction,
     DBTransactionItem,
 )
-from app.routers.transactions.datamodels import (
-    ResponseTransaction,
-    ResponseTransactionAction,
-    ResponseTransactionDetails,
-    ResponseTransactionItem,
-)
 from app.exceptions.exceptions import (
     ExcDiscountActiveNotFound,
     ExcInsufficientStock,
     ExcItemNotFound,
+)
+from app.routers.transactions.datamodels import (
+    ResponseGetCurrentTransaction,
+    TransactionAction,
+    TransactionCreated,
+    TransactionItem,
 )
 
 
@@ -45,9 +45,7 @@ def get_delivery_option_db(
     db: Session,
     delivery_option_id: uuid.UUID,
 ):
-    query = select(DBDeliveryOptions).where(
-        DBDeliveryOptions.option_id == delivery_option_id
-    )
+    query = select(DBDeliveryOptions).where(DBDeliveryOptions.option_id == delivery_option_id)
     delivery_option_db = db.exec(query).first()
     if not delivery_option_db:
         raise ExcDiscountActiveNotFound(discount_code=delivery_option_id)
@@ -64,9 +62,7 @@ def get_item_db(
     if not item_db:
         raise ExcItemNotFound(item_id=item_id)
     elif item_db.stock < item_count:
-        raise ExcInsufficientStock(
-            item_id=item_id, requested=item_count, available=item_db.stock
-        )
+        raise ExcInsufficientStock(item_id=item_id, requested=item_count, available=item_db.stock)
     return item_db
 
 
@@ -76,9 +72,7 @@ def update_item_stock(
     item_count: int,
 ):
     query = (
-        update(DBItem)
-        .where(DBItem.item_id == item_id)
-        .values(stock=(DBItem.stock - item_count))
+        update(DBItem).where(DBItem.item_id == item_id).values(stock=(DBItem.stock - item_count))
     )
     db.exec(query)
 
@@ -113,8 +107,7 @@ def apply_discounts(
             or (
                 discount.categories
                 and item_db.category in discount.categories
-                and not set(item_db.subcategories)
-                & set(discount.categories[item_db.category])
+                and not set(item_db.subcategories) & set(discount.categories[item_db.category])
             )
         ):
             continue
@@ -133,7 +126,7 @@ def apply_discounts(
 def get_response_transaction(
     db: Session,
     transaction_db: DBTransaction,
-    delivery_options: dict[uuid.UUID, DBDeliveryOptions],
+    delivery_options: dict[uuid.UUID, DBDeliveryOptions] = dict(),
 ):
     delivery_option = delivery_options.get(transaction_db.delivery_option_id)
     if not delivery_option:
@@ -148,17 +141,12 @@ def get_response_transaction(
 
     response_transaction_items = []
     for transaction_item_db in transaction_items_db:
-        query = select(DBItemSnapshot).where(
-            DBItemSnapshot.item_id == transaction_item_db.item_id
-        )
+        query = select(DBItemSnapshot).where(DBItemSnapshot.item_id == transaction_item_db.item_id)
         item_db = db.exec(query).first()
-        response_transaction_item = ResponseTransactionItem(
-            item_id=item_db.item_id,
-            name=item_db.name,
-            item_updated_at=item_db.updated_at,
-            count=transaction_item_db.count,
+        response_transaction_item = TransactionItem(
+            **item_db.model_dump(),
+            **transaction_item_db.model_dump(exclude={"item_id"}),
             price_unit=item_db.price,
-            price_after_discounts=item_db.price,
         )
         response_transaction_items.append(response_transaction_item)
 
@@ -168,23 +156,20 @@ def get_response_transaction(
     )
     transaction_actions_db = db.exec(query)
     for transaction_action_db in transaction_actions_db:
-        response_transaction_action = ResponseTransactionAction(
+        response_transaction_action = TransactionAction(
             action=transaction_action_db.action,
             description=transaction_action_db.description,
             performed_at=transaction_action_db.performed_at,
         )
         response_transaction_actions.append(response_transaction_action)
 
-    response_transaction_details = ResponseTransactionDetails(
-        transaction_id=transaction_db.transaction_id,
-        user_id=transaction_db.user_id,
-        created_at=transaction_db.created_at,
+    response_transaction_details = TransactionCreated(
+        **transaction_db.model_dump(),
+        **delivery_option_db.model_dump(exclude={"name"}),
         delivery_option=delivery_option_db.name,
         delivery_price=delivery_option_db.price,
-        delivery_details=transaction_db.transaction_details,
-        total_price=transaction_db.total_price,
     )
-    return ResponseTransaction(
+    return ResponseGetCurrentTransaction(
         transaction=response_transaction_details,
         items=response_transaction_items,
         actions=response_transaction_actions,

@@ -1,4 +1,5 @@
 from fastapi import HTTPException
+from fastapi.exceptions import RequestValidationError
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from jwt.exceptions import ExpiredSignatureError
@@ -33,6 +34,24 @@ def log_error(request: Request, exc: HTTPException):
             "detail": exc.detail,
             "req_id": getattr(request.state, "req_id", None),
         }
+    )
+
+
+async def exception_handler_validation_error(request, exc: RequestValidationError):
+    logger.error(
+        {
+            "type": "validation_exception",
+            "detail": exc.errors(),
+            "body": exc.body,
+            "req_id": getattr(request.state, "req_id", None),
+        }
+    )
+    return JSONResponse(
+        status_code=422,
+        content=dict(
+            error_code="VALIDATION_ERROR",
+            message="Input validation failed.",
+        ),
     )
 
 
@@ -79,9 +98,7 @@ async def exception_handler_transaction_active_not_found(
     )
 
 
-async def exception_handler_transactions_active_found(
-    request, exc: ExcTransactionsActiveFound
-):
+async def exception_handler_transactions_active_found(request, exc: ExcTransactionsActiveFound):
     log_error(request, exc)
     return JSONResponse(
         status_code=exc.status_code,
@@ -152,9 +169,7 @@ async def exception_handler_token_expired(request, exc: ExpiredSignatureError):
     )
 
 
-async def exception_handler_discount_active_not_found(
-    request, exc: ExcDiscountActiveNotFound
-):
+async def exception_handler_discount_active_not_found(request, exc: ExcDiscountActiveNotFound):
     log_error(request, exc)
     return JSONResponse(
         status_code=exc.status_code,
@@ -186,6 +201,7 @@ async def exception_handler_insufficient_stock(request, exc: ExcInsufficientStoc
 
 EXCEPTION_HANDLERS = {
     HTTPException: exception_handler_http,
+    RequestValidationError: exception_handler_validation_error,
     ExcUserExists: exception_handler_user_exists,
     ExcTransactionActiveNotFound: exception_handler_transaction_active_not_found,
     ExcTransactionsActiveFound: exception_handler_transactions_active_found,

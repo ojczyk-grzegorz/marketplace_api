@@ -82,9 +82,17 @@ CREATE TABLE transactions (
     user_id UUID NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
     delivery_option_id UUID NOT NULL,
-    transaction_details JSONB NOT NULL,
     total_price NUMERIC NOT NULL,
-    
+    name VARCHAR(256) NOT NULL,
+    last_name VARCHAR(256) NOT NULL,
+    email VARCHAR(256) NOT NULL,
+    phone VARCHAR(16) NOT NULL,
+    country VARCHAR(128) NOT NULL,
+    city VARCHAR(128) NOT NULL,
+    postal_code VARCHAR(16) NOT NULL,
+    address_line_1 VARCHAR(256) NOT NULL,
+    address_line_2 VARCHAR(256),
+
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (delivery_option_id) REFERENCES delivery_options(option_id)
 );
@@ -135,7 +143,15 @@ CREATE TABLE transactions_finalized (
     finalized_at TIMESTAMPTZ NOT NULL,
     delivery_option VARCHAR(32) NOT NULL,
     delivery_price NUMERIC NOT NULL,
-    transaction_details JSONB NOT NULL,
+    name VARCHAR(256) NOT NULL,
+    last_name VARCHAR(256) NOT NULL,
+    email VARCHAR(256) NOT NULL,
+    phone VARCHAR(16) NOT NULL,
+    country VARCHAR(128) NOT NULL,
+    city VARCHAR(128) NOT NULL,
+    postal_code VARCHAR(16) NOT NULL,
+    address_line_1 VARCHAR(256) NOT NULL,
+    address_line_2 VARCHAR(256),
     items JSONB NOT NULL,
     action_history JSONB NOT NULL
 );
