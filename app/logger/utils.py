@@ -5,7 +5,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 from uuid import UUID
 
-from app.utils.configs import get_settings
+from app.configs.utils import get_settings
 
 FILENAME_LOGS = "logs/app.log"
 
@@ -14,9 +14,9 @@ class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, dt.datetime):
             return obj.isoformat()
-        if isinstance(obj, UUID):
-            return obj.hex
-        return super().default(obj)
+        elif isinstance(obj, UUID):
+            return str(obj)
+        return str(obj)
 
 
 class LogFormatterJson(logging.Formatter):

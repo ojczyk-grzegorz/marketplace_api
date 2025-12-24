@@ -4,13 +4,13 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 
-from app.datamodels.auth import BearerToken
-from app.datamodels.configs import Settings
-from app.dbmodels.dbmodels import DBUser
+from app.auth.datamodels import BearerToken
+from app.auth.utils import get_access_token, verify_password
+from app.configs.datamodels import Settings
+from app.configs.utils import get_settings
+from app.database.dbmodels import DBUser
+from app.database.utils import get_db_session
 from app.exceptions.exceptions import ExcInvalidCredentials
-from app.utils.auth import get_access_token, verify_password
-from app.utils.configs import get_settings
-from app.utils.db import get_db_session
 
 
 async def get_token(

@@ -16,8 +16,8 @@ class UserToUpdate(BaseModel):
 
 
 class UserCreated(BaseModel):
-    user_id: EmailStr
-    email: str
+    user_id: uuid.UUID
+    email: EmailStr
     phone: str
 
 

@@ -14,7 +14,7 @@ from app.exceptions.exceptions import (
     ExcUserExists,
     ExcUserNotFound,
 )
-from app.utils.logger import get_logger
+from app.logger.utils import get_logger
 
 logger = get_logger()
 
@@ -150,7 +150,6 @@ async def exception_handler_token_expired(request, exc: ExpiredSignatureError):
             message="The provided token has expired.",
         ),
     )
-
 
 
 async def exception_handler_discount_active_not_found(

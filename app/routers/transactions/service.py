@@ -3,23 +3,22 @@ import uuid
 
 from sqlmodel import Session, select
 
-from app.datamodels.configs import Settings
-from app.datamodels.response import (
+from app.auth.utils import validate_access_token
+from app.configs.datamodels import Settings
+from app.database.dbmodels import (
+    DBTransaction,
+    DBTransactionDiscount,
+    DBTransactionItem,
+)
+from app.routers.transactions.datamodels import (
+    TransactionCreate,
     ResponseTransaction,
     ResponseTransactionDetails,
     ResponseTransactionItem,
     ResponseTransactionsCurrent,
 )
-from app.datamodels.transaction import (
-    TransactionCreate,
-)
-from app.dbmodels.dbmodels import (
-    DBTransaction,
-    DBTransactionDiscount,
-    DBTransactionItem,
-)
 from app.exceptions.exceptions import ExcTransactionActiveNotFound
-from app.services.transactions.utils import (
+from app.routers.transactions.utils import (
     apply_discounts,
     check_for_item_snapshot,
     get_delivery_option_db,
@@ -28,7 +27,6 @@ from app.services.transactions.utils import (
     get_response_transaction,
     update_item_stock,
 )
-from app.utils.auth import validate_access_token
 
 
 async def create_transaction(

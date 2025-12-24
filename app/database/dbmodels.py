@@ -38,7 +38,8 @@ class DBUser(SQLModel, table=True):
     __tablename__ = "users"
 
     user_id: uuid.UUID = Field(
-        sa_column=Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+        sa_column=Column(UUID(as_uuid=True), primary_key=True),
+        default_factory=uuid.uuid4,
     )
     email: str = Field(sa_column=Column(String(256), unique=True, nullable=False))
     phone: str = Field(sa_column=Column(String(16), unique=True, nullable=False))

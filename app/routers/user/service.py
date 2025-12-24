@@ -2,8 +2,10 @@ import datetime as dt
 
 from sqlmodel import Session, delete, insert, select, update
 
-from app.datamodels.configs import Settings
-from app.datamodels.user import (
+from app.auth.utils import get_password_hash, validate_access_token
+from app.configs.datamodels import Settings
+from app.database.dbmodels import DBTransaction, DBUser
+from app.routers.user.datamodels import (
     ResponseCreateUser,
     ResponseRemoveUser,
     ResponseUpdateUser,
@@ -13,13 +15,11 @@ from app.datamodels.user import (
     UserToUpdate,
     UserUpdated,
 )
-from app.dbmodels.dbmodels import DBTransaction, DBUser
 from app.exceptions.exceptions import (
     ExcTransactionsActiveFound,
     ExcUserExists,
     ExcUserNotFound,
 )
-from app.utils.auth import get_password_hash, validate_access_token
 
 
 async def create_user(db: Session, user_req: UserToCreate):
@@ -41,6 +41,7 @@ async def create_user(db: Session, user_req: UserToCreate):
         created_at=created_at,
         updated_at=created_at,
     )
+    user_id = user_db.user_id
     query = insert(DBUser).values(
         {**user_db.model_dump(), "password_hash": user_db.password_hash}
     )
@@ -48,7 +49,7 @@ async def create_user(db: Session, user_req: UserToCreate):
     db.commit()
 
     return ResponseCreateUser(
-        user_created=UserCreated(email=user_req.email, phone=user_req.phone),
+        user_created=UserCreated(user_id=user_id, email=user_req.email, phone=user_req.phone),
     )
 
 

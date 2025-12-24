@@ -4,22 +4,22 @@ from fastapi import APIRouter, Body, Depends, status
 from fastapi.routing import APIRoute
 from sqlmodel import Session
 
-from app.datamodels.configs import Settings
-from app.datamodels.user import (
+from app.auth.utils import oauth2_scheme
+from app.configs.datamodels import Settings
+from app.configs.utils import get_settings
+from app.database.utils import get_db_session
+from app.routers.user.datamodels import (
     ResponseCreateUser,
     ResponseRemoveUser,
     ResponseUpdateUser,
     UserToCreate,
     UserToUpdate,
 )
-from app.services.users.service import (
+from app.routers.user.service import (
     create_user,
     remove_user,
     update_user,
 )
-from app.utils.auth import oauth2_scheme
-from app.utils.configs import get_settings
-from app.utils.db import get_db_session
 from testing.openapi_examples import (
     get_user_create_examples,
     get_user_update_examples,

@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import QueuePool
 from sqlmodel import Session
 
-from app.utils.configs import get_settings
+from app.configs.utils import get_settings
 
 settings = get_settings()
 

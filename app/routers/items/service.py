@@ -4,10 +4,10 @@ import uuid
 from fastapi import Depends, Path
 from sqlmodel import Session, select
 
-from app.datamodels.item import ItemQuery, ResponseFilterItems, ResponseRetrieveItem
-from app.dbmodels.dbmodels import DBItem
+from app.database.dbmodels import DBItem
+from app.database.utils import get_db_session
+from app.routers.items.datamodels import ItemQuery, ResponseFilterItems, ResponseRetrieveItem
 from app.exceptions.exceptions import ExcItemNotFound
-from app.utils.db import get_db_session
 
 
 async def filter_items(

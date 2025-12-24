@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from app.datamodels.configs import Settings
+from app.configs.datamodels import Settings
 
 
 @lru_cache()

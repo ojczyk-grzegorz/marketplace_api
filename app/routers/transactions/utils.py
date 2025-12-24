@@ -3,13 +3,7 @@ import uuid
 
 from sqlmodel import Session, insert, select, update
 
-from app.datamodels.response import (
-    ResponseTransaction,
-    ResponseTransactionAction,
-    ResponseTransactionDetails,
-    ResponseTransactionItem,
-)
-from app.dbmodels.dbmodels import (
+from app.database.dbmodels import (
     DBDeliveryOptions,
     DBDiscount,
     DBItem,
@@ -17,6 +11,12 @@ from app.dbmodels.dbmodels import (
     DBTransaction,
     DBTransactionAction,
     DBTransactionItem,
+)
+from app.routers.transactions.datamodels import (
+    ResponseTransaction,
+    ResponseTransactionAction,
+    ResponseTransactionDetails,
+    ResponseTransactionItem,
 )
 from app.exceptions.exceptions import (
     ExcDiscountActiveNotFound,

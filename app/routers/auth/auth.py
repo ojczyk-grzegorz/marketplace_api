@@ -5,11 +5,11 @@ from fastapi.routing import APIRoute
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
 
-from app.datamodels.auth import BearerToken
-from app.datamodels.configs import Settings
-from app.services.auth.service import get_token
-from app.utils.configs import get_settings
-from app.utils.db import get_db_session
+from app.auth.datamodels import BearerToken
+from app.configs.datamodels import Settings
+from app.configs.utils import get_settings
+from app.database.utils import get_db_session
+from app.routers.auth.service import get_token
 
 router = APIRouter(prefix="/auth", tags=["Authentication"], route_class=APIRoute)
 

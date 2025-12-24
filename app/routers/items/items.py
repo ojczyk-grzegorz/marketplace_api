@@ -5,9 +5,9 @@ from fastapi import APIRouter, Depends, Path, Query, status
 from fastapi.routing import APIRoute
 from sqlmodel import Session
 
-from app.datamodels.item import ItemQuery, ResponseFilterItems, ResponseRetrieveItem
-from app.services.items.service import filter_items, retrieve_item
-from app.utils.db import get_db_session
+from app.database.utils import get_db_session
+from app.routers.items.datamodels import ItemQuery, ResponseFilterItems, ResponseRetrieveItem
+from app.routers.items.service import filter_items, retrieve_item
 
 router = APIRouter(prefix="/items", tags=["Items"], route_class=APIRoute)
 
