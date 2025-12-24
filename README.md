@@ -33,3 +33,11 @@ To exit back to your regular user, just type exit.
 
 
 https://github.com/WhiskyToad/fastapi-starter/blob/main/.pre-commit-config.yaml
+
+- Add get transactions finilized
+- Improve logging
+- Add mock data
+- Add tests
+- app docker setup
+- postgres docker setup
+- postgrs duckdb setup

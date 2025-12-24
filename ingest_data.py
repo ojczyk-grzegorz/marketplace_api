@@ -15,7 +15,7 @@ from app.database.utils import get_db_session
 def main():
     db = next(get_db_session())
 
-    with open("db_setup/CREATE_TABLES.sql") as f:
+    with open("postgres/CREATE_TABLES.sql") as f:
         db.exec(text(f.read()))
 
     with open("testing/mock_data/users.json") as f:
