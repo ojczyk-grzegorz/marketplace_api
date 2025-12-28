@@ -1,0 +1,84 @@
+[
+    {
+        "price": 1199.99,
+        "name": "Apple iPhone 14 Pro Max 256GB Smartphone Mobile Phone Electronics",
+        "category": "Electronics",
+        "description": "Latest Apple iPhone 14 Pro Max smartphone with ProRAW photography, A16 Bionic chip, and Dynamic Island. Unlocked mobile phone device brand new in original packaging. Premium electronics smartphone with advanced camera system, 5G connectivity, iOS operating system, and professional photography capabilities.",
+        "created_at": "2024-12-19T10:00:00+00:00",
+        "item_id": "550e8400-e29b-41d4-a716-446655440001",
+        "subcategories": [
+            "Smartphones",
+            "Mobile Phones",
+            "Apple Devices",
+            "Communication"
+        ],
+        "brand": "APPLE",
+        "features": {
+            "color": "Deep Purple",
+            "camera": "48MP Main + 12MP Ultra Wide + 12MP Telephoto",
+            "storage": "256GB",
+            "unlocked": true,
+            "warranty": "1 Year Apple Warranty",
+            "condition": "New",
+            "battery_life": "Up to 29 hours video playback"
+        },
+        "updated_at": "2024-12-19T10:00:00+00:00"
+    },
+    {
+        "price": 2499.0,
+        "name": "Apple MacBook Pro 14-inch M2 Pro Laptop Computer Professional Electronics",
+        "category": "Electronics",
+        "description": "Professional Apple MacBook Pro laptop computer with M2 Pro chip, 16GB RAM memory, 1TB SSD storage. Perfect for developers, creative professionals, video editing, programming, and design work. High-performance computing device with Retina display, macOS operating system, and premium build quality.",
+        "created_at": "2024-12-19T10:30:00+00:00",
+        "item_id": "550e8400-e29b-41d4-a716-446655440003",
+        "subcategories": [
+            "Laptops",
+            "Computers",
+            "Apple Devices",
+            "Professional"
+        ],
+        "brand": "APPLE",
+        "features": {
+            "ram": "16GB",
+            "color": "Space Gray",
+            "ports": [
+                "3x Thunderbolt 4",
+                "HDMI",
+                "SDXC",
+                "MagSafe 3"
+            ],
+            "storage": "1TB SSD",
+            "processor": "M2 Pro",
+            "screen_size": "14-inch",
+            "battery_life": "Up to 18 hours"
+        },
+        "updated_at": "2024-12-19T10:30:00+00:00"
+    },
+    {
+        "price": 1099.0,
+        "name": "Apple iPad Pro 12.9-inch M2 Wi-Fi 256GB Tablet Computing Electronics",
+        "category": "Electronics",
+        "description": "Apple iPad Pro latest tablet with M2 chip and 12.9-inch Liquid Retina XDR display. Space Gray color with 256GB storage and Wi-Fi connectivity. Professional computing device perfect for digital art, productivity, and creative work. Includes USB-C cable and adapter. Premium electronics for designers and professionals.",
+        "created_at": "2024-12-19T17:00:00+00:00",
+        "item_id": "550e8400-e29b-41d4-a716-446655440016",
+        "subcategories": [
+            "Tablets",
+            "Apple Devices",
+            "Professional",
+            "Computing"
+        ],
+        "brand": "APPLE",
+        "features": {
+            "chip": "M2",
+            "color": "Space Gray",
+            "cameras": "12MP Wide, 10MP Ultra Wide",
+            "display": "12.9-inch Liquid Retina XDR",
+            "storage": "256GB",
+            "condition": "New",
+            "thunderbolt": true,
+            "connectivity": "Wi-Fi",
+            "apple_pencil_support": "2nd Generation"
+        },
+        "updated_at": "2024-12-19T17:00:00+00:00"
+    }
+]

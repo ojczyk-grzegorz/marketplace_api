@@ -1,0 +1,93 @@
+[
+    {
+        "user_id": "8f581062-3ca0-4b57-a037-7c88291882ba",
+        "created_at": "2025-11-15T14:38:54.413793+00:00",
+        "finalized_at": "2025-11-26T11:29:46.431411+00:00",
+        "name": "John",
+        "email": "johndoe@example.com",
+        "country": "Poland",
+        "city": "Krak\u00f3w",
+        "address_line_1": "Wawel Cathedral, Wawel",
+        "total_price": 1004.1,
+        "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
+        "last_name": "Doe",
+        "phone": "+48123456789",
+        "postal_code": "31-001",
+        "address_line_2": null,
+        "delivery": {
+            "name": "COURIER1 STANDARD DELIVERY",
+            "price": 15.0,
+            "contractor_id": "3f912b96-dc32-4ee3-8e72-8ce0d49c398a",
+            "option_id": "13f92f95-5fe7-46b5-8893-5ea1a5eeae5a"
+        },
+        "items": [
+            {
+                "count": 1,
+                "price_after_discounts": 989.1,
+                "name": "Apple iPad Pro 12.9-inch M2 Wi-Fi 256GB Tablet Computing Electronics",
+                "category": "Electronics",
+                "price": 1099.0,
+                "description": "Apple iPad Pro latest tablet with M2 chip and 12.9-inch Liquid Retina XDR display. Space Gray color with 256GB storage and Wi-Fi connectivity. Professional computing device perfect for digital art, productivity, and creative work. Includes USB-C cable and adapter. Premium electronics for designers and professionals.",
+                "created_at": "2024-12-19T17:00:00+00:00",
+                "stock": 9,
+                "subcategories": [
+                    "Tablets",
+                    "Apple Devices",
+                    "Professional",
+                    "Computing"
+                ],
+                "item_id": "550e8400-e29b-41d4-a716-446655440016",
+                "brand": "APPLE",
+                "features": {
+                    "chip": "M2",
+                    "color": "Space Gray",
+                    "cameras": "12MP Wide, 10MP Ultra Wide",
+                    "display": "12.9-inch Liquid Retina XDR",
+                    "storage": "256GB",
+                    "condition": "New",
+                    "thunderbolt": true,
+                    "connectivity": "Wi-Fi",
+                    "apple_pencil_support": "2nd Generation"
+                },
+                "updated_at": "2024-12-19T17:00:00+00:00"
+            }
+        ],
+        "action_history": [
+            {
+                "action_id": "a4d180e7-28e7-41cb-a4e6-e4a9f31598cd",
+                "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
+                "action": "REQUEST RECEIVED",
+                "performed_by": "3f912b96-dc32-4ee3-8e72-8ce0d49c398c",
+                "performed_at": "2025-11-22T16:19:26.231411+00:00"
+            },
+            {
+                "action_id": "a4d180e7-28e7-41cb-a4e6-e4a9f31598cd",
+                "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
+                "action": "ITEM(S) PACKED",
+                "performed_by": "1f912b96-dc32-4ee3-8e72-8ce0d49c398b",
+                "performed_at": "2025-11-23T17:29:26.231411+00:00"
+            },
+            {
+                "action_id": "a4d180e7-28e7-41cb-a4e6-e4a9f31598cd",
+                "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
+                "action": "PACKAGE DISPATCHED",
+                "performed_by": "3f912b96-dc32-4ee3-8e72-8ce0d49c398a",
+                "performed_at": "2025-11-23T19:21:36.451411+00:00"
+            },
+            {
+                "action_id": "a4d180e7-28e7-41cb-a4e6-e4a9f31598cd",
+                "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
+                "action": "PACKAGE DELIVERED",
+                "performed_by": "3f912b96-dc32-4ee3-8e72-8ce0d49c398a",
+                "performed_at": "2025-11-25T11:32:31.429111+00:00"
+            },
+            {
+                "action_id": "a4d180e7-28e7-41cb-a4e6-e4a9f31598cd",
+                "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
+                "action": "REQUEST FINALIZED",
+                "performed_by": "3f912b96-dc32-4ee3-8e72-8ce0d49c398c",
+                "performed_at": "2025-11-26T11:29:46.431411+00:00"
+            }
+        ]
+    }
+]

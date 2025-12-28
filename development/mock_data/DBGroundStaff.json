@@ -1,0 +1,17 @@
+[
+    {
+        "role": "DELIVERY",
+        "staff_id": "3f912b96-dc32-4ee3-8e72-8ce0d49c398a",
+        "name": "COURIER1"
+    },
+    {
+        "role": "MAGAZINE",
+        "staff_id": "1f912b96-dc32-4ee3-8e72-8ce0d49c398b",
+        "name": "MAGAZINE_WORKER1"
+    },
+    {
+        "role": "IT_OPS",
+        "staff_id": "3f912b96-dc32-4ee3-8e72-8ce0d49c398c",
+        "name": "IT_OPS1"
+    }
+]
