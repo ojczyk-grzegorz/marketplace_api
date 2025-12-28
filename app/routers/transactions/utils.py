@@ -13,8 +13,8 @@ from app.database.dbmodels import (
     DBTransactionItem,
 )
 from app.exceptions.exceptions import (
-    ExcDiscountActiveNotFound,
     ExcDeliveryOptionNotFound,
+    ExcDiscountActiveNotFound,
     ExcInsufficientStock,
     ExcItemNotFound,
 )

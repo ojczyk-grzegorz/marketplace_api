@@ -11,7 +11,9 @@ from app.configs.utils import get_settings
 from app.database.utils import get_db_session
 from app.routers.transactions.datamodels import (
     ResponseGetAllCurrentTransactions,
+    ResponseGetAllFinalizedTransactions,
     ResponseGetCurrentTransaction,
+    ResponseGetFinalizedTransaction,
     TransactionToCreate,
 )
 from app.routers.transactions.service import (
@@ -95,7 +97,7 @@ async def req_get_current_transaction(
 @router.get(
     "/finalized",
     status_code=status.HTTP_200_OK,
-    response_model=ResponseGetAllCurrentTransactions,
+    response_model=ResponseGetAllFinalizedTransactions,
     response_model_exclude_none=True,
     description="Route for retrieving current user's transactions",
 )
@@ -114,7 +116,7 @@ async def req_get_all_finalized_transactions(
 @router.get(
     "/finalized/{transaction_id}",
     status_code=status.HTTP_200_OK,
-    response_model=ResponseGetCurrentTransaction,
+    response_model=ResponseGetFinalizedTransaction,
     response_model_exclude_none=True,
     description="Route for retrieving transaction status",
 )

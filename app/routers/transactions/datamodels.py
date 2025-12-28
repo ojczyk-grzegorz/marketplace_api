@@ -70,6 +70,7 @@ class TransactionFinalized(BaseModel):
     user_id: uuid.UUID
     created_at: dt.datetime
     finalized_at: dt.datetime
+    total_price: Decimal
 
     name: str
     last_name: str

@@ -163,6 +163,7 @@ class DBTransactionFinalized(SQLModel, table=True):
     user_id: uuid.UUID = Field(sa_column=Column(UUID(as_uuid=True), nullable=False))
     created_at: dt.datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=True))
     finalized_at: dt.datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=True))
+    total_price: Decimal = Field(sa_column=Column(Numeric, nullable=False))
 
     name: str = Field(sa_column=Column(String(256), nullable=True))
     last_name: str = Field(sa_column=Column(String(256), nullable=True))

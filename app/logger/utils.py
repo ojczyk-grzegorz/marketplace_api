@@ -4,6 +4,8 @@ import json
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from uuid import UUID
+import traceback
+from fastapi.requests import Request
 
 from app.configs.utils import get_settings
 
@@ -24,7 +26,7 @@ class LogFormatterJson(logging.Formatter):
         if not isinstance(record.msg, (str, dict)):
             record.msg = str(record.msg)
         log_record = {
-            "timestamp": self.formatTime(record, self.datefmt),
+            "time_generated": self.formatTime(record, self.datefmt),
             "level": record.levelname,
             "log_type": "struct" if isinstance(record.msg, dict) else "string",
             "log": record.msg,
@@ -50,3 +52,15 @@ def get_logger() -> logging.Logger:
     logger.addHandler(handler_file)
 
     return logger
+
+
+def log_error(logger: logging.Logger, req_id: UUID, exc: Exception):
+    log = {
+        "timestamp": dt.datetime.now(dt.UTC).isoformat(),
+        "req_id": req_id,
+        "type": "error",
+        "error_type": exc.__class__.__name__,
+        "message": str(exc),
+        "traceback": traceback.format_exc().splitlines(),
+    }
+    logger.error(log)
