@@ -34,7 +34,9 @@ To exit back to your regular user, just type exit.
 
 https://github.com/WhiskyToad/fastapi-starter/blob/main/.pre-commit-config.yaml
 
-- Add tests
-- app docker setup
-- postgres docker setup
-- postgrs duckdb setup
+- Improve data schemas & models
+- Tests
+- App docker setup
+- Postgres docker setup
+- Postgres duckdb setup
+- Readme
