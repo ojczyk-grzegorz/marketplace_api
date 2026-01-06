@@ -651,7 +651,6 @@ dependencies = [
     { name = "aiohttp" },
     { name = "apscheduler" },
     { name = "bcrypt" },
-    { name = "duckdb" },
     { name = "fastapi", extra = ["standard"] },
     { name = "fastapi-utilities" },
     { name = "httpx" },
@@ -670,6 +669,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "duckdb" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-mock" },
@@ -681,7 +681,6 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.13.2" },
     { name = "apscheduler", specifier = ">=3.11.1" },
     { name = "bcrypt", specifier = ">=5.0.0" },
-    { name = "duckdb", specifier = ">=1.4.3" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.121.1" },
     { name = "fastapi-utilities", specifier = ">=0.3.1" },
     { name = "httpx", specifier = ">=0.28.1" },
@@ -700,6 +699,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "duckdb", specifier = ">=1.4.3" },
     { name = "pytest", specifier = ">=8.4.2" },
     { name = "pytest-asyncio", specifier = ">=1.2.0" },
     { name = "pytest-mock", specifier = ">=3.15.1" },

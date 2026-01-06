@@ -1,14 +1,3 @@
-fastapi
-uv
-ruff
-pydantic
-sqlmodel
-sqlalchemy
-starlette exceptions
-pytest
-duckdb
-httpx
-
 <!-- https://stackoverflow.com/questions/11919391/postgresql-error-fatal-role-username-does-not-exist -->
 sudo -u postgres createuser owning_user
 
@@ -34,7 +23,6 @@ To exit back to your regular user, just type exit.
 
 https://github.com/WhiskyToad/fastapi-starter/blob/main/.pre-commit-config.yaml
 
-- Improve data schemas & models
 - Tests
 - App docker setup
 - Postgres docker setup
