@@ -2,14 +2,15 @@ from fastapi import HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
-from jwt.exceptions import ExpiredSignatureError
 from pydantic import BaseModel
 
 from app.exceptions.exceptions import (
     ExcDeliveryOptionNotFound,
     ExcDiscountActiveNotFound,
+    ExcExpiredToken,
     ExcInsufficientStock,
     ExcInvalidCredentials,
+    ExcInvalidToken,
     ExcItemNotFound,
     ExcTransactionActiveNotFound,
     ExcTransactionFinalizedNotFound,
@@ -175,19 +176,6 @@ async def exception_handler_user_not_found(request: Request, exc: ExcUserNotFoun
     )
 
 
-async def exception_handler_token_expired(
-    request: Request, exc: ExpiredSignatureError
-) -> JSONResponse:
-    log_error(logger, request.state.req_id, exc)
-    return JSONResponse(
-        status_code=401,
-        content=dict(
-            error_code="TOKEN_EXPIRED",
-            message="The provided token has expired.",
-        ),
-    )
-
-
 async def exception_handler_discount_active_not_found(
     request: Request, exc: ExcDiscountActiveNotFound
 ) -> JSONResponse:
@@ -222,6 +210,28 @@ async def exception_handler_insufficient_stock(
     )
 
 
+async def exception_handler_invalid_token(request: Request, exc: ExcInvalidToken) -> JSONResponse:
+    log_error(logger, request.state.req_id, exc)
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=dict(
+            error_code="INVALID_TOKEN",
+            message=exc.detail,
+        ),
+    )
+
+
+async def exception_handler_token_expired(request: Request, exc: ExcExpiredToken) -> JSONResponse:
+    log_error(logger, request.state.req_id, exc)
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=dict(
+            error_code="TOKEN_EXPIRED",
+            message=exc.detail,
+        ),
+    )
+
+
 EXCEPTION_HANDLERS = {
     HTTPException: exception_handler_http,
     RequestValidationError: exception_handler_validation_error,
@@ -233,7 +243,8 @@ EXCEPTION_HANDLERS = {
     ExcItemNotFound: exception_handler_item_not_found,
     ExcInvalidCredentials: exception_handler_invalid_credentials,
     ExcUserNotFound: exception_handler_user_not_found,
-    ExpiredSignatureError: exception_handler_token_expired,
     ExcDiscountActiveNotFound: exception_handler_discount_active_not_found,
     ExcInsufficientStock: exception_handler_insufficient_stock,
+    ExcInvalidToken: exception_handler_invalid_token,
+    ExcExpiredToken: exception_handler_token_expired,
 }

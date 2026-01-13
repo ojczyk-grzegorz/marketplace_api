@@ -1,6 +1,6 @@
 import datetime as dt
 
-from sqlmodel import Session, delete, insert, select, update
+from sqlmodel import Session, delete, select, update
 
 from app.auth.utils import get_password_hash, validate_access_token
 from app.configs.datamodels import Settings
@@ -33,21 +33,26 @@ async def create_user(db: Session, user_req: UserToCreate) -> ResponseCreateUser
             phone=(user_req.phone if user_db.phone == user_req.phone else None),
         )
 
-    created_at = dt.datetime.now(dt.timezone.utc)
-    user_db = DBUser(
-        email=user_req.email,
-        phone=user_req.phone,
-        password_hash=get_password_hash(user_req.password).decode("utf-8"),
-        created_at=created_at,
-        updated_at=created_at,
-    )
-    user_id = user_db.user_id
-    query = insert(DBUser).values({**user_db.model_dump(), "password_hash": user_db.password_hash})
-    db.exec(query)
-    db.commit()
+    try:
+        created_at = dt.datetime.now(dt.timezone.utc)
+        user_db = DBUser(
+            email=user_req.email,
+            phone=user_req.phone,
+            password_hash=get_password_hash(user_req.password),
+            created_at=created_at,
+            updated_at=created_at,
+        )
+        db.add(user_db)
+        db.commit()
+        db.refresh(user_db)
+    except Exception as e:
+        db.rollback()
+        raise e
 
     return ResponseCreateUser(
-        user_created=UserCreated(user_id=user_id, email=user_req.email, phone=user_req.phone),
+        user_created=UserCreated(
+            user_id=user_db.user_id, email=user_req.email, phone=user_req.phone
+        ),
     )
 
 
@@ -74,19 +79,22 @@ async def update_user(
         **user.model_dump(exclude_none=True),
     )
     if user.password:
-        user_db_update["password_hash"] = get_password_hash(user.password).decode("utf-8")
-
-    db_user = DBUser.model_validate(user_db)
-
-    query = update(DBUser).where(DBUser.user_id == user_id).values(user_db_update)
-    db.exec(query)
-    db.commit()
+        user_db_update["password_hash"] = get_password_hash(user.password)
+        del user_db_update["password"]
+    try:
+        query = update(DBUser).where(DBUser.user_id == user_id).values(user_db_update)
+        db.exec(query)
+        db.commit()
+        db.refresh(user_db)
+    except Exception as e:
+        db.rollback()
+        raise e
 
     return ResponseUpdateUser(
         user_updated=UserUpdated(
             user_id=user_id,
-            email=db_user.email,
-            phone=db_user.phone,
+            email=user_db.email,
+            phone=user_db.phone,
             password_changed=bool(user.password),
         ),
     )
@@ -112,16 +120,20 @@ async def remove_user(
     phone = user_db.phone
 
     query = select(DBTransaction).where(DBTransaction.user_id == user_id)
-    db_user_tranasactions = db.exec(query).all()
-    if db_user_tranasactions:
+    db_user_transactions = db.exec(query).all()
+    if db_user_transactions:
         raise ExcTransactionsActiveFound(
             user_id=user_id,
-            transaction_ids=[t.transaction_id for t in db_user_tranasactions],
+            transaction_ids=[t.transaction_id for t in db_user_transactions],
         )
 
-    query = delete(DBUser).where(DBUser.user_id == user_id)
-    db.exec(query)
-    db.commit()
+    try:
+        query = delete(DBUser).where(DBUser.user_id == user_id)
+        db.exec(query)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise e
 
     return ResponseRemoveUser(
         user_removed=UserRemoved(user_id=user_id, email=email, phone=phone),

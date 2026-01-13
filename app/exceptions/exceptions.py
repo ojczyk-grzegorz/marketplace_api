@@ -40,7 +40,7 @@ class ExcTransactionActiveNotFound(HTTPException):
 class ExcTransactionsActiveFound(HTTPException):
     def __init__(self, transaction_ids: list[str], user_id: uuid.UUID) -> None:
         super().__init__(
-            status_code=404,
+            status_code=409,
             detail=f"User with ID {user_id} has active transactions with IDs {transaction_ids}.",
         )
         self.transaction_ids = transaction_ids
@@ -51,7 +51,7 @@ class ExcDiscountActiveNotFound(HTTPException):
     def __init__(self, discount_code: str) -> None:
         super().__init__(
             status_code=404,
-            detail=f"Active discount with code {discount_code} not found.",
+            detail=f"Active discount with ID {discount_code} not found.",
         )
         self.discount_code = discount_code
 
@@ -60,7 +60,7 @@ class ExcDeliveryOptionNotFound(HTTPException):
     def __init__(self, delivery_option_id: uuid.UUID) -> None:
         super().__init__(
             status_code=404,
-            detail=f"Active discount with code {delivery_option_id} not found.",
+            detail=f"Delivery option with ID {delivery_option_id} not found.",
         )
         self.delivery_option_id = delivery_option_id
 
@@ -69,7 +69,7 @@ class ExcTransactionFinalizedNotFound(HTTPException):
     def __init__(self, user_id: uuid.UUID, transaction_id: uuid.UUID) -> None:
         super().__init__(
             status_code=404,
-            detail=f"Active transaction with ID {transaction_id} of user with ID {user_id} not found.",
+            detail=f"Finalized transaction with ID {transaction_id} of user with ID {user_id} not found.",
         )
         self.transaction_id = transaction_id
         self.user_id = user_id
@@ -84,3 +84,13 @@ class ExcInsufficientStock(HTTPException):
         self.item_id = item_id
         self.requested = requested
         self.available = available
+
+
+class ExcInvalidToken(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(status_code=401, detail="Invalid or malformed token.")
+
+
+class ExcExpiredToken(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(status_code=401, detail="Token has expired.")

@@ -11,7 +11,7 @@ from app.configs.utils import get_settings
 from app.database.utils import get_db_session
 from app.routers.auth.service import get_token
 
-router = APIRouter(prefix="/auth", tags=["Authentication"], route_class=APIRoute)
+router = APIRouter(prefix="/v1/auth", tags=["Authentication"], route_class=APIRoute)
 
 
 @router.post(
