@@ -22,7 +22,7 @@ from app.routers.user.datamodels import (
 )
 
 
-async def create_user(db: Session, user_req: UserToCreate):
+async def create_user(db: Session, user_req: UserToCreate) -> ResponseCreateUser:
     query = select(DBUser).where(
         (DBUser.email == user_req.email) | (DBUser.phone == user_req.phone)
     )
@@ -56,7 +56,7 @@ async def update_user(
     db: Session,
     token: str,
     user: UserToUpdate,
-):
+) -> ResponseUpdateUser:
     user_id = validate_access_token(
         token=token,
         secret_key=settings.auth_secret_key,
@@ -96,7 +96,7 @@ async def remove_user(
     settings: Settings,
     db: Session,
     token: str,
-):
+) -> ResponseRemoveUser:
     user_id = validate_access_token(
         token=token,
         secret_key=settings.auth_secret_key,

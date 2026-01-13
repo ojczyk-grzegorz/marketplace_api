@@ -17,7 +17,7 @@ from app.routers.items.datamodels import (
 async def filter_items(
     item_query: ItemQuery,
     db: Session,
-):
+) -> ResponseFilterItems:
     query = select(DBItem)
     if item_query.search:
         query = query.where(
@@ -44,7 +44,7 @@ async def filter_items(
 async def retrieve_item(
     db: Annotated[Session, Depends(get_db_session)],
     item_id: Annotated[uuid.UUID, Path(...)],
-):
+) -> ResponseRetrieveItem:
     query = select(DBItem).where(DBItem.item_id == item_id)
     item = db.exec(query).first()
     if not item:

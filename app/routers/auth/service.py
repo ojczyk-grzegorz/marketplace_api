@@ -17,7 +17,7 @@ async def get_token(
     settings: Annotated[Settings, Depends(get_settings)],
     db: Annotated[Session, Depends(get_db_session)],
     form: Annotated[OAuth2PasswordRequestForm, Depends()],
-):
+) -> ResponseGetToken:
     query = select(DBUser).where(DBUser.email == form.username)
     db_user_matching = db.exec(query).first()
 

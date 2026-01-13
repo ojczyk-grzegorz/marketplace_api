@@ -37,7 +37,7 @@ logger = get_logger()
 
 
 @app.get("/", description="API home page.", response_class=JSONResponse)
-async def get_home(settings: Annotated[Settings, Depends(get_settings)]):
+async def get_home(settings: Annotated[Settings, Depends(get_settings)]) -> JSONResponse:
     return JSONResponse(status_code=200, content={"message": f"Hello from {settings.app_name}!"})
 
 
@@ -45,6 +45,6 @@ async def get_home(settings: Annotated[Settings, Depends(get_settings)]):
 async def get_healthcheck(
     settings: Annotated[Settings, Depends(get_settings)],
     db: Annotated[Session, Depends(get_db_session)],
-):
+) -> JSONResponse:
     db.exec(text("SELECT 1 as test")).first()
     return JSONResponse(status_code=200, content={"message": f"{settings.app_name} is healthy!"})

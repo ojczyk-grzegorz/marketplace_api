@@ -27,7 +27,7 @@ router = APIRouter(prefix="/items", tags=["Items"], route_class=APIRoute)
 async def req_filter_items(
     db: Annotated[Session, Depends(get_db_session)],
     item_query: Annotated[ItemQuery, Query(openapi_examples=get_filter_items_examples())],
-):
+) -> ResponseFilterItems:
     return await filter_items(item_query=item_query, db=db)
 
 
@@ -41,5 +41,5 @@ async def req_filter_items(
 async def req_retrieve_item(
     db: Annotated[Session, Depends(get_db_session)],
     item_id: Annotated[uuid.UUID, Path(..., openapi_examples=get_retrieve_item_examples())],
-):
+) -> ResponseRetrieveItem:
     return await retrieve_item(db=db, item_id=item_id)

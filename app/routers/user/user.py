@@ -41,7 +41,7 @@ async def req_create_user(
         UserToCreate,
         Body(..., openapi_examples=get_user_create_examples()),
     ],
-):
+) -> ResponseCreateUser:
     return await create_user(db=db, user_req=user_req)
 
 
@@ -60,7 +60,7 @@ async def req_update_user(
         UserToUpdate,
         Body(..., openapi_examples=get_user_update_examples()),
     ],
-):
+) -> ResponseUpdateUser:
     return await update_user(
         settings=settings,
         db=db,
@@ -80,7 +80,7 @@ async def req_user_remove(
     settings: Annotated[Settings, Depends(get_settings)],
     db: Annotated[Session, Depends(get_db_session)],
     token: str = Depends(oauth2_scheme),
-):
+) -> ResponseRemoveUser:
     return await remove_user(
         settings=settings,
         db=db,

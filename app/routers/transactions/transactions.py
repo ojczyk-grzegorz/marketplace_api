@@ -43,7 +43,7 @@ async def req_create_transaction(
         TransactionToCreate,
         Body(..., openapi_examples=get_transaction_create_examples()),
     ],
-):
+) -> ResponseGetCurrentTransaction:
     return await create_transaction(
         settings=settings,
         db=db,
@@ -63,7 +63,7 @@ async def req_get_all_current_transactions(
     settings: Annotated[Settings, Depends(get_settings)],
     db: Annotated[Session, Depends(get_db_session)],
     token: str = Depends(oauth2_scheme),
-):
+) -> ResponseGetAllCurrentTransactions:
     return await get_all_current_transactions(
         settings=settings,
         db=db,
@@ -85,7 +85,7 @@ async def req_get_current_transaction(
     transaction_id: Annotated[
         uuid.UUID, Path(..., description="The UUID of the transaction to retrieve")
     ],
-):
+) -> ResponseGetCurrentTransaction:
     return await get_current_transaction(
         settings=settings,
         db=db,
@@ -105,7 +105,7 @@ async def req_get_all_finalized_transactions(
     settings: Annotated[Settings, Depends(get_settings)],
     db: Annotated[Session, Depends(get_db_session)],
     token: str = Depends(oauth2_scheme),
-):
+) -> ResponseGetAllFinalizedTransactions:
     return await get_all_finalized_transactions(
         settings=settings,
         db=db,
@@ -127,7 +127,7 @@ async def req_get_finalized_transaction(
     transaction_id: Annotated[
         uuid.UUID, Path(..., description="The UUID of the transaction to retrieve")
     ],
-):
+) -> ResponseGetFinalizedTransaction:
     return await get_finalized_transaction(
         settings=settings,
         db=db,

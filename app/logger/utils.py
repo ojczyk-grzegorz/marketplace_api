@@ -4,6 +4,7 @@ import json
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import traceback
+from typing import Any
 from uuid import UUID
 
 from app.configs.utils import get_settings
@@ -12,16 +13,14 @@ FILENAME_LOGS = "logs/app.log"
 
 
 class CustomJSONEncoder(json.JSONEncoder):
-    def default(self, obj):
+    def default(self, obj: Any) -> str:
         if isinstance(obj, dt.datetime):
             return obj.isoformat()
-        elif isinstance(obj, UUID):
-            return str(obj)
         return str(obj)
 
 
 class LogFormatterJson(logging.Formatter):
-    def format(self, record):
+    def format(self, record: Any) -> str:
         if not isinstance(record.msg, (str, dict)):
             record.msg = str(record.msg)
         log_record = {
@@ -53,7 +52,7 @@ def get_logger() -> logging.Logger:
     return logger
 
 
-def log_error(logger: logging.Logger, req_id: UUID, exc: Exception):
+def log_error(logger: logging.Logger, req_id: UUID, exc: Exception) -> None:
     log = {
         "timestamp": dt.datetime.now(dt.UTC).isoformat(),
         "req_id": req_id,

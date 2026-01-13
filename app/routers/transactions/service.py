@@ -118,7 +118,7 @@ async def get_all_current_transactions(
     settings: Settings,
     db: Session,
     token: str,
-):
+) -> ResponseGetAllCurrentTransactions:
     user_id: int = validate_access_token(
         token=token,
         secret_key=settings.auth_secret_key,
@@ -144,7 +144,7 @@ async def get_current_transaction(
     db: Session,
     token: str,
     transaction_id: uuid.UUID,
-):
+) -> ResponseGetCurrentTransaction:
     user_id: int = validate_access_token(
         token=token,
         secret_key=settings.auth_secret_key,

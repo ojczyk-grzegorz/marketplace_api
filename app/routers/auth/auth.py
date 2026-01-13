@@ -24,5 +24,5 @@ async def req_get_token(
     form: Annotated[OAuth2PasswordRequestForm, Depends()],
     settings: Annotated[Settings, Depends(get_settings)],
     db: Annotated[Session, Depends(get_db_session)],
-):
+) -> ResponseGetToken:
     return await get_token(settings=settings, db=db, form=form)

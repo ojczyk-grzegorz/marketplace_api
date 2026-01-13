@@ -7,14 +7,14 @@ import jwt
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 
-def verify_password(plain_password, hashed_password):
+def verify_password(plain_password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(
         bytes(plain_password, encoding="utf-8"),
         bytes(hashed_password, encoding="utf-8"),
     )
 
 
-def get_password_hash(password):
+def get_password_hash(password: str) -> bytes:
     return bcrypt.hashpw(
         bytes(password, encoding="utf-8"),
         bcrypt.gensalt(),

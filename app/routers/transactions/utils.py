@@ -29,7 +29,7 @@ from app.routers.transactions.datamodels import (
 def get_db_discounts(
     db: Session,
     discount_codes: list[DBDiscount],
-):
+) -> list[DBDiscount]:
     discounts_db = []
     if not discount_codes:
         return discounts_db
@@ -45,7 +45,7 @@ def get_db_discounts(
 def get_db_delivery_options(
     db: Session,
     delivery_option_id: uuid.UUID,
-):
+) -> DBDeliveryOptions:
     query = select(DBDeliveryOptions).where(DBDeliveryOptions.option_id == delivery_option_id)
     delivery_option_db = db.exec(query).first()
     if not delivery_option_db:
@@ -57,7 +57,7 @@ def get_db_item(
     db: Session,
     item_id: uuid.UUID,
     item_count: int,
-):
+) -> DBItem:
     query = select(DBItem).where(DBItem.item_id == item_id)
     item_db = db.exec(query).first()
     if not item_db:
@@ -71,7 +71,7 @@ def update_db_item_stock(
     db: Session,
     item_id: uuid.UUID,
     item_count: int,
-):
+) -> None:
     query = (
         update(DBItem).where(DBItem.item_id == item_id).values(stock=(DBItem.stock - item_count))
     )
@@ -81,7 +81,7 @@ def update_db_item_stock(
 def check_for_db_item_snapshot(
     db: Session,
     item_db: DBItem,
-):
+) -> None:
     query = select(DBItemSnapshot).where(
         (DBItemSnapshot.item_id == item_db.item_id)
         & (DBItemSnapshot.updated_at == item_db.updated_at)
@@ -127,8 +127,10 @@ def apply_db_discounts(
 def get_response_current_transaction(
     db: Session,
     transaction_db: DBTransaction,
-    delivery_options: dict[uuid.UUID, DBDeliveryOptions] = dict(),
+    delivery_options: dict[uuid.UUID, DBDeliveryOptions] | None = None,
 ) -> ResponseGetCurrentTransaction:
+    if not delivery_options:
+        delivery_options = {}
     delivery_option = delivery_options.get(transaction_db.delivery_option_id)
     if not delivery_option:
         query = select(DBDeliveryOptions).where(
