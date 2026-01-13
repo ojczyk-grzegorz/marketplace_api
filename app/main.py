@@ -1,3 +1,4 @@
+from collections.abc import AsyncGenerator
 from typing import Annotated
 
 from fastapi import Depends, FastAPI
@@ -16,7 +17,21 @@ from app.routers.items import items
 from app.routers.transactions import transactions
 from app.routers.user import user
 
-app = FastAPI(tags=["Main"])
+logger = get_logger()
+
+
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    logger.info("Starting up the API.")
+    yield
+    logger.info("Shutting down the API.")
+
+
+app = FastAPI(
+    title="Generic e-commerce API",
+    description="A generic e-commerce API built with FastAPI and SQLModel for learning purposes.",
+    version="1.0.0",
+    lifespan=lifespan,
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,9 +46,6 @@ app.include_router(user.router)
 app.include_router(items.router)
 app.include_router(transactions.router)
 app.exception_handlers.update(EXCEPTION_HANDLERS)
-
-
-logger = get_logger()
 
 
 @app.get("/", description="API home page.", response_class=JSONResponse)
