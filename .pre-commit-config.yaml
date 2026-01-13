@@ -8,3 +8,10 @@ repos:
       - id: check-added-large-files
       - id: check-merge-conflict
       - id: mixed-line-ending
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.11
+    hooks:
+      - id: ruff-check
+        args: [ --fix ]
+      - id: ruff-format
