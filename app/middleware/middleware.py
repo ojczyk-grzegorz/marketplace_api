@@ -1,6 +1,5 @@
-from uuid import uuid4
-import traceback
 import datetime as dt
+from uuid import uuid4
 
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse

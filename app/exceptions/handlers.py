@@ -28,8 +28,9 @@ class ExceptionResponseModel(BaseModel):
     details: dict | None = None
 
 
-
-async def exception_handler_validation_error(request: Request, exc: RequestValidationError):
+async def exception_handler_validation_error(
+    request: Request, exc: RequestValidationError
+):
     log_error(logger, request.state.req_id, exc)
     return JSONResponse(
         status_code=422,
@@ -83,7 +84,9 @@ async def exception_handler_transaction_active_not_found(
     )
 
 
-async def exception_handler_delivery_option_not_found(request: Request, exc: ExcDeliveryOptionNotFound):
+async def exception_handler_delivery_option_not_found(
+    request: Request, exc: ExcDeliveryOptionNotFound
+):
     log_error(logger, request.state.req_id, exc)
     return JSONResponse(
         status_code=exc.status_code,
@@ -114,7 +117,9 @@ async def exception_handler_transaction_finalized_not_found(
     )
 
 
-async def exception_handler_transactions_active_found(request: Request, exc: ExcTransactionsActiveFound):
+async def exception_handler_transactions_active_found(
+    request: Request, exc: ExcTransactionsActiveFound
+):
     log_error(logger, request.state.req_id, exc)
     return JSONResponse(
         status_code=exc.status_code,
@@ -143,7 +148,9 @@ async def exception_handler_item_not_found(request: Request, exc: ExcItemNotFoun
     )
 
 
-async def exception_handler_invalid_credentials(request: Request, exc: ExcInvalidCredentials):
+async def exception_handler_invalid_credentials(
+    request: Request, exc: ExcInvalidCredentials
+):
     log_error(logger, request.state.req_id, exc)
     return JSONResponse(
         status_code=exc.status_code,
@@ -179,7 +186,9 @@ async def exception_handler_token_expired(request: Request, exc: ExpiredSignatur
     )
 
 
-async def exception_handler_discount_active_not_found(request: Request, exc: ExcDiscountActiveNotFound):
+async def exception_handler_discount_active_not_found(
+    request: Request, exc: ExcDiscountActiveNotFound
+):
     log_error(logger, request.state.req_id, exc)
     return JSONResponse(
         status_code=exc.status_code,
@@ -193,7 +202,9 @@ async def exception_handler_discount_active_not_found(request: Request, exc: Exc
     )
 
 
-async def exception_handler_insufficient_stock(request: Request, exc: ExcInsufficientStock):
+async def exception_handler_insufficient_stock(
+    request: Request, exc: ExcInsufficientStock
+):
     log_error(logger, request.state.req_id, exc)
     return JSONResponse(
         status_code=exc.status_code,

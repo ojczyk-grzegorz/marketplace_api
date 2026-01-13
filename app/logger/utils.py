@@ -3,9 +3,8 @@ from functools import lru_cache
 import json
 import logging
 from logging.handlers import TimedRotatingFileHandler
-from uuid import UUID
 import traceback
-from fastapi.requests import Request
+from uuid import UUID
 
 from app.configs.utils import get_settings
 
