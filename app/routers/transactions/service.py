@@ -96,18 +96,22 @@ async def create_transaction(
         delivery_option=db_delivery_options.name,
         delivery_price=db_delivery_options.price,
     )
-    db.add(db_transaction)
+    try:
+        db.add(db_transaction)
 
-    transaction_db_discounts = [
-        DBTransactionDiscount(
-            transaction_id=transaction_id,
-            discount_code=discount.discount_code,
-        )
-        for discount in db_discounts
-    ]
-    db.add_all(transaction_db_discounts)
-    db.add_all(db_transaction_items)
-    db.commit()
+        transaction_db_discounts = [
+            DBTransactionDiscount(
+                transaction_id=transaction_id,
+                discount_code=discount.discount_code,
+            )
+            for discount in db_discounts
+        ]
+        db.add_all(transaction_db_discounts)
+        db.add_all(db_transaction_items)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise e
 
     return ResponseGetCurrentTransaction(
         transaction=response_transaction_details, items=transaction_items

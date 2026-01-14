@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     db_user: str
     db_password: str
 
-    db_schema: str = Field("ecommerce_api")
+    db_name: str = Field("ecommerce_api")
 
     auth_secret_key: str = Field(...)
     auth_algorithm: str = Field("HS256")

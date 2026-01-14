@@ -1,8 +1,7 @@
-from collections.abc import Awaitable
+from collections.abc import Callable
 import datetime as dt
 from uuid import uuid4
 
-from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
@@ -13,7 +12,7 @@ logger = get_logger()
 
 
 class CustomMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next: Awaitable) -> JSONResponse:
+    async def dispatch(self, request: Request, call_next: Callable) -> JSONResponse:
         req_id = uuid4()
         log = {
             "timestamp": dt.datetime.now(dt.UTC).isoformat(),
@@ -42,7 +41,3 @@ class CustomMiddleware(BaseHTTPMiddleware):
         }
         logger.info(log)
         return response
-
-
-def custom_middleware_factory(app: FastAPI) -> CustomMiddleware:
-    return CustomMiddleware(app)

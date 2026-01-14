@@ -11,7 +11,7 @@ from app.configs.utils import get_settings
 from app.database.utils import get_db_session
 from app.exceptions.handlers import EXCEPTION_HANDLERS
 from app.logger.utils import get_logger
-from app.middleware.middleware import custom_middleware_factory
+from app.middleware.middleware import CustomMiddleware
 from app.routers.auth import auth
 from app.routers.items import items
 from app.routers.transactions import transactions
@@ -40,7 +40,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(custom_middleware_factory)
+app.add_middleware(CustomMiddleware)
 app.include_router(auth.router)
 app.include_router(user.router)
 app.include_router(items.router)

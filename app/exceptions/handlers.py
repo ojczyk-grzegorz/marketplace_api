@@ -2,7 +2,6 @@ from fastapi import HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 
 from app.exceptions.exceptions import (
     ExcDeliveryOptionNotFound,
@@ -21,12 +20,6 @@ from app.exceptions.exceptions import (
 from app.logger.utils import get_logger, log_error
 
 logger = get_logger()
-
-
-class ExceptionResponseModel(BaseModel):
-    error_code: str
-    message: str
-    details: dict | None = None
 
 
 async def exception_handler_validation_error(
@@ -55,15 +48,19 @@ async def exception_handler_http(request: Request, exc: HTTPException) -> JSONRe
 
 async def exception_handler_user_exists(request: Request, exc: ExcUserExists) -> JSONResponse:
     log_error(logger, request.state.req_id, exc)
+
+    details = {}
+    if exc.email:
+        details["email"] = exc.email
+    if exc.phone:
+        details["phone"] = exc.phone
+
     return JSONResponse(
         status_code=exc.status_code,
         content=dict(
             error_code="USER_EXISTS",
             message=exc.detail,
-            details={
-                "email": exc.email,
-                "phone": exc.phone,
-            },
+            details=details,
         ),
     )
 

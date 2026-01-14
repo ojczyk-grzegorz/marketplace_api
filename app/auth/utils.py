@@ -1,4 +1,5 @@
 import datetime as dt
+import uuid
 
 import bcrypt
 from fastapi.security import OAuth2PasswordBearer
@@ -37,7 +38,7 @@ def get_access_token(data: dict, secret_key: str, algorithm: str, expire_minutes
     return token
 
 
-def validate_access_token(token: str, secret_key: str, algorithms: list[str]) -> int:
+def validate_access_token(token: str, secret_key: str, algorithms: list[str]) -> uuid.UUID:
     try:
         payload: dict = jwt.decode(
             jwt=token, key=secret_key, algorithms=algorithms, options={"verify_exp": True}
