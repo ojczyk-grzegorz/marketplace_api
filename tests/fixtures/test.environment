@@ -1,0 +1,16 @@
+APP_NAME="test-ecommerce_api"
+
+ENVIRONMENT="test"
+LOGGER_NAME="ecommerce_api"
+LOGGER_LEVEL="DEBUG"
+
+DB_HOST="localhost"
+DB_PORT="5432"
+DB_USER="user"
+DB_PASSWORD="password"
+
+DB_NAME="test-ecommerce_api"
+
+AUTH_SECRET_KEY="SECRET"
+AUTH_ALGORITHM="HS256"
+AUTH_ACCESS_TOKEN_EXPIRE_MINUTES="1440"
