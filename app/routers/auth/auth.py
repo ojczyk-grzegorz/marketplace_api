@@ -15,7 +15,7 @@ router = APIRouter(prefix="/v1/auth", tags=["Authentication"], route_class=APIRo
 
 
 @router.post(
-    "/v1/token",
+    "/token",
     status_code=status.HTTP_200_OK,
     response_model=ResponseGetToken,
     description="Route for getting user token",
