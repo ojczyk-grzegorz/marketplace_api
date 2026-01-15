@@ -1,4 +1,5 @@
 from collections.abc import AsyncGenerator
+import contextlib
 from typing import Annotated
 
 from fastapi import Depends, FastAPI
@@ -20,6 +21,7 @@ from app.routers.user import user
 logger = get_logger()
 
 
+@contextlib.asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Starting up the API.")
     yield
