@@ -32,6 +32,19 @@ class LogFormatterJson(logging.Formatter):
         return json.dumps(log_record, cls=CustomJSONEncoder)
 
 
+class LogFormatterTerminal(logging.Formatter):
+    def format(self, record: Any) -> str:
+        if not isinstance(record.msg, (str, dict)):
+            record.msg = str(record.msg)
+        log_record = {
+            "time_generated": self.formatTime(record, self.datefmt),
+            "level": record.levelname,
+            "log_type": "struct" if isinstance(record.msg, dict) else "string",
+            "log": record.msg,
+        }
+        return json.dumps(log_record, cls=CustomJSONEncoder, indent=4)
+
+
 @lru_cache()
 def get_logger() -> logging.Logger:
     settings = get_settings()
@@ -41,10 +54,7 @@ def get_logger() -> logging.Logger:
 
     # Console handler
     handler_stream = logging.StreamHandler()
-    formatter_stream = logging.Formatter(
-        fmt="%(levelname)s | %(asctime)s | %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
+    formatter_stream = LogFormatterTerminal()
     handler_stream.setFormatter(formatter_stream)
     handler_stream.setLevel(settings.logger_level)
     logger.addHandler(handler_stream)
