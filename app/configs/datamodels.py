@@ -19,9 +19,9 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    app_name: str = Field("E-commerce API")
+    app_name: str = Field("Generic E-commerce API")
     environment: Environment = Field(Environment.DEVELOPMENT)
-    logger_name: str = Field("ecommerce_api")
+    logger_name: str = Field("generic_ecommerce_api")
     logger_level: str = Field("INFO")
 
     db_host: str = Field("localhost")
@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     db_user: str
     db_password: str
 
-    db_name: str = Field("ecommerce_api")
+    db_name: str = Field("generic_ecommerce_api")
 
     auth_secret_key: str = Field(...)
     auth_algorithm: str = Field("HS256")

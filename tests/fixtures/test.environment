@@ -1,7 +1,7 @@
-APP_NAME="test-ecommerce_api"
+APP_NAME="generic_ecommerce_api"
 
 ENVIRONMENT="test"
-LOGGER_NAME="ecommerce_api"
+LOGGER_NAME="generic_ecommerce_api"
 LOGGER_LEVEL="DEBUG"
 
 DB_HOST="localhost"
@@ -9,7 +9,7 @@ DB_PORT="5432"
 DB_USER="user"
 DB_PASSWORD="password"
 
-DB_NAME="test-ecommerce_api"
+DB_NAME="generic_ecommerce_api"
 
 AUTH_SECRET_KEY="SECRET"
 AUTH_ALGORITHM="HS256"
