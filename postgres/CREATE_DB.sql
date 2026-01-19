@@ -1,4 +1,4 @@
-CREATE DATABASE generice_ecommerce_api
+CREATE DATABASE generic_ecommerce_api
 	WITH
 	OWNER = postgres
 	ENCODING = 'UTF-8'
@@ -6,6 +6,5 @@ CREATE DATABASE generice_ecommerce_api
 	CONNECTION LIMIT = -1
 	IS_TEMPLATE = False;
 
--- SELECT * FROM pg_timezone_names;
-ALTER DATABASE generice_ecommerce_api
+ALTER DATABASE generic_ecommerce_api
 	SET timezone TO 'UTC';

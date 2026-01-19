@@ -1,5 +1,5 @@
+BEGIN;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 
 DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
@@ -15,7 +15,7 @@ CREATE TABLE users (
 DROP TABLE IF EXISTS items CASCADE;
 CREATE TABLE items (
 	item_id UUID PRIMARY KEY,
-    name VARCHAR(256) NOT NULL,    
+    name VARCHAR(256) NOT NULL,
     category VARCHAR(32) NOT NULL,
     subcategories VARCHAR(32)[],
     price NUMERIC NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE items (
 DROP TABLE IF EXISTS items_snapshots CASCADE;
 CREATE TABLE items_snapshots (
 	item_id UUID NOT NULL,
-    name VARCHAR(256) NOT NULL,    
+    name VARCHAR(256) NOT NULL,
     category VARCHAR(32),
     subcategories VARCHAR(32)[],
     price NUMERIC NOT NULL,
@@ -40,8 +40,8 @@ CREATE TABLE items_snapshots (
     features JSONB,
     created_at TIMESTAMPTZ NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL,
-    
-    PRIMARY KEY (item_id, updated_at) 
+
+    PRIMARY KEY (item_id, updated_at)
 );
 
 
@@ -50,7 +50,7 @@ CREATE TABLE ground_staff (
     staff_id UUID PRIMARY KEY,
     name VARCHAR(128) NOT NULL,
     role VARCHAR(64) NOT NULL
-); 
+);
 
 
 DROP TABLE IF EXISTS delivery_options CASCADE;
@@ -72,7 +72,7 @@ CREATE TABLE discounts (
     discount_percentage NUMERIC NOT NULL,
     item_ids UUID[],
     brands VARCHAR(128)[],
-    categories JSONB 
+    categories JSONB
 );
 
 
@@ -102,7 +102,7 @@ CREATE TABLE transaction_discounts (
     row_id SERIAL PRIMARY KEY,
 	transaction_id UUID NOT NULL,
     discount_code VARCHAR(128) NOT NULL,
-    
+
     FOREIGN KEY (transaction_id) REFERENCES transactions(transaction_id),
     FOREIGN KEY (discount_code) REFERENCES discounts(discount_code)
 );
@@ -117,7 +117,7 @@ CREATE TABLE transaction_items (
     price_after_discounts NUMERIC NOT NULL,
 
     FOREIGN KEY (transaction_id) REFERENCES transactions(transaction_id) ON DELETE CASCADE,
-    FOREIGN KEY (item_id, updated_at)  REFERENCES items_snapshots(item_id, updated_at)    
+    FOREIGN KEY (item_id, updated_at)  REFERENCES items_snapshots(item_id, updated_at)
 );
 
 
@@ -151,8 +151,10 @@ CREATE TABLE transactions_finalized (
     postal_code VARCHAR(16),
     address_line_1 VARCHAR(256),
     address_line_2 VARCHAR(256),
-    
+
     delivery JSONB,
     items JSONB,
     action_history JSONB NOT NULL
 );
+
+COMMIT;
