@@ -39,13 +39,21 @@ def get_logger() -> logging.Logger:
     logger = logging.getLogger(settings.logger_name)
     logger.setLevel(settings.logger_level)
 
+    # Console handler
+    handler_stream = logging.StreamHandler()
+    formatter_stream = logging.Formatter(
+        fmt="%(levelname)s | %(asctime)s | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    handler_stream.setFormatter(formatter_stream)
+    handler_stream.setLevel(settings.logger_level)
+    logger.addHandler(handler_stream)
+
+    # File handler
     handler_file = TimedRotatingFileHandler(
         FILENAME_LOGS, when="M", interval=5, utc=True, encoding="utf-8"
     )
-    formatter_file = LogFormatterJson(
-        fmt='{"timestamp": "%(asctime)s", "level": "%(levelname)s", "log": %(message)s}',
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
+    formatter_file = LogFormatterJson()
     handler_file.setFormatter(formatter_file)
     logger.addHandler(handler_file)
 
