@@ -691,7 +691,7 @@ wheels = [
 ]
 
 [[package]]
-name = "generice_ecommorce_api"
+name = "generice_ecommerce_api"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
