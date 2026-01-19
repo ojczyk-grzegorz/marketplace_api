@@ -1,5 +1,5 @@
-CREATE DATABASE marketplace_api
-	WITH 
+CREATE DATABASE generice_ecommorce_api
+	WITH
 	OWNER = postgres
 	ENCODING = 'UTF-8'
 	LOCALE_PROVIDER = 'libc'
@@ -7,6 +7,5 @@ CREATE DATABASE marketplace_api
 	IS_TEMPLATE = False;
 
 -- SELECT * FROM pg_timezone_names;
-ALTER DATABASE marketplace_api
+ALTER DATABASE generice_ecommorce_api
 	SET timezone TO 'UTC';
-
