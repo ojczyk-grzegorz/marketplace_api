@@ -7,7 +7,7 @@ import jwt
 
 from app.exceptions.exceptions import ExcExpiredToken, ExcInvalidToken
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/auth/token")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:

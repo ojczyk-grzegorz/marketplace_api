@@ -80,7 +80,6 @@ async def update_user(
     )
     if user.password:
         user_db_update["password_hash"] = get_password_hash(user.password)
-        del user_db_update["password"]
     try:
         query = update(DBUser).where(DBUser.user_id == user_id).values(user_db_update)
         db.exec(query)
