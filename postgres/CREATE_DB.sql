@@ -5,6 +5,3 @@ CREATE DATABASE generic_ecommerce_api
 	LOCALE_PROVIDER = 'libc'
 	CONNECTION LIMIT = -1
 	IS_TEMPLATE = False;
-
-ALTER DATABASE generic_ecommerce_api
-	SET timezone TO 'UTC';

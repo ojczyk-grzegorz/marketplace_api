@@ -1,4 +1,9 @@
 BEGIN;
+
+ALTER DATABASE generic_ecommerce_api
+	SET timezone TO 'UTC';
+
+
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 DROP TABLE IF EXISTS users CASCADE;
