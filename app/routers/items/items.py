@@ -12,7 +12,7 @@ from app.routers.items.datamodels import (
     ResponseRetrieveItem,
 )
 from app.routers.items.service import filter_items, retrieve_item
-from development.openapi_examples import get_filter_items_examples, get_retrieve_item_examples
+from app.utils.openapi_examples import get_filter_items_examples, get_retrieve_item_examples
 
 router = APIRouter(prefix="/v1/items", tags=["Items"], route_class=APIRoute)
 

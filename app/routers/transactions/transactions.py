@@ -23,7 +23,7 @@ from app.routers.transactions.service import (
     get_current_transaction,
     get_finalized_transaction,
 )
-from development.openapi_examples import get_transaction_create_examples
+from app.utils.openapi_examples import get_transaction_create_examples
 
 router = APIRouter(prefix="/v1/transactions", tags=["Transactions"], route_class=APIRoute)
 

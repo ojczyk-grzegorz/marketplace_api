@@ -20,7 +20,7 @@ def get_user_create_examples() -> dict:
                 "phone": "+48123456789",
                 "password": "p2",
             },
-        }
+        },
     }
 
 
@@ -73,7 +73,6 @@ def get_retrieve_item_examples() -> dict:
             "value": "00000000-0000-0000-0000-000000000000",
         },
     }
-
 
 
 def get_transaction_create_examples() -> dict:
