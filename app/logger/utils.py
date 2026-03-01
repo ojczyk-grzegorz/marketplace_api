@@ -1,3 +1,4 @@
+import os
 import datetime as dt
 from functools import lru_cache
 import json
@@ -10,6 +11,10 @@ from uuid import UUID
 from app.configs.utils import get_settings
 
 FILENAME_LOGS = "logs/app.log"
+if not os.path.exists(FILENAME_LOGS):
+    os.makedirs(os.path.dirname(FILENAME_LOGS), exist_ok=True)
+    with open(FILENAME_LOGS, "w", encoding="utf-8") as f:
+        f.write("")
 
 
 class CustomJSONEncoder(json.JSONEncoder):
