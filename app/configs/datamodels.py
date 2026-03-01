@@ -1,10 +1,11 @@
-from enum import Enum
+from typing import Annotated
+from enum import StrEnum
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Environment(str, Enum):
+class Environment(StrEnum):
     DEVELOPMENT = "development"
     TEST = "test"
     STAGING = "staging"
@@ -19,18 +20,17 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    app_name: str = Field("Generic E-commerce API")
-    environment: Environment = Field(Environment.DEVELOPMENT)
-    logger_name: str = Field("generic_ecommerce_api")
-    logger_level: str = Field("INFO")
+    app_name: Annotated[str, Field("Generic E-commerce API")]
+    environment: Annotated[Environment, Field(Environment.DEVELOPMENT)]
+    logger_name: Annotated[str, Field("generic_ecommerce_api")]
+    logger_level: Annotated[str, Field("INFO")]
 
-    db_host: str = Field("localhost")
-    db_port: int = Field(5432)
-    db_user: str
-    db_password: str
+    db_host: Annotated[str, Field("localhost")]
+    db_port: Annotated[int, Field(5432)]
+    db_user: Annotated[str, Field(...)]
+    db_password: Annotated[str, Field(...)]
+    db_name: Annotated[str, Field("generic_ecommerce_api")]
 
-    db_name: str = Field("generic_ecommerce_api")
-
-    auth_secret_key: str = Field(...)
-    auth_algorithm: str = Field("HS256")
-    auth_access_token_expire_minutes: int = Field(60 * 24)
+    auth_secret_key: Annotated[str, Field(...)]
+    auth_algorithm: Annotated[str, Field("HS256")]
+    auth_access_token_expire_minutes: Annotated[int, Field(60 * 24)]
