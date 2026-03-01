@@ -1,5 +1,5 @@
-from typing import Annotated
 from enum import StrEnum
+from typing import Annotated
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
