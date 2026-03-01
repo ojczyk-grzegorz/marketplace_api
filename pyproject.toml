@@ -3,7 +3,7 @@ name = "generic_ecommerce_api"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = "==3.13.*"
 dependencies = [
     "aiohttp>=3.13.2",
     "apscheduler>=3.11.1",
@@ -18,7 +18,6 @@ dependencies = [
     "python-multipart>=0.0.20",
     "pytz>=2025.2",
     "uvicorn>=0.38.0",
-    "psycopg2>=2.9.11",
     "sqlalchemy>=2.0.44",
     "bcrypt>=5.0.0",
     "sqlmodel>=0.0.27",
