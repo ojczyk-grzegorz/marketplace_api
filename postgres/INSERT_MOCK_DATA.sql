@@ -86,6 +86,318 @@ FROM JSONB_TO_RECORDSET('
 
 
 
+
+INSERT INTO users(
+    user_id,
+    email,
+    phone,
+    password_hash,
+    created_at,
+    updated_at
+)
+SELECT
+    user_id,
+    email,
+    phone,
+    password_hash,
+    created_at,
+    updated_at
+FROM JSONB_TO_RECORDSET('
+[
+    {
+        "user_id": "8f581062-3ca0-4b57-a037-7c88291882ba",
+        "email": "user@example.com",
+        "phone": "+48123456789",
+        "password_hash": "$2b$12$ekgRkqQes6xlQpCEt4K4X.ogzRInRY3e0lBMMBsLY1bN1U5mGNHdG",
+        "created_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z"
+    }
+]
+') AS u(
+    user_id UUID,
+    email VARCHAR(256),
+    phone VARCHAR(32),
+    password_hash VARCHAR(256),
+    created_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ
+);
+
+
+INSERT INTO items_snapshots(
+    item_id,
+    name,
+    category,
+    subcategories,
+    price,
+    brand,
+    description,
+    features,
+    created_at,
+    updated_at
+)
+SELECT
+    item_id,
+    name,
+    category,
+    subcategories,
+    price,
+    brand,
+    description,
+    features,
+    created_at,
+    updated_at
+FROM JSONB_TO_RECORDSET('
+[
+    {
+        "price": 1199.99,
+        "name": "Apple iPhone 14 Pro Max 256GB Smartphone Mobile Phone Electronics",
+        "category": "Electronics",
+        "description": "Latest Apple iPhone 14 Pro Max smartphone with ProRAW photography, A16 Bionic chip, and Dynamic Island. Unlocked mobile phone device brand new in original packaging. Premium electronics smartphone with advanced camera system, 5G connectivity, iOS operating system, and professional photography capabilities.",
+        "created_at": "2024-12-19T10:00:00+00:00",
+        "item_id": "550e8400-e29b-41d4-a716-446655440001",
+        "subcategories": [
+            "Smartphones",
+            "Mobile Phones",
+            "Apple Devices",
+            "Communication"
+        ],
+        "brand": "APPLE",
+        "features": {
+            "color": "Deep Purple",
+            "camera": "48MP Main + 12MP Ultra Wide + 12MP Telephoto",
+            "storage": "256GB",
+            "unlocked": true,
+            "warranty": "1 Year Apple Warranty",
+            "condition": "New",
+            "battery_life": "Up to 29 hours video playback"
+        },
+        "updated_at": "2024-12-19T10:00:00+00:00"
+    },
+    {
+        "price": 2499.0,
+        "name": "Apple MacBook Pro 14-inch M2 Pro Laptop Computer Professional Electronics",
+        "category": "Electronics",
+        "description": "Professional Apple MacBook Pro laptop computer with M2 Pro chip, 16GB RAM memory, 1TB SSD storage. Perfect for developers, creative professionals, video editing, programming, and design work. High-performance computing device with Retina display, macOS operating system, and premium build quality.",
+        "created_at": "2024-12-19T10:30:00+00:00",
+        "item_id": "550e8400-e29b-41d4-a716-446655440003",
+        "subcategories": [
+            "Laptops",
+            "Computers",
+            "Apple Devices",
+            "Professional"
+        ],
+        "brand": "APPLE",
+        "features": {
+            "ram": "16GB",
+            "color": "Space Gray",
+            "ports": [
+                "3x Thunderbolt 4",
+                "HDMI",
+                "SDXC",
+                "MagSafe 3"
+            ],
+            "storage": "1TB SSD",
+            "processor": "M2 Pro",
+            "screen_size": "14-inch",
+            "battery_life": "Up to 18 hours"
+        },
+        "updated_at": "2024-12-19T10:30:00+00:00"
+    },
+    {
+        "price": 1099.0,
+        "name": "Apple iPad Pro 12.9-inch M2 Wi-Fi 256GB Tablet Computing Electronics",
+        "category": "Electronics",
+        "description": "Apple iPad Pro latest tablet with M2 chip and 12.9-inch Liquid Retina XDR display. Space Gray color with 256GB storage and Wi-Fi connectivity. Professional computing device perfect for digital art, productivity, and creative work. Includes USB-C cable and adapter. Premium electronics for designers and professionals.",
+        "created_at": "2024-12-19T17:00:00+00:00",
+        "item_id": "550e8400-e29b-41d4-a716-446655440016",
+        "subcategories": [
+            "Tablets",
+            "Apple Devices",
+            "Professional",
+            "Computing"
+        ],
+        "brand": "APPLE",
+        "features": {
+            "chip": "M2",
+            "color": "Space Gray",
+            "cameras": "12MP Wide, 10MP Ultra Wide",
+            "display": "12.9-inch Liquid Retina XDR",
+            "storage": "256GB",
+            "condition": "New",
+            "thunderbolt": true,
+            "connectivity": "Wi-Fi",
+            "apple_pencil_support": "2nd Generation"
+        },
+        "updated_at": "2024-12-19T17:00:00+00:00"
+    }
+]
+') AS i(
+    item_id UUID,
+    name VARCHAR(256),
+    category VARCHAR(32),
+    subcategories VARCHAR(32)[],
+    price NUMERIC,
+    brand VARCHAR(128),
+    description TEXT,
+    features JSONB,
+    created_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ
+);
+
+
+INSERT INTO transactions_finalized(
+    user_id,
+    created_at,
+    finalized_at,
+    name,
+    email,
+    country,
+    city,
+    address_line_1,
+    total_price,
+    transaction_id,
+    last_name,
+    phone,
+    postal_code,
+    address_line_2,
+    delivery,
+    items,
+    action_history
+)
+SELECT
+    user_id,
+    created_at,
+    finalized_at,
+    name,
+    email,
+    country,
+    city,
+    address_line_1,
+    total_price,
+    transaction_id,
+    last_name,
+    phone,
+    postal_code,
+    address_line_2,
+    delivery,
+    items,
+    action_history
+FROM JSONB_TO_RECORDSET('
+[
+    {
+        "user_id": "8f581062-3ca0-4b57-a037-7c88291882ba",
+        "created_at": "2025-11-15T14:38:54.413793+00:00",
+        "finalized_at": "2025-11-26T11:29:46.431411+00:00",
+        "name": "John",
+        "email": "johndoe@example.com",
+        "country": "Poland",
+        "city": "Krak\u00f3w",
+        "address_line_1": "Wawel Cathedral, Wawel",
+        "total_price": 1004.1,
+        "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
+        "last_name": "Doe",
+        "phone": "+48123456789",
+        "postal_code": "31-001",
+        "address_line_2": null,
+        "delivery": {
+            "name": "COURIER1 STANDARD DELIVERY",
+            "price": 15.0,
+            "contractor_id": "3f912b96-dc32-4ee3-8e72-8ce0d49c398a",
+            "option_id": "13f92f95-5fe7-46b5-8893-5ea1a5eeae5a"
+        },
+        "items": [
+            {
+                "count": 1,
+                "price_after_discounts": 989.1,
+                "name": "Apple iPad Pro 12.9-inch M2 Wi-Fi 256GB Tablet Computing Electronics",
+                "category": "Electronics",
+                "price": 1099.0,
+                "description": "Apple iPad Pro latest tablet with M2 chip and 12.9-inch Liquid Retina XDR display. Space Gray color with 256GB storage and Wi-Fi connectivity. Professional computing device perfect for digital art, productivity, and creative work. Includes USB-C cable and adapter. Premium electronics for designers and professionals.",
+                "created_at": "2024-12-19T17:00:00+00:00",
+                "stock": 9,
+                "subcategories": [
+                    "Tablets",
+                    "Apple Devices",
+                    "Professional",
+                    "Computing"
+                ],
+                "item_id": "550e8400-e29b-41d4-a716-446655440016",
+                "brand": "APPLE",
+                "features": {
+                    "chip": "M2",
+                    "color": "Space Gray",
+                    "cameras": "12MP Wide, 10MP Ultra Wide",
+                    "display": "12.9-inch Liquid Retina XDR",
+                    "storage": "256GB",
+                    "condition": "New",
+                    "thunderbolt": true,
+                    "connectivity": "Wi-Fi",
+                    "apple_pencil_support": "2nd Generation"
+                },
+                "updated_at": "2024-12-19T17:00:00+00:00"
+            }
+        ],
+        "action_history": [
+            {
+                "action_id": "a4d180e7-28e7-41cb-a4e6-e4a9f31598cd",
+                "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
+                "action": "REQUEST RECEIVED",
+                "performed_by": "3f912b96-dc32-4ee3-8e72-8ce0d49c398c",
+                "performed_at": "2025-11-22T16:19:26.231411+00:00"
+            },
+            {
+                "action_id": "a4d180e7-28e7-41cb-a4e6-e4a9f31598cd",
+                "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
+                "action": "ITEM(S) PACKED",
+                "performed_by": "1f912b96-dc32-4ee3-8e72-8ce0d49c398b",
+                "performed_at": "2025-11-23T17:29:26.231411+00:00"
+            },
+            {
+                "action_id": "a4d180e7-28e7-41cb-a4e6-e4a9f31598cd",
+                "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
+                "action": "PACKAGE DISPATCHED",
+                "performed_by": "3f912b96-dc32-4ee3-8e72-8ce0d49c398a",
+                "performed_at": "2025-11-23T19:21:36.451411+00:00"
+            },
+            {
+                "action_id": "a4d180e7-28e7-41cb-a4e6-e4a9f31598cd",
+                "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
+                "action": "PACKAGE DELIVERED",
+                "performed_by": "3f912b96-dc32-4ee3-8e72-8ce0d49c398a",
+                "performed_at": "2025-11-25T11:32:31.429111+00:00"
+            },
+            {
+                "action_id": "a4d180e7-28e7-41cb-a4e6-e4a9f31598cd",
+                "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
+                "action": "REQUEST FINALIZED",
+                "performed_by": "3f912b96-dc32-4ee3-8e72-8ce0d49c398c",
+                "performed_at": "2025-11-26T11:29:46.431411+00:00"
+            }
+        ]
+    }
+]
+') AS o(
+    user_id UUID,
+    created_at TIMESTAMPTZ,
+    finalized_at TIMESTAMPTZ,
+    name VARCHAR(128),
+    email VARCHAR(256),
+    country VARCHAR(64),
+    city VARCHAR(64),
+    address_line_1 VARCHAR(256),
+    total_price NUMERIC,
+    transaction_id UUID,
+    last_name VARCHAR(128),
+    phone VARCHAR(32),
+    postal_code VARCHAR(16),
+    address_line_2 VARCHAR(256),
+    delivery JSONB,
+    items JSONB,
+    action_history JSONB
+);
+
+
+
 INSERT INTO items(
 	item_id,
     name,
@@ -690,312 +1002,5 @@ FROM JSONB_TO_RECORDSET('
     stock INT
 );
 
-INSERT INTO users(
-    user_id,
-    email,
-    phone,
-    password_hash,
-    created_at,
-    updated_at
-)
-SELECT
-    user_id,
-    email,
-    phone,
-    password_hash,
-    created_at,
-    updated_at
-FROM JSONB_TO_RECORDSET('
-[
-    {
-        "user_id": "8f581062-3ca0-4b57-a037-7c88291882ba",
-        "email": "user@example.com",
-        "phone": "+48123456789",
-        "password_hash": "$2b$12$ekgRkqQes6xlQpCEt4K4X.ogzRInRY3e0lBMMBsLY1bN1U5mGNHdG",
-        "created_at": "2024-01-01T00:00:00Z",
-        "updated_at": "2024-01-01T00:00:00Z"
-    }
-]
-') AS u(
-    user_id UUID,
-    email VARCHAR(256),
-    phone VARCHAR(32),
-    password_hash VARCHAR(256),
-    created_at TIMESTAMPTZ,
-    updated_at TIMESTAMPTZ
-);
 
-
-INSERT INTO items_snapshots(
-    item_id,
-    name,
-    category,
-    subcategories,
-    price,
-    brand,
-    description,
-    features,
-    created_at,
-    updated_at
-)
-SELECT
-    item_id,
-    name,
-    category,
-    subcategories,
-    price,
-    brand,
-    description,
-    features,
-    created_at,
-    updated_at
-FROM JSONB_TO_RECORDSET('
-[
-    {
-        "price": 1199.99,
-        "name": "Apple iPhone 14 Pro Max 256GB Smartphone Mobile Phone Electronics",
-        "category": "Electronics",
-        "description": "Latest Apple iPhone 14 Pro Max smartphone with ProRAW photography, A16 Bionic chip, and Dynamic Island. Unlocked mobile phone device brand new in original packaging. Premium electronics smartphone with advanced camera system, 5G connectivity, iOS operating system, and professional photography capabilities.",
-        "created_at": "2024-12-19T10:00:00+00:00",
-        "item_id": "550e8400-e29b-41d4-a716-446655440001",
-        "subcategories": [
-            "Smartphones",
-            "Mobile Phones",
-            "Apple Devices",
-            "Communication"
-        ],
-        "brand": "APPLE",
-        "features": {
-            "color": "Deep Purple",
-            "camera": "48MP Main + 12MP Ultra Wide + 12MP Telephoto",
-            "storage": "256GB",
-            "unlocked": true,
-            "warranty": "1 Year Apple Warranty",
-            "condition": "New",
-            "battery_life": "Up to 29 hours video playback"
-        },
-        "updated_at": "2024-12-19T10:00:00+00:00"
-    },
-    {
-        "price": 2499.0,
-        "name": "Apple MacBook Pro 14-inch M2 Pro Laptop Computer Professional Electronics",
-        "category": "Electronics",
-        "description": "Professional Apple MacBook Pro laptop computer with M2 Pro chip, 16GB RAM memory, 1TB SSD storage. Perfect for developers, creative professionals, video editing, programming, and design work. High-performance computing device with Retina display, macOS operating system, and premium build quality.",
-        "created_at": "2024-12-19T10:30:00+00:00",
-        "item_id": "550e8400-e29b-41d4-a716-446655440003",
-        "subcategories": [
-            "Laptops",
-            "Computers",
-            "Apple Devices",
-            "Professional"
-        ],
-        "brand": "APPLE",
-        "features": {
-            "ram": "16GB",
-            "color": "Space Gray",
-            "ports": [
-                "3x Thunderbolt 4",
-                "HDMI",
-                "SDXC",
-                "MagSafe 3"
-            ],
-            "storage": "1TB SSD",
-            "processor": "M2 Pro",
-            "screen_size": "14-inch",
-            "battery_life": "Up to 18 hours"
-        },
-        "updated_at": "2024-12-19T10:30:00+00:00"
-    },
-    {
-        "price": 1099.0,
-        "name": "Apple iPad Pro 12.9-inch M2 Wi-Fi 256GB Tablet Computing Electronics",
-        "category": "Electronics",
-        "description": "Apple iPad Pro latest tablet with M2 chip and 12.9-inch Liquid Retina XDR display. Space Gray color with 256GB storage and Wi-Fi connectivity. Professional computing device perfect for digital art, productivity, and creative work. Includes USB-C cable and adapter. Premium electronics for designers and professionals.",
-        "created_at": "2024-12-19T17:00:00+00:00",
-        "item_id": "550e8400-e29b-41d4-a716-446655440016",
-        "subcategories": [
-            "Tablets",
-            "Apple Devices",
-            "Professional",
-            "Computing"
-        ],
-        "brand": "APPLE",
-        "features": {
-            "chip": "M2",
-            "color": "Space Gray",
-            "cameras": "12MP Wide, 10MP Ultra Wide",
-            "display": "12.9-inch Liquid Retina XDR",
-            "storage": "256GB",
-            "condition": "New",
-            "thunderbolt": true,
-            "connectivity": "Wi-Fi",
-            "apple_pencil_support": "2nd Generation"
-        },
-        "updated_at": "2024-12-19T17:00:00+00:00"
-    }
-]
-') AS i(
-    item_id UUID,
-    name VARCHAR(256),
-    category VARCHAR(32),
-    subcategories VARCHAR(32)[],
-    price NUMERIC,
-    brand VARCHAR(128),
-    description TEXT,
-    features JSONB,
-    created_at TIMESTAMPTZ,
-    updated_at TIMESTAMPTZ
-);
-
-
-INSERT INTO transactions_finalized(
-    user_id,
-    created_at,
-    finalized_at,
-    name,
-    email,
-    country,
-    city,
-    address_line_1,
-    total_price,
-    transaction_id,
-    last_name,
-    phone,
-    postal_code,
-    address_line_2,
-    delivery,
-    items,
-    action_history
-)
-SELECT
-    user_id,
-    created_at,
-    finalized_at,
-    name,
-    email,
-    country,
-    city,
-    address_line_1,
-    total_price,
-    transaction_id,
-    last_name,
-    phone,
-    postal_code,
-    address_line_2,
-    delivery,
-    items,
-    action_history
-FROM JSONB_TO_RECORDSET('
-[
-    {
-        "user_id": "8f581062-3ca0-4b57-a037-7c88291882ba",
-        "created_at": "2025-11-15T14:38:54.413793+00:00",
-        "finalized_at": "2025-11-26T11:29:46.431411+00:00",
-        "name": "John",
-        "email": "johndoe@example.com",
-        "country": "Poland",
-        "city": "Krak\u00f3w",
-        "address_line_1": "Wawel Cathedral, Wawel",
-        "total_price": 1004.1,
-        "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
-        "last_name": "Doe",
-        "phone": "+48123456789",
-        "postal_code": "31-001",
-        "address_line_2": null,
-        "delivery": {
-            "name": "COURIER1 STANDARD DELIVERY",
-            "price": 15.0,
-            "contractor_id": "3f912b96-dc32-4ee3-8e72-8ce0d49c398a",
-            "option_id": "13f92f95-5fe7-46b5-8893-5ea1a5eeae5a"
-        },
-        "items": [
-            {
-                "count": 1,
-                "price_after_discounts": 989.1,
-                "name": "Apple iPad Pro 12.9-inch M2 Wi-Fi 256GB Tablet Computing Electronics",
-                "category": "Electronics",
-                "price": 1099.0,
-                "description": "Apple iPad Pro latest tablet with M2 chip and 12.9-inch Liquid Retina XDR display. Space Gray color with 256GB storage and Wi-Fi connectivity. Professional computing device perfect for digital art, productivity, and creative work. Includes USB-C cable and adapter. Premium electronics for designers and professionals.",
-                "created_at": "2024-12-19T17:00:00+00:00",
-                "stock": 9,
-                "subcategories": [
-                    "Tablets",
-                    "Apple Devices",
-                    "Professional",
-                    "Computing"
-                ],
-                "item_id": "550e8400-e29b-41d4-a716-446655440016",
-                "brand": "APPLE",
-                "features": {
-                    "chip": "M2",
-                    "color": "Space Gray",
-                    "cameras": "12MP Wide, 10MP Ultra Wide",
-                    "display": "12.9-inch Liquid Retina XDR",
-                    "storage": "256GB",
-                    "condition": "New",
-                    "thunderbolt": true,
-                    "connectivity": "Wi-Fi",
-                    "apple_pencil_support": "2nd Generation"
-                },
-                "updated_at": "2024-12-19T17:00:00+00:00"
-            }
-        ],
-        "action_history": [
-            {
-                "action_id": "a4d180e7-28e7-41cb-a4e6-e4a9f31598cd",
-                "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
-                "action": "REQUEST RECEIVED",
-                "performed_by": "3f912b96-dc32-4ee3-8e72-8ce0d49c398c",
-                "performed_at": "2025-11-22T16:19:26.231411+00:00"
-            },
-            {
-                "action_id": "a4d180e7-28e7-41cb-a4e6-e4a9f31598cd",
-                "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
-                "action": "ITEM(S) PACKED",
-                "performed_by": "1f912b96-dc32-4ee3-8e72-8ce0d49c398b",
-                "performed_at": "2025-11-23T17:29:26.231411+00:00"
-            },
-            {
-                "action_id": "a4d180e7-28e7-41cb-a4e6-e4a9f31598cd",
-                "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
-                "action": "PACKAGE DISPATCHED",
-                "performed_by": "3f912b96-dc32-4ee3-8e72-8ce0d49c398a",
-                "performed_at": "2025-11-23T19:21:36.451411+00:00"
-            },
-            {
-                "action_id": "a4d180e7-28e7-41cb-a4e6-e4a9f31598cd",
-                "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
-                "action": "PACKAGE DELIVERED",
-                "performed_by": "3f912b96-dc32-4ee3-8e72-8ce0d49c398a",
-                "performed_at": "2025-11-25T11:32:31.429111+00:00"
-            },
-            {
-                "action_id": "a4d180e7-28e7-41cb-a4e6-e4a9f31598cd",
-                "transaction_id": "b4d180e7-28e7-41cb-a4e6-e4a9f31598cc",
-                "action": "REQUEST FINALIZED",
-                "performed_by": "3f912b96-dc32-4ee3-8e72-8ce0d49c398c",
-                "performed_at": "2025-11-26T11:29:46.431411+00:00"
-            }
-        ]
-    }
-]
-') AS o(
-    user_id UUID,
-    created_at TIMESTAMPTZ,
-    finalized_at TIMESTAMPTZ,
-    name VARCHAR(128),
-    email VARCHAR(256),
-    country VARCHAR(64),
-    city VARCHAR(64),
-    address_line_1 VARCHAR(256),
-    total_price NUMERIC,
-    transaction_id UUID,
-    last_name VARCHAR(128),
-    phone VARCHAR(32),
-    postal_code VARCHAR(16),
-    address_line_2 VARCHAR(256),
-    delivery JSONB,
-    items JSONB,
-    action_history JSONB
-);
 COMMIT;
